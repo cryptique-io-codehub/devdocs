@@ -1,16 +1,129 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Documentation",
-  "colors": {
-    "primary": "#0D9373"
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Cryptique",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
   },
-  "navigation": {
-    "groups": [
-      {
-        "group": "Getting Started",
-        "pages": []
-      }
-    ]
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#4B57AA",
+    "light": "#4B57AA",
+    "dark": "#8E8E8E",
+    "anchors": {
+      "from": "#4B57AA",
+      "to": "#8E8E8E"
+    }
+  },
+  "font": {
+    "headings": {
+      "family": "Raleway",
+      "weight": 700
+    },
+    "body": {
+      "family": "Raleway",
+      "weight": 400
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Support",
+      "url": "https://tawk.to/chat/697c9c380c73c21c37c52292/1jg7c4fos"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Dashboard",
+    "url": "https://app.cryptique.io"
+  },
+  "tabs": [
+    {
+      "name": "Guide",
+      "url": "guide"
+    },
+    {
+      "name": "Integrations",
+      "url": "integrations"
+    },
+    {
+      "name": "Changelog",
+      "url": "changelog"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/aspect-dev/cryptique-sdk"
+    },
+    {
+      "name": "Community",
+      "icon": "discord",
+      "url": "https://discord.gg/cryptique"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "guide/introduction",
+        "guide/quickstart",
+        "guide/installation"
+      ]
+    },
+    {
+      "group": "Configuration",
+      "pages": [
+        "guide/initialization",
+        "guide/auto-events"
+      ]
+    },
+    {
+      "group": "SDK Reference",
+      "pages": [
+        "guide/sdk-reference/track",
+        "guide/sdk-reference/identify",
+        "guide/sdk-reference/people",
+        "guide/sdk-reference/wallet",
+        "guide/sdk-reference/utilities"
+      ]
+    },
+    {
+      "group": "Technical",
+      "pages": [
+        "guide/data-limits",
+        "guide/privacy"
+      ]
+    },
+    {
+      "group": "Chain Support",
+      "pages": [
+        "integrations/overview",
+        "integrations/wallet-enrichment",
+        "integrations/smart-contracts"
+      ]
+    },
+    {
+      "group": "Changelog",
+      "pages": [
+        "changelog/overview"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "twitter": "https://twitter.com/cryptaboratoire",
+    "linkedin": "https://linkedin.com/company/cryptique"
+  },
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true
+  },
+  "analytics": {
+    "posthog": {
+      "apiKey": ""
+    }
+  },
+  "modeToggle": {
+    "default": "dark",
+    "isHidden": false
   }
 }

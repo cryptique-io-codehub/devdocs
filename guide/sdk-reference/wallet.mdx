@@ -1,0 +1,328 @@
+---
+title: Wallet Methods
+description: "Track wallet connections and addresses"
+---
+
+## Overview
+
+Cryptique provides specialized methods for tracking wallet connections in Web3 applications. The SDK automatically detects wallet connections via EIP-6963 and `window.ethereum`, but you can also manually trigger wallet tracking.
+
+<Info>
+  When a wallet connects, Cryptique automatically links the wallet address to the current session and user profile. This enables unified analytics across off-chain behavior and on-chain transactions.
+</Info>
+
+---
+
+## Automatic Wallet Detection
+
+Cryptique automatically detects:
+
+- **Wallet Connection**: When `window.ethereum` or EIP-6963 providers connect
+- **Account Changes**: When user switches accounts (`accountsChanged` event)
+- **Chain Changes**: When user switches networks (`chainChanged` event)
+- **Wallet Type**: MetaMask, Coinbase Wallet, WalletConnect, etc.
+
+This data is captured in session data without any code required.
+
+---
+
+## Cryptique.connectWallet()
+
+Trigger the wallet connection flow programmatically.
+
+```javascript
+Cryptique.connectWallet()
+```
+
+### Returns
+
+`void` - The wallet address is captured automatically when the user connects.
+
+### Example
+
+```javascript
+// Button click handler
+function handleConnectClick() {
+  Cryptique.connectWallet();
+}
+```
+
+```jsx
+// React component
+<button onClick={() => Cryptique.connectWallet()}>
+  Connect Wallet
+</button>
+```
+
+---
+
+## Cryptique.walletAddress()
+
+Manually associate a wallet address with the current user. Use this when you already have the wallet address from your own connection flow.
+
+```javascript
+Cryptique.walletAddress(address)
+```
+
+<ParamField path="address" type="string" required>
+  The wallet address to associate with the current user (e.g., `0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21`).
+</ParamField>
+
+### Returns
+
+`void`
+
+### How It Works
+
+When you call `walletAddress()`:
+
+1. The address is linked to the current session
+2. If this address exists for another user profile, the profiles are merged via CQ Intelligence
+3. The wallet becomes available for enrichment (if enabled)
+
+### Examples
+
+```javascript
+// After your own wallet connection logic
+const address = await connectWallet();
+Cryptique.walletAddress(address);
+
+// With ethers.js
+const provider = new ethers.BrowserProvider(window.ethereum);
+const signer = await provider.getSigner();
+const address = await signer.getAddress();
+Cryptique.walletAddress(address);
+
+// With wagmi
+const { address } = useAccount();
+useEffect(() => {
+  if (address) {
+    Cryptique.walletAddress(address);
+  }
+}, [address]);
+
+// With RainbowKit
+const { address, isConnected } = useAccount();
+useEffect(() => {
+  if (isConnected && address) {
+    Cryptique.walletAddress(address);
+  }
+}, [isConnected, address]);
+```
+
+---
+
+## Multiple Wallets
+
+Users can connect multiple wallets. Each call to `walletAddress()` adds to the user's wallet collection:
+
+```javascript
+// User connects first wallet
+Cryptique.walletAddress('0x111...');
+
+// User connects second wallet  
+Cryptique.walletAddress('0x222...');
+
+// Both wallets are now linked to this user profile
+```
+
+<Tip>
+  The user profile accumulates all connected wallets. You can see all associated wallets in the Cryptique dashboard under the user's profile.
+</Tip>
+
+---
+
+## Wallet Disconnect Behavior
+
+There is no explicit `Cryptique.disconnectWallet()` method. Disconnection is handled automatically:
+
+1. SDK listens to `accountsChanged` events
+2. When accounts become empty (disconnected), session data updates
+3. `wallet_connected` session field becomes `false`
+4. Last wallet data is retained for the session
+
+---
+
+## Combining with identify()
+
+You can use wallet address as the user's identity:
+
+```javascript
+// Option 1: Wallet as primary identity
+function handleWalletConnect(address) {
+  Cryptique.identify(address);
+  Cryptique.walletAddress(address);
+}
+
+// Option 2: Separate user ID + wallet
+function handleWalletConnect(userId, walletAddress) {
+  Cryptique.identify(userId);
+  Cryptique.walletAddress(walletAddress);
+}
+```
+
+---
+
+## Session Data Fields
+
+When a wallet is connected, these fields are captured in session data:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `wallet_connected` | boolean | Whether a wallet is currently connected |
+| `wallet_address` | string | The connected wallet address |
+| `wallet_type` | string | Detected wallet provider (MetaMask, etc.) |
+| `chain_id` | number | Connected chain ID |
+
+---
+
+## Integration Examples
+
+<Tabs>
+  <Tab title="wagmi + React">
+    ```jsx
+    import { useAccount } from 'wagmi';
+    import { useEffect } from 'react';
+    import Cryptique from 'cryptique-sdk';
+
+    function WalletTracker() {
+      const { address, isConnected, connector } = useAccount();
+      
+      useEffect(() => {
+        if (isConnected && address) {
+          Cryptique.walletAddress(address);
+          Cryptique.track('Wallet Connected', {
+            address: address,
+            walletType: connector?.name
+          });
+        }
+      }, [isConnected, address, connector]);
+      
+      return null;
+    }
+
+    // Use in your app
+    function App() {
+      return (
+        <>
+          <WalletTracker />
+          {/* rest of app */}
+        </>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="ethers.js">
+    ```javascript
+    import { ethers } from 'ethers';
+    import Cryptique from 'cryptique-sdk';
+
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert('Please install a wallet');
+        return;
+      }
+      
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+      const network = await provider.getNetwork();
+      
+      // Track with Cryptique
+      Cryptique.walletAddress(address);
+      Cryptique.track('Wallet Connected', {
+        address: address,
+        chainId: Number(network.chainId)
+      });
+      
+      return { address, provider, signer };
+    }
+
+    // Listen for account changes
+    window.ethereum?.on('accountsChanged', (accounts) => {
+      if (accounts.length > 0) {
+        Cryptique.walletAddress(accounts[0]);
+      }
+    });
+    ```
+  </Tab>
+
+  <Tab title="Web3Modal">
+    ```javascript
+    import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5';
+    import Cryptique from 'cryptique-sdk';
+
+    const modal = createWeb3Modal({
+      ethersConfig: defaultConfig({ metadata }),
+      chains: [mainnet],
+      projectId: 'YOUR_PROJECT_ID'
+    });
+
+    // Subscribe to connection events
+    modal.subscribeProvider(({ address, isConnected }) => {
+      if (isConnected && address) {
+        Cryptique.walletAddress(address);
+        Cryptique.track('Wallet Connected', { address });
+      }
+    });
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Best Practices
+
+### Track Connection Events
+
+```javascript
+// Track the connection as an event too
+function handleWalletConnect(address, chainId) {
+  Cryptique.walletAddress(address);
+  
+  Cryptique.track('Wallet Connected', {
+    address: address,
+    chainId: chainId,
+    connectionMethod: 'metamask'
+  });
+}
+```
+
+### Handle Multiple Chains
+
+```javascript
+// Track chain switches
+window.ethereum?.on('chainChanged', (chainId) => {
+  Cryptique.track('Chain Switched', {
+    newChainId: parseInt(chainId, 16),
+    chainName: getChainName(chainId)
+  });
+});
+```
+
+### Store Primary Wallet
+
+```javascript
+// If user has multiple wallets, track the primary one
+function setPrimaryWallet(address) {
+  Cryptique.people.set({
+    primaryWallet: address
+  });
+}
+```
+
+---
+
+## Related Methods
+
+<CardGroup cols={2}>
+  <Card title="Identify Users" icon="user" href="/guide/sdk-reference/identify">
+    Link wallets to user identities
+  </Card>
+  <Card title="Wallet Enrichment" icon="database" href="/integrations/wallet-enrichment">
+    Get on-chain wallet data
+  </Card>
+</CardGroup>

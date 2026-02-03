@@ -1,0 +1,382 @@
+---
+title: Track Events
+description: "Send custom events to capture specific user actions"
+---
+
+## Cryptique.track()
+
+Track custom events to capture specific user actions in your dApp. This is how you instrument Web3-specific interactions like swaps, stakes, mints, and more.
+
+```javascript
+Cryptique.track(eventName, properties?, options?)
+```
+
+### Parameters
+
+<ParamField path="eventName" type="string" required>
+  The name of the event. Use descriptive, action-oriented names.
+  
+  - Maximum length: **255 characters**
+  - Case-sensitive
+  - Use consistent naming conventions (e.g., `Title Case` or `snake_case`)
+</ParamField>
+
+<ParamField path="properties" type="object">
+  Optional object containing event properties. Add context to your events with relevant data.
+  
+  See [Data Limits](/guide/data-limits) for property constraints.
+</ParamField>
+
+<ParamField path="options" type="object">
+  Optional configuration for this specific event.
+</ParamField>
+
+### Returns
+
+`void` - Events are sent asynchronously.
+
+---
+
+## Basic Examples
+
+### Simple Event
+
+```javascript
+Cryptique.track('Button Clicked');
+```
+
+### Event with Properties
+
+```javascript
+Cryptique.track('Swap Completed', {
+  fromToken: 'ETH',
+  toToken: 'USDC',
+  amount: 1.5,
+  slippage: 0.5,
+  dex: 'Uniswap'
+});
+```
+
+---
+
+## Web3 Event Examples
+
+<Tabs>
+  <Tab title="DeFi">
+    ```javascript
+    // Swap
+    Cryptique.track('Swap Completed', {
+      fromToken: 'ETH',
+      toToken: 'USDC',
+      fromAmount: 1.5,
+      toAmount: 2847.50,
+      slippage: 0.5,
+      priceImpact: 0.02,
+      dex: 'Uniswap V3'
+    });
+
+    // Stake
+    Cryptique.track('Stake Initiated', {
+      token: 'ETH',
+      amount: 32,
+      protocol: 'Lido',
+      expectedAPY: 4.2
+    });
+
+    // Liquidity
+    Cryptique.track('Liquidity Added', {
+      pool: 'ETH-USDC',
+      token0Amount: 1,
+      token1Amount: 1850,
+      lpTokensReceived: 42.5,
+      protocol: 'Uniswap V3'
+    });
+
+    // Borrow
+    Cryptique.track('Borrow Completed', {
+      collateral: 'ETH',
+      collateralAmount: 5,
+      borrowed: 'USDC',
+      borrowedAmount: 5000,
+      healthFactor: 1.8,
+      protocol: 'Aave'
+    });
+    ```
+  </Tab>
+
+  <Tab title="NFT">
+    ```javascript
+    // Mint
+    Cryptique.track('NFT Minted', {
+      collection: 'CoolCats',
+      tokenId: 1234,
+      price: 0.05,
+      currency: 'ETH',
+      mintPhase: 'public'
+    });
+
+    // Purchase
+    Cryptique.track('NFT Purchased', {
+      collection: 'BoredApes',
+      tokenId: 5678,
+      price: 45.5,
+      currency: 'ETH',
+      marketplace: 'OpenSea',
+      seller: '0x1234...5678'
+    });
+
+    // List
+    Cryptique.track('NFT Listed', {
+      collection: 'Azuki',
+      tokenId: 9012,
+      listPrice: 12.5,
+      currency: 'ETH',
+      marketplace: 'Blur',
+      duration: '7 days'
+    });
+    ```
+  </Tab>
+
+  <Tab title="Gaming">
+    ```javascript
+    // Game Start
+    Cryptique.track('Game Started', {
+      gameMode: 'battle',
+      characterId: 'warrior_001',
+      level: 15,
+      entryFee: 0.01,
+      currency: 'ETH'
+    });
+
+    // Item Purchase
+    Cryptique.track('Item Purchased', {
+      itemId: 'sword_legendary',
+      itemType: 'weapon',
+      price: 500,
+      currency: 'GOLD',
+      rarity: 'legendary'
+    });
+
+    // Achievement
+    Cryptique.track('Achievement Unlocked', {
+      achievementId: 'first_win',
+      achievementName: 'Victory Royale',
+      rewardType: 'token',
+      rewardAmount: 100
+    });
+    ```
+  </Tab>
+
+  <Tab title="General">
+    ```javascript
+    // Wallet Connect
+    Cryptique.track('Wallet Connect Clicked', {
+      walletType: 'MetaMask',
+      page: '/swap'
+    });
+
+    // Feature Usage
+    Cryptique.track('Feature Used', {
+      featureName: 'Advanced Charts',
+      featureCategory: 'trading',
+      userTier: 'pro'
+    });
+
+    // Error
+    Cryptique.track('Transaction Error', {
+      errorType: 'insufficient_gas',
+      errorMessage: 'Not enough ETH for gas',
+      attemptedAction: 'swap',
+      walletBalance: 0.001
+    });
+
+    // Conversion
+    Cryptique.track('Signup Completed', {
+      source: 'twitter',
+      campaign: 'launch_2025',
+      referrer: '0xabc...def'
+    });
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Event Naming Best Practices
+
+### Do ✅
+
+```javascript
+// Action-oriented, descriptive names
+Cryptique.track('Swap Completed');
+Cryptique.track('NFT Minted');
+Cryptique.track('Stake Initiated');
+Cryptique.track('Wallet Connected');
+
+// Consistent casing
+Cryptique.track('Profile Updated');  // Title Case
+Cryptique.track('profile_updated');  // or snake_case
+```
+
+### Don't ❌
+
+```javascript
+// Vague names
+Cryptique.track('click');
+Cryptique.track('event');
+Cryptique.track('action');
+
+// Inconsistent casing
+Cryptique.track('swapCompleted');  // camelCase
+Cryptique.track('SWAP_COMPLETED'); // SCREAMING_CASE
+Cryptique.track('swap completed'); // lowercase with spaces
+```
+
+---
+
+## Property Best Practices
+
+### Use Meaningful Properties
+
+```javascript
+// Good - provides actionable context
+Cryptique.track('Swap Completed', {
+  fromToken: 'ETH',
+  toToken: 'USDC',
+  amount: 1.5,
+  valueUSD: 2847.50,
+  slippage: 0.5,
+  success: true
+});
+
+// Bad - too vague
+Cryptique.track('Swap Completed', {
+  data: 'some swap',
+  value: 1.5
+});
+```
+
+### Avoid Reserved Properties
+
+These property names are reserved and will be stripped from event data:
+
+```javascript
+// Don't use these - they're auto-captured
+{
+  page,
+  full_url,
+  current_url,
+  uri,
+  referrer,
+  user_agent,
+  language,
+  screen_width,
+  screen_height,
+  viewport_width,
+  viewport_height,
+  dpi,
+  timestamp,
+  page_title,
+  title,
+  url,
+  href
+}
+```
+
+---
+
+## Tracking Conversion Funnels
+
+Track each step of your conversion funnel to identify drop-offs:
+
+```javascript
+// Step 1: User views swap page
+Cryptique.track('Swap Page Viewed');
+
+// Step 2: User selects tokens
+Cryptique.track('Tokens Selected', {
+  fromToken: 'ETH',
+  toToken: 'USDC'
+});
+
+// Step 3: User enters amount
+Cryptique.track('Amount Entered', {
+  fromToken: 'ETH',
+  amount: 1.5
+});
+
+// Step 4: User clicks swap
+Cryptique.track('Swap Initiated', {
+  fromToken: 'ETH',
+  toToken: 'USDC',
+  amount: 1.5
+});
+
+// Step 5: User confirms in wallet
+Cryptique.track('Wallet Confirmation Requested');
+
+// Step 6: Transaction succeeds
+Cryptique.track('Swap Completed', {
+  fromToken: 'ETH',
+  toToken: 'USDC',
+  amount: 1.5,
+  txHash: '0x123...'
+});
+```
+
+---
+
+## Error Tracking
+
+Track errors to identify friction points:
+
+```javascript
+try {
+  await executeSwap();
+  Cryptique.track('Swap Completed', { success: true });
+} catch (error) {
+  Cryptique.track('Swap Failed', {
+    success: false,
+    errorCode: error.code,
+    errorMessage: error.message,
+    errorType: error.name
+  });
+}
+```
+
+---
+
+## TypeScript
+
+```typescript
+interface SwapEvent {
+  fromToken: string;
+  toToken: string;
+  amount: number;
+  slippage: number;
+  success: boolean;
+  txHash?: string;
+}
+
+Cryptique.track<SwapEvent>('Swap Completed', {
+  fromToken: 'ETH',
+  toToken: 'USDC',
+  amount: 1.5,
+  slippage: 0.5,
+  success: true,
+  txHash: '0x123...'
+});
+```
+
+---
+
+## Related Methods
+
+<CardGroup cols={2}>
+  <Card title="Identify Users" icon="user" href="/guide/sdk-reference/identify">
+    Link events to user identities
+  </Card>
+  <Card title="User Properties" icon="user-gear" href="/guide/sdk-reference/people">
+    Set persistent user attributes
+  </Card>
+</CardGroup>

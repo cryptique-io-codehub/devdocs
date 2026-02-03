@@ -1,0 +1,115 @@
+---
+title: Chain Support Overview
+description: "Supported blockchains across Cryptique features"
+---
+
+## Overview
+
+Cryptique supports multiple blockchains across different features. The level of support varies by feature:
+
+| Feature | Chains Supported |
+|---------|------------------|
+| **Wallet Enrichment** | 9 chains |
+| **Smart Contract Indexing** | 35 chains |
+
+---
+
+## Quick Reference
+
+<Tabs>
+  <Tab title="Wallet Enrichment">
+    Used for: Net worth, dApp interactions, token balances
+    
+    **Supported Chains:**
+    - Ethereum
+    - Polygon
+    - BNB Smart Chain
+    - Base
+    - Optimism
+    - Arbitrum
+    - Avalanche
+    - Monad
+    - Soneium (net worth only)
+    
+    [Full details →](/integrations/wallet-enrichment)
+  </Tab>
+  
+  <Tab title="Smart Contracts">
+    Used for: Transaction indexing, event monitoring
+    
+    **35 Chains Supported**
+    
+    Including: Ethereum, Base, Polygon, Arbitrum, Optimism, BNB Chain, Avalanche, Solana-compatible L2s, and many more.
+    
+    [Full details →](/integrations/smart-contracts)
+  </Tab>
+</Tabs>
+
+---
+
+## Feature Comparison by Chain
+
+| Chain | Smart Contract Indexing | Wallet Enrichment | Net Worth |
+|-------|:-----------------------:|:-----------------:|:---------:|
+| Ethereum | ✅ | ✅ | ✅ |
+| Polygon | ✅ | ✅ | ✅ |
+| BNB Smart Chain | ✅ | ✅ | ✅ |
+| Base | ✅ | ✅ | ✅ |
+| Optimism | ✅ | ✅ | ✅ |
+| Arbitrum One | ✅ | ✅ | ✅ |
+| Avalanche | ✅ | ✅ | ✅ |
+| Monad | ✅ | ✅ | ✅ |
+| Soneium | ✅ | ❌ | ✅ |
+| zkSync | ✅ | ❌ | ❌ |
+| Linea | ✅ | ❌ | ❌ |
+| Scroll | ✅ | ❌ | ❌ |
+| Blast | ✅ | ❌ | ❌ |
+| *+25 more* | ✅ | ❌ | ❌ |
+
+---
+
+## Adding Chain Support
+
+### Smart Contracts
+
+1. Go to **Settings → Contracts** in your dashboard
+2. Click **Add Contract**
+3. Select chain from dropdown (35 options)
+4. Enter contract address and details
+5. Click Save
+
+Cryptique automatically indexes all transactions from the deployment block.
+
+### Wallet Enrichment
+
+Wallet enrichment is automatically applied to connected wallets. Enable auto-enhancement in your dashboard settings, or manually trigger enrichment for specific wallets.
+
+<Info>
+  Wallet enrichment requires Wallet Credits. See [pricing](/guide/data-limits#wallet-credit-costs) for credit costs.
+</Info>
+
+---
+
+## Coming Soon
+
+We're actively working on adding support for:
+
+- **Solana**
+- **Sui**
+- **Aptos**
+- **Cosmos ecosystem**
+
+Want to request a chain? Email [hello@cryptique.io](mailto:hello@cryptique.io).
+
+---
+
+## Related Pages
+
+<CardGroup cols={2}>
+  <Card title="Wallet Enrichment" icon="wallet" href="/integrations/wallet-enrichment">
+    Detailed chain support for wallet data
+  </Card>
+  <Card title="Smart Contracts" icon="file-contract" href="/integrations/smart-contracts">
+    All 35 supported chains for indexing
+  </Card>
+</CardGroup>

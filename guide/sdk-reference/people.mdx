@@ -1,0 +1,405 @@
+---
+title: User Profiles (People)
+description: "Set and manage persistent user properties"
+---
+
+## Overview
+
+The `Cryptique.people` object provides methods to set and manage persistent user properties. Unlike event properties (which describe a single action), user properties describe the user themselves and persist across sessions.
+
+<Info>
+  User properties are ideal for storing user attributes like plan type, signup date, preferences, and cumulative metrics.
+</Info>
+
+---
+
+## Method Reference
+
+| Method | Description |
+|--------|-------------|
+| `people.set()` | Set user properties (overwrites existing) |
+| `people.set_once()` | Set properties only if not already set |
+| `people.increment()` | Increment numeric properties |
+| `people.append()` | Append to list properties |
+| `people.union()` | Add unique values to list properties |
+| `people.remove()` | Remove values from list properties |
+| `people.unset()` | Remove properties entirely |
+| `people.deleteUser()` | Delete the user profile |
+| `people.trackCharge()` | Track revenue/payment |
+| `people.clearCharges()` | Clear all charges |
+
+---
+
+## people.set()
+
+Set user properties. Overwrites any existing values.
+
+```javascript
+Cryptique.people.set(properties)
+```
+
+<ParamField path="properties" type="object" required>
+  Object containing property key-value pairs to set.
+</ParamField>
+
+### Examples
+
+```javascript
+// Set multiple properties
+Cryptique.people.set({
+  email: 'user@example.com',
+  plan: 'pro',
+  company: 'Acme Inc',
+  signupDate: '2025-01-15'
+});
+
+// Update a single property
+Cryptique.people.set({
+  plan: 'enterprise'
+});
+
+// Set Web3-specific properties
+Cryptique.people.set({
+  primaryWallet: '0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21',
+  preferredChain: 'ethereum',
+  totalSwaps: 47,
+  firstTransactionDate: '2024-03-20'
+});
+```
+
+---
+
+## people.set_once()
+
+Set properties only if they haven't been set before. Useful for immutable properties like signup date or referral source.
+
+```javascript
+Cryptique.people.set_once(properties)
+```
+
+<ParamField path="properties" type="object" required>
+  Object containing property key-value pairs to set once.
+</ParamField>
+
+### Examples
+
+```javascript
+// Only sets if not already present
+Cryptique.people.set_once({
+  signupDate: new Date().toISOString(),
+  referralSource: 'twitter',
+  initialPlan: 'free'
+});
+
+// These won't overwrite existing values
+Cryptique.people.set_once({
+  signupDate: '2025-02-01'  // Ignored if signupDate exists
+});
+```
+
+---
+
+## people.increment()
+
+Increment (or decrement) numeric properties.
+
+```javascript
+Cryptique.people.increment(properties)
+```
+
+<ParamField path="properties" type="object" required>
+  Object with property names as keys and increment amounts as values. Use negative numbers to decrement.
+</ParamField>
+
+### Examples
+
+```javascript
+// Increment by 1
+Cryptique.people.increment({
+  totalSwaps: 1,
+  loginCount: 1
+});
+
+// Increment by specific amounts
+Cryptique.people.increment({
+  totalVolumeUSD: 2500,
+  tokensTraded: 5
+});
+
+// Decrement (use negative numbers)
+Cryptique.people.increment({
+  creditsRemaining: -10
+});
+```
+
+---
+
+## people.append()
+
+Append values to list properties.
+
+```javascript
+Cryptique.people.append(properties)
+```
+
+<ParamField path="properties" type="object" required>
+  Object with property names as keys and values to append.
+</ParamField>
+
+### Examples
+
+```javascript
+// Append to a list
+Cryptique.people.append({
+  connectedWallets: '0x789...',
+  tradedTokens: 'USDC',
+  visitedPages: '/swap'
+});
+
+// Can create duplicates
+Cryptique.people.append({
+  tradedTokens: 'ETH'  // Added even if 'ETH' exists
+});
+```
+
+---
+
+## people.union()
+
+Add unique values to list properties (no duplicates).
+
+```javascript
+Cryptique.people.union(properties)
+```
+
+<ParamField path="properties" type="object" required>
+  Object with property names as keys and arrays of values to union.
+</ParamField>
+
+### Examples
+
+```javascript
+// Add unique values only
+Cryptique.people.union({
+  tradedTokens: ['ETH', 'USDC', 'DAI'],
+  usedFeatures: ['swap', 'stake', 'bridge']
+});
+
+// Won't add duplicates
+Cryptique.people.union({
+  tradedTokens: ['ETH']  // Ignored if 'ETH' already exists
+});
+```
+
+---
+
+## people.remove()
+
+Remove specific values from list properties.
+
+```javascript
+Cryptique.people.remove(properties)
+```
+
+<ParamField path="properties" type="object" required>
+  Object with property names as keys and values to remove.
+</ParamField>
+
+### Examples
+
+```javascript
+// Remove specific values from lists
+Cryptique.people.remove({
+  connectedWallets: '0x789...',
+  watchlist: 'DOGE'
+});
+```
+
+---
+
+## people.unset()
+
+Remove properties entirely from the user profile.
+
+```javascript
+Cryptique.people.unset(propertyNames)
+```
+
+<ParamField path="propertyNames" type="string | string[]" required>
+  Property name(s) to remove.
+</ParamField>
+
+### Examples
+
+```javascript
+// Remove a single property
+Cryptique.people.unset('temporaryFlag');
+
+// Remove multiple properties
+Cryptique.people.unset(['oldProperty', 'deprecatedField']);
+```
+
+---
+
+## people.deleteUser()
+
+Permanently delete the user profile and all associated data.
+
+```javascript
+Cryptique.people.deleteUser()
+```
+
+<Warning>
+  This action is irreversible. The user's profile and all properties will be permanently deleted.
+</Warning>
+
+### Example
+
+```javascript
+// Delete user profile (e.g., for GDPR requests)
+async function handleAccountDeletion() {
+  await deleteUserFromDatabase(userId);
+  Cryptique.people.deleteUser();
+  Cryptique.reset();
+}
+```
+
+---
+
+## people.trackCharge()
+
+Track a payment or revenue event associated with the user.
+
+```javascript
+Cryptique.people.trackCharge(amount, properties?)
+```
+
+<ParamField path="amount" type="number" required>
+  The charge amount (in your preferred currency).
+</ParamField>
+
+<ParamField path="properties" type="object">
+  Optional properties describing the charge.
+</ParamField>
+
+### Examples
+
+```javascript
+// Track a simple charge
+Cryptique.people.trackCharge(99.99);
+
+// Track with properties
+Cryptique.people.trackCharge(49.99, {
+  plan: 'pro',
+  billingCycle: 'monthly',
+  currency: 'USD'
+});
+
+// Track crypto payments
+Cryptique.people.trackCharge(0.5, {
+  currency: 'ETH',
+  valueUSD: 950,
+  txHash: '0x123...',
+  product: 'NFT Mint'
+});
+```
+
+---
+
+## people.clearCharges()
+
+Clear all tracked charges for the user.
+
+```javascript
+Cryptique.people.clearCharges()
+```
+
+### Example
+
+```javascript
+// Clear charges (e.g., after refund)
+Cryptique.people.clearCharges();
+```
+
+---
+
+## Reserved Property Names
+
+These property names are reserved and cannot be used:
+
+```javascript
+// ❌ Don't use these
+{
+  $name,
+  $email,
+  $charges,
+  $phoneno
+}
+```
+
+---
+
+## Property Limits
+
+| Constraint | Limit |
+|-----------|-------|
+| Max properties per user | 500 |
+| Max property key length | 255 characters |
+| Max string value length | 255 bytes (UTF-8) |
+| Max object value size | 256 KB |
+| Max object nesting depth | 3 levels |
+
+See [Data Limits](/guide/data-limits) for complete details.
+
+---
+
+## Complete Example
+
+```javascript
+// On signup
+Cryptique.identify(user.id);
+
+Cryptique.people.set({
+  email: user.email,
+  plan: 'free'
+});
+
+Cryptique.people.set_once({
+  signupDate: new Date().toISOString(),
+  referralSource: utmSource
+});
+
+// On first trade
+Cryptique.people.increment({ totalTrades: 1 });
+Cryptique.people.union({ tradedTokens: ['ETH', 'USDC'] });
+
+// On upgrade
+Cryptique.people.set({ plan: 'pro' });
+Cryptique.people.trackCharge(99, {
+  plan: 'pro',
+  billingCycle: 'annual'
+});
+
+// On connecting new wallet
+Cryptique.people.append({
+  connectedWallets: newWalletAddress
+});
+
+// On disconnecting wallet
+Cryptique.people.remove({
+  connectedWallets: removedWalletAddress
+});
+```
+
+---
+
+## Related Methods
+
+<CardGroup cols={2}>
+  <Card title="Identify Users" icon="user" href="/guide/sdk-reference/identify">
+    Link sessions to identities
+  </Card>
+  <Card title="Track Events" icon="bolt" href="/guide/sdk-reference/track">
+    Track user actions
+  </Card>
+</CardGroup>

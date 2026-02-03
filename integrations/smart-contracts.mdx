@@ -1,0 +1,279 @@
+---
+title: Smart Contract Indexing
+description: "35 supported chains for smart contract indexing"
+---
+
+## Overview
+
+Cryptique indexes smart contract transactions, events, and interactions across **35 blockchains**. Add your contract address, and we automatically index all historical and real-time transactions.
+
+---
+
+## Supported Chains
+
+### Ethereum & L2s
+
+| Chain | Chain ID | Type |
+|-------|----------|------|
+| Ethereum | 1 | Mainnet |
+| Optimism (OP) | 10 | L2 |
+| Arbitrum One | 42161 | L2 |
+| Arbitrum Nova | 42170 | L2 |
+| Base | 8453 | L2 |
+| zkSync | 324 | L2 |
+| Linea | 59144 | L2 |
+| Scroll | 534352 | L2 |
+| Blast | 81457 | L2 |
+| Taiko | 167000 | L2 |
+| Abstract | 2741 | L2 |
+| Unichain | 130 | L2 |
+
+### BNB Ecosystem
+
+| Chain | Chain ID | Type |
+|-------|----------|------|
+| BNB Smart Chain | 56 | Mainnet |
+| opBNB | 204 | L2 |
+
+### Polygon Ecosystem
+
+| Chain | Chain ID | Type |
+|-------|----------|------|
+| Polygon | 137 | Mainnet |
+
+### Alternative L1s
+
+| Chain | Chain ID | Type |
+|-------|----------|------|
+| Avalanche C-Chain | 43114 | L1 |
+| Gnosis | 100 | L1 |
+| Celo | 42220 | L1 |
+| Moonbeam | 1284 | L1 |
+| Moonriver | 1285 | L1 |
+| Sonic | 146 | L1 |
+| Sei | 1329 | L1 |
+| Berachain | 80094 | L1 |
+| Monad | 143 | L1 |
+| Mantle | 5000 | L1 |
+| Fraxtal | 252 | L1 |
+
+### Specialized Chains
+
+| Chain | Chain ID | Type |
+|-------|----------|------|
+| Soneium | 1946 | L2 (Sony) |
+| ApeChain | 33139 | L2 (NFT) |
+| World | 480 | L2 (World ID) |
+| Katana | 747474 | L2 |
+| HyperEVM | 999 | L2 |
+| Stable | 988 | L2 |
+| Swellchain | 1923 | L2 |
+
+### Other Networks
+
+| Chain | Chain ID | Type |
+|-------|----------|------|
+| XDC | 50 | L1 |
+| BitTorrent Chain | 199 | L1 |
+
+---
+
+## Complete Chain Reference
+
+| Chain | Chain ID |
+|-------|----------|
+| Ethereum | 1 |
+| Optimism | 10 |
+| XDC | 50 |
+| BNB Smart Chain | 56 |
+| Gnosis | 100 |
+| Unichain | 130 |
+| Polygon | 137 |
+| Monad | 143 |
+| Sonic | 146 |
+| BitTorrent Chain | 199 |
+| opBNB | 204 |
+| Fraxtal | 252 |
+| zkSync | 324 |
+| World | 480 |
+| HyperEVM | 999 |
+| Stable | 988 |
+| Moonbeam | 1284 |
+| Moonriver | 1285 |
+| Sei | 1329 |
+| Soneium | 1946 |
+| Swellchain | 1923 |
+| Abstract | 2741 |
+| Mantle | 5000 |
+| Base | 8453 |
+| ApeChain | 33139 |
+| Arbitrum One | 42161 |
+| Arbitrum Nova | 42170 |
+| Celo | 42220 |
+| Avalanche C-Chain | 43114 |
+| Linea | 59144 |
+| Blast | 81457 |
+| Berachain | 80094 |
+| Taiko | 167000 |
+| Scroll | 534352 |
+| Katana | 747474 |
+
+---
+
+## Adding a Smart Contract
+
+<Steps>
+  <Step title="Navigate to Settings">
+    Go to **Settings → Contracts** in your [dashboard](https://app.cryptique.io).
+  </Step>
+  
+  <Step title="Click Add Contract">
+    Click the **Add Contract** button.
+  </Step>
+  
+  <Step title="Enter Contract Details">
+    Fill in the required information:
+    
+    | Field | Description | Example |
+    |-------|-------------|---------|
+    | **Contract Address** | The deployed contract address | `0x1f98...` |
+    | **Contract Name** | Friendly name for identification | `My Token` |
+    | **Token Symbol** | Symbol (if applicable) | `MTK` |
+    | **Chain** | Select from dropdown | Ethereum |
+    | **Decimals** | Token decimal places | `18` |
+  </Step>
+  
+  <Step title="Save & Index">
+    Click **Save**. Cryptique automatically:
+    - Detects the contract type (ERC-20, ERC-721, ERC-1155, custom)
+    - Indexes all historical transactions from deployment
+    - Begins real-time monitoring (15-second sync)
+  </Step>
+</Steps>
+
+---
+
+## Contract Limits by Plan
+
+| Plan | Contract Limit |
+|------|----------------|
+| Free | 1 contract |
+| Starter | Unlimited |
+| Pro | Unlimited |
+| Enterprise | Unlimited |
+
+<Note>
+  The limiting factor for Starter and Pro plans is **API calls**, not contract count. Each transaction fetch counts as an API call.
+</Note>
+
+---
+
+## What Gets Indexed
+
+For each contract, Cryptique indexes:
+
+| Data | Description |
+|------|-------------|
+| **Transactions** | All transactions involving the contract |
+| **Events** | All emitted events (Transfer, Approval, custom) |
+| **Method Calls** | Which functions were called |
+| **Value Transfers** | ETH/native token transfers |
+| **Token Transfers** | ERC-20/721/1155 transfers |
+| **Gas Data** | Gas used, gas price |
+| **Block Data** | Block number, timestamp |
+| **Status** | Success/failure |
+
+---
+
+## Indexing Timeline
+
+| Stage | Timeline |
+|-------|----------|
+| **Contract Added** | Immediate |
+| **Historical Backfill** | Minutes to hours (depends on transaction volume) |
+| **Real-Time Sync** | 15 seconds |
+
+<Info>
+  High-volume contracts (millions of transactions) may take longer to fully backfill. Real-time sync starts immediately regardless.
+</Info>
+
+---
+
+## Supported Contract Types
+
+Cryptique auto-detects and optimizes indexing for:
+
+| Type | Description |
+|------|-------------|
+| **ERC-20** | Fungible tokens |
+| **ERC-721** | NFTs (non-fungible tokens) |
+| **ERC-1155** | Multi-token standard |
+| **Custom** | Any contract with events |
+
+For custom contracts, all emitted events are indexed regardless of type.
+
+---
+
+## Use Cases
+
+### Track Token Transfers
+
+Monitor all transfers of your token:
+
+```
+Contract: Your ERC-20 token
+Events: Transfer(from, to, value)
+```
+
+### NFT Activity
+
+Track mints, sales, and transfers:
+
+```
+Contract: Your NFT collection
+Events: Transfer, Approval, ApprovalForAll
+```
+
+### DeFi Protocol
+
+Monitor swaps, liquidity, and positions:
+
+```
+Contract: Your DEX or lending pool
+Events: Swap, Deposit, Withdraw, Liquidation
+```
+
+### Governance
+
+Track votes and proposals:
+
+```
+Contract: Your governance contract
+Events: ProposalCreated, VoteCast, ProposalExecuted
+```
+
+---
+
+## Linking On-Chain to Off-Chain
+
+When a wallet that's connected to your dApp makes a transaction on your contract:
+
+1. Transaction is indexed by Cryptique
+2. Wallet address is matched to user session
+3. Transaction appears in user's unified profile
+4. You see: `User visited /swap → entered amount → confirmed → transaction 0x123 succeeded`
+
+This is the core value of Cryptique—automatic linking of behavior to transactions.
+
+---
+
+## Related Pages
+
+<CardGroup cols={2}>
+  <Card title="Chain Overview" icon="link" href="/integrations/overview">
+    Feature comparison by chain
+  </Card>
+  <Card title="Wallet Enrichment" icon="wallet" href="/integrations/wallet-enrichment">
+    Get wallet portfolio data
+  </Card>
+</CardGroup>

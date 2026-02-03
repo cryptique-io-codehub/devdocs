@@ -1,0 +1,260 @@
+---
+title: Wallet Enrichment
+description: "Supported chains for wallet data enrichment"
+---
+
+## Overview
+
+Wallet enrichment allows you to get detailed on-chain data about connected wallets, including net worth, dApp interactions, and token balances. This feature uses **Wallet Credits**.
+
+---
+
+## Enrichment Methods
+
+| Method | Credit Cost | Description |
+|--------|-------------|-------------|
+| **Net Worth** | 20 credits | Total wallet value across all holdings |
+| **dApp Interactions** | 8 credits | History of protocols the wallet has used |
+| **Token Balances** | 12 credits | All token holdings with balances |
+| **Full Enhancement** | 40 credits | All three methods combined |
+
+---
+
+## Supported Chains
+
+### Net Worth
+
+Net worth calculation supports **9 chains**:
+
+| Chain | Chain ID | Status |
+|-------|----------|--------|
+| Ethereum | 1 | ✅ Supported |
+| Polygon | 137 | ✅ Supported |
+| BNB Smart Chain | 56 | ✅ Supported |
+| Base | 8453 | ✅ Supported |
+| Optimism | 10 | ✅ Supported |
+| Arbitrum One | 42161 | ✅ Supported |
+| Avalanche C-Chain | 43114 | ✅ Supported |
+| Monad | 143 | ✅ Supported |
+| Soneium | 1946 | ✅ Supported |
+
+<Info>
+  Net worth aggregates all token holdings, DeFi positions, and NFT floor values across supported chains.
+</Info>
+
+---
+
+### dApp Interactions
+
+dApp interaction history supports **8 chains**:
+
+| Chain | Chain ID | Status |
+|-------|----------|--------|
+| Ethereum | 1 | ✅ Supported |
+| Polygon | 137 | ✅ Supported |
+| BNB Smart Chain | 56 | ✅ Supported |
+| Base | 8453 | ✅ Supported |
+| Optimism | 10 | ✅ Supported |
+| Arbitrum One | 42161 | ✅ Supported |
+| Avalanche C-Chain | 43114 | ✅ Supported |
+| Monad | 143 | ✅ Supported |
+
+<Note>
+  Soneium is **not** supported for dApp interactions.
+</Note>
+
+---
+
+### Token Balances
+
+Token balance queries support **8 chains**:
+
+| Chain | Chain ID | Status |
+|-------|----------|--------|
+| Ethereum | 1 | ✅ Supported |
+| Polygon | 137 | ✅ Supported |
+| BNB Smart Chain | 56 | ✅ Supported |
+| Base | 8453 | ✅ Supported |
+| Optimism | 10 | ✅ Supported |
+| Arbitrum One | 42161 | ✅ Supported |
+| Avalanche C-Chain | 43114 | ✅ Supported |
+| Monad | 143 | ✅ Supported |
+
+<Note>
+  Soneium is **not** supported for token balances.
+</Note>
+
+---
+
+## Support Matrix
+
+| Chain | Net Worth | dApp Interactions | Token Balances |
+|-------|:---------:|:-----------------:|:--------------:|
+| Ethereum | ✅ | ✅ | ✅ |
+| Polygon | ✅ | ✅ | ✅ |
+| BNB Smart Chain | ✅ | ✅ | ✅ |
+| Base | ✅ | ✅ | ✅ |
+| Optimism | ✅ | ✅ | ✅ |
+| Arbitrum One | ✅ | ✅ | ✅ |
+| Avalanche | ✅ | ✅ | ✅ |
+| Monad | ✅ | ✅ | ✅ |
+| Soneium | ✅ | ❌ | ❌ |
+
+---
+
+## How to Enable Enrichment
+
+### Auto-Enhancement
+
+Enable automatic enrichment for all new wallet connections:
+
+1. Go to **Settings → Wallet Enrichment** in your dashboard
+2. Toggle **Auto-Enhancement** on
+3. Select which enrichment methods to apply automatically
+
+<Warning>
+  Auto-enhancement consumes Wallet Credits for each new wallet. Monitor your credit usage.
+</Warning>
+
+### Manual Enrichment
+
+Enrich specific wallets on-demand:
+
+1. Go to **Users → [User Profile]** in your dashboard
+2. Click on a connected wallet
+3. Click **Enrich** and select methods
+4. View enriched data in the wallet profile
+
+---
+
+## Credit Consumption
+
+| Plan | Included Credits | Additional |
+|------|------------------|------------|
+| Free | 0 | Not available |
+| Starter | 0 (purchase add-ons) | $5 / 500 credits |
+| Pro | 1,500 / month | $5 / 500 credits |
+| Enterprise | Custom | Custom |
+
+### Credit Calculation Examples
+
+| Scenario | Credits Used |
+|----------|--------------|
+| 10 wallets × Net Worth only | 200 credits |
+| 10 wallets × Full Enhancement | 400 credits |
+| 50 wallets × dApp Interactions | 400 credits |
+| 100 wallets × Token Balances | 1,200 credits |
+
+---
+
+## Data Returned
+
+### Net Worth Response
+
+```json
+{
+  "wallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21",
+  "netWorth": {
+    "totalUSD": 125430.50,
+    "breakdown": {
+      "ethereum": 85000.00,
+      "polygon": 12500.00,
+      "base": 15430.50,
+      "arbitrum": 12500.00
+    }
+  },
+  "lastUpdated": "2025-02-04T10:30:00Z"
+}
+```
+
+### dApp Interactions Response
+
+```json
+{
+  "wallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21",
+  "interactions": [
+    {
+      "protocol": "Uniswap",
+      "chain": "ethereum",
+      "firstInteraction": "2024-03-15",
+      "lastInteraction": "2025-02-01",
+      "transactionCount": 47
+    },
+    {
+      "protocol": "Aave",
+      "chain": "ethereum",
+      "firstInteraction": "2024-06-20",
+      "lastInteraction": "2025-01-28",
+      "transactionCount": 12
+    }
+  ]
+}
+```
+
+### Token Balances Response
+
+```json
+{
+  "wallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21",
+  "tokens": [
+    {
+      "symbol": "ETH",
+      "name": "Ethereum",
+      "chain": "ethereum",
+      "balance": "2.5",
+      "valueUSD": 4625.00
+    },
+    {
+      "symbol": "USDC",
+      "name": "USD Coin",
+      "chain": "ethereum",
+      "balance": "5000.00",
+      "valueUSD": 5000.00
+    }
+  ]
+}
+```
+
+---
+
+## Use Cases
+
+### Segment High-Value Users
+
+Use net worth data to identify high-value users:
+
+```
+Filter: Net Worth > $50,000
+Action: Apply VIP tag, prioritize support
+```
+
+### Identify Competitor Users
+
+Use dApp interactions to find users active on competitors:
+
+```
+Filter: Interacted with [Competitor Protocol] in last 30 days
+Action: Targeted re-engagement campaign
+```
+
+### Analyze Token Preferences
+
+Use token balances to understand user portfolios:
+
+```
+Filter: Holds [Your Token]
+Action: Segment for governance announcements
+```
+
+---
+
+## Related Pages
+
+<CardGroup cols={2}>
+  <Card title="Chain Overview" icon="link" href="/integrations/overview">
+    All supported chains
+  </Card>
+  <Card title="Smart Contracts" icon="file-contract" href="/integrations/smart-contracts">
+    Contract indexing chains
+  </Card>
+</CardGroup>

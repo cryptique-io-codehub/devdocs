@@ -1,0 +1,297 @@
+---
+title: Installation
+description: "Install Cryptique via NPM package or CDN script tag"
+---
+
+## Installation Methods
+
+Cryptique can be installed in two ways:
+
+| Method | Best For | Auto-Init |
+|--------|----------|-----------|
+| **NPM Package** | React, Next.js, Vue, modern JS apps | Manual |
+| **CDN Script** | Static sites, quick testing, no build step | Automatic |
+
+---
+
+## NPM Package
+
+### Install
+
+<CodeGroup>
+```bash npm
+npm install cryptique-sdk
+```
+
+```bash yarn
+yarn add cryptique-sdk
+```
+
+```bash pnpm
+pnpm add cryptique-sdk
+```
+</CodeGroup>
+
+### Import & Initialize
+
+```javascript
+import Cryptique from 'cryptique-sdk';
+
+Cryptique.init({
+  siteId: 'your-site-id',
+  autoEvents: true
+});
+```
+
+### Framework Examples
+
+<Tabs>
+  <Tab title="React">
+    ```jsx
+    // src/index.js or src/main.jsx
+    import React from 'react';
+    import ReactDOM from 'react-dom/client';
+    import Cryptique from 'cryptique-sdk';
+    import App from './App';
+
+    // Initialize before rendering
+    Cryptique.init({
+      siteId: 'your-site-id',
+      autoEvents: true
+    });
+
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+    ```
+  </Tab>
+
+  <Tab title="Next.js (App Router)">
+    ```jsx
+    // app/layout.js
+    'use client';
+
+    import { useEffect } from 'react';
+    import Cryptique from 'cryptique-sdk';
+
+    export default function RootLayout({ children }) {
+      useEffect(() => {
+        Cryptique.init({
+          siteId: 'your-site-id',
+          autoEvents: true
+        });
+      }, []);
+
+      return (
+        <html lang="en">
+          <body>{children}</body>
+        </html>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Next.js (Pages Router)">
+    ```jsx
+    // pages/_app.js
+    import { useEffect } from 'react';
+    import Cryptique from 'cryptique-sdk';
+
+    function MyApp({ Component, pageProps }) {
+      useEffect(() => {
+        Cryptique.init({
+          siteId: 'your-site-id',
+          autoEvents: true
+        });
+      }, []);
+
+      return <Component {...pageProps} />;
+    }
+
+    export default MyApp;
+    ```
+  </Tab>
+
+  <Tab title="Vue 3">
+    ```javascript
+    // main.js
+    import { createApp } from 'vue';
+    import Cryptique from 'cryptique-sdk';
+    import App from './App.vue';
+
+    Cryptique.init({
+      siteId: 'your-site-id',
+      autoEvents: true
+    });
+
+    createApp(App).mount('#app');
+    ```
+  </Tab>
+
+  <Tab title="Vanilla JS">
+    ```javascript
+    // app.js
+    import Cryptique from 'cryptique-sdk';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      Cryptique.init({
+        siteId: 'your-site-id',
+        autoEvents: true
+      });
+    });
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## CDN Script Tag
+
+For static sites or quick testing, use the CDN version. The SDK auto-initializes using attributes on the script tag.
+
+### Basic Installation
+
+```html
+<script 
+  src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js" 
+  site-id="your-site-id" 
+  auto-events="true">
+</script>
+```
+
+<Info>
+  Place the script tag in your `<head>` or at the end of `<body>`. Earlier placement ensures you capture all page interactions.
+</Info>
+
+### Script Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `site-id` | string | *required* | Your Cryptique Site ID |
+| `auto-events` | boolean | `true` | Enable/disable automatic event tracking |
+| `auto-events-disabled-events` | string | `""` | Comma-separated list of auto-events to disable |
+| `auto-events-disabled-paths` | string | `""` | Comma-separated list of URL paths to exclude |
+
+### CDN Examples
+
+<Tabs>
+  <Tab title="Basic">
+    ```html
+    <script 
+      src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js" 
+      site-id="your-site-id" 
+      auto-events="true">
+    </script>
+    ```
+  </Tab>
+
+  <Tab title="Disable Specific Events">
+    ```html
+    <script 
+      src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js" 
+      site-id="your-site-id" 
+      auto-events="true"
+      auto-events-disabled-events="page_scroll,text_selection">
+    </script>
+    ```
+  </Tab>
+
+  <Tab title="Exclude Paths">
+    ```html
+    <script 
+      src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js" 
+      site-id="your-site-id" 
+      auto-events="true"
+      auto-events-disabled-paths="/admin,/internal">
+    </script>
+    ```
+  </Tab>
+
+  <Tab title="Disable All Auto-Events">
+    ```html
+    <script 
+      src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js" 
+      site-id="your-site-id" 
+      auto-events="false">
+    </script>
+    ```
+  </Tab>
+</Tabs>
+
+### Using with CDN (After Load)
+
+When using the CDN, the `Cryptique` object is available globally after the script loads:
+
+```html
+<script 
+  src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js" 
+  site-id="your-site-id" 
+  auto-events="true">
+</script>
+
+<script>
+  // Track a custom event
+  Cryptique.track('Button Clicked', { 
+    buttonId: 'cta-main' 
+  });
+</script>
+```
+
+---
+
+## Verifying Installation
+
+After installation, verify Cryptique is working:
+
+<Steps>
+  <Step title="Check Console">
+    Open your browser's developer console. You should see no errors related to Cryptique.
+  </Step>
+  
+  <Step title="Check Network Tab">
+    In the Network tab, filter by "cryptique". You should see requests to `api.cryptique.io` for event tracking.
+  </Step>
+  
+  <Step title="Check Dashboard">
+    Log into [app.cryptique.io](https://app.cryptique.io) and view your **Live Events** feed. You should see `page_view` events appearing in real-time.
+  </Step>
+</Steps>
+
+---
+
+## TypeScript Support
+
+The NPM package includes TypeScript definitions out of the box:
+
+```typescript
+import Cryptique from 'cryptique-sdk';
+
+interface SwapEventProps {
+  fromToken: string;
+  toToken: string;
+  amount: number;
+  slippage: number;
+}
+
+Cryptique.track<SwapEventProps>('Swap Completed', {
+  fromToken: 'ETH',
+  toToken: 'USDC',
+  amount: 1.5,
+  slippage: 0.5
+});
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Initialization Options" icon="sliders" href="/guide/initialization">
+    Configure SDK behavior
+  </Card>
+  <Card title="Auto-Tracked Events" icon="bolt" href="/guide/auto-events">
+    See what's tracked automatically
+  </Card>
+</CardGroup>

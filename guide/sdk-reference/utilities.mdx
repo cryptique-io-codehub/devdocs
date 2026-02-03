@@ -1,0 +1,268 @@
+---
+title: Utilities
+description: "Additional SDK methods for privacy, configuration, and control"
+---
+
+## Privacy Methods
+
+### Cryptique.optOut()
+
+Opt the current user out of all tracking. When called, Cryptique stops collecting any data for this user.
+
+```javascript
+Cryptique.optOut()
+```
+
+### Returns
+
+`void`
+
+### Example
+
+```javascript
+// Respect user's privacy preference
+function handlePrivacyToggle(trackingEnabled) {
+  if (!trackingEnabled) {
+    Cryptique.optOut();
+  }
+}
+
+// Cookie consent integration
+if (!hasConsent()) {
+  Cryptique.optOut();
+}
+```
+
+<Info>
+  After calling `optOut()`, no events, sessions, or user data will be collected until the user clears their browser data or you reinitialize the SDK.
+</Info>
+
+---
+
+## Auto-Event Control
+
+### Cryptique.disableAutoEvent()
+
+Disable specific auto-tracked events at runtime.
+
+```javascript
+Cryptique.disableAutoEvent(events)
+```
+
+<ParamField path="events" type="string | string[]" required>
+  Event name(s) to disable.
+</ParamField>
+
+### Example
+
+```javascript
+// Disable single event
+Cryptique.disableAutoEvent('page_scroll');
+
+// Disable multiple events
+Cryptique.disableAutoEvent(['page_scroll', 'text_selection', 'media_play']);
+```
+
+---
+
+### Cryptique.enableAutoEvent()
+
+Re-enable previously disabled auto-tracked events.
+
+```javascript
+Cryptique.enableAutoEvent(events)
+```
+
+<ParamField path="events" type="string | string[]" required>
+  Event name(s) to re-enable.
+</ParamField>
+
+### Example
+
+```javascript
+// Re-enable single event
+Cryptique.enableAutoEvent('page_scroll');
+
+// Re-enable multiple events
+Cryptique.enableAutoEvent(['page_scroll', 'text_selection']);
+```
+
+---
+
+### Cryptique.setAutoEventsDisabledEvents()
+
+Replace the entire list of disabled auto-events.
+
+```javascript
+Cryptique.setAutoEventsDisabledEvents(events)
+```
+
+<ParamField path="events" type="string[]" required>
+  Complete array of event names to disable. Replaces any previously disabled events.
+</ParamField>
+
+### Example
+
+```javascript
+// Set specific disabled events (clears previous settings)
+Cryptique.setAutoEventsDisabledEvents(['rage_click', 'dead_click', 'text_selection']);
+
+// Enable all auto-events (empty array)
+Cryptique.setAutoEventsDisabledEvents([]);
+```
+
+---
+
+## Identity Methods
+
+### Cryptique.reset()
+
+Clear the current user identity and start a new anonymous session. Essential for logout flows.
+
+```javascript
+Cryptique.reset()
+```
+
+### Returns
+
+`void`
+
+### Example
+
+```javascript
+function handleLogout() {
+  // Clear your app's auth state
+  authService.logout();
+  
+  // Reset Cryptique identity
+  Cryptique.reset();
+  
+  // Redirect to home
+  router.push('/');
+}
+```
+
+<Warning>
+  Always call `reset()` when a user logs out to prevent the next user from being associated with the previous user's data.
+</Warning>
+
+---
+
+## Auto-Tracked Event Names
+
+Reference list of all auto-tracked events that can be used with `disableAutoEvent()` and `enableAutoEvent()`:
+
+| Event Name | Description |
+|------------|-------------|
+| `page_view` | Page views and SPA navigation |
+| `element_click` | Click interactions |
+| `rage_click` | Rapid clicking (frustration signal) |
+| `dead_click` | Clicks on non-interactive elements |
+| `page_scroll` | Scroll depth tracking |
+| `form_submit` | Form submissions |
+| `form_focus` | Form field focus |
+| `media_play` | Video/audio play |
+| `media_pause` | Video/audio pause |
+| `text_selection` | Text highlighting |
+
+---
+
+## Method Quick Reference
+
+| Method | Purpose |
+|--------|---------|
+| `Cryptique.init(options)` | Initialize the SDK |
+| `Cryptique.track(event, props)` | Track custom event |
+| `Cryptique.identify(id)` | Set user identity |
+| `Cryptique.reset()` | Clear identity, new session |
+| `Cryptique.optOut()` | Stop all tracking |
+| `Cryptique.connectWallet()` | Trigger wallet connection |
+| `Cryptique.walletAddress(addr)` | Register wallet address |
+| `Cryptique.disableAutoEvent(e)` | Disable auto-events |
+| `Cryptique.enableAutoEvent(e)` | Enable auto-events |
+| `Cryptique.setAutoEventsDisabledEvents(e)` | Replace disabled list |
+| `Cryptique.people.set(props)` | Set user properties |
+| `Cryptique.people.set_once(props)` | Set if not exists |
+| `Cryptique.people.increment(props)` | Increment numbers |
+| `Cryptique.people.append(props)` | Append to lists |
+| `Cryptique.people.union(props)` | Add unique to lists |
+| `Cryptique.people.remove(props)` | Remove from lists |
+| `Cryptique.people.unset(props)` | Remove properties |
+| `Cryptique.people.deleteUser()` | Delete user profile |
+| `Cryptique.people.trackCharge(amt, props)` | Track payment |
+| `Cryptique.people.clearCharges()` | Clear payments |
+
+---
+
+## Implementing Do Not Track
+
+Respect the browser's Do Not Track setting:
+
+```javascript
+function initCryptique() {
+  // Check DNT setting
+  const dnt = navigator.doNotTrack === '1' || 
+              window.doNotTrack === '1';
+  
+  Cryptique.init({
+    siteId: 'your-site-id',
+    autoEvents: !dnt  // Disable auto-events if DNT
+  });
+  
+  if (dnt) {
+    Cryptique.optOut();
+  }
+}
+```
+
+---
+
+## GDPR Compliance Pattern
+
+```javascript
+// On page load
+function initAnalytics() {
+  Cryptique.init({ 
+    siteId: 'your-site-id',
+    autoEvents: false  // Don't track until consent
+  });
+}
+
+// When user accepts cookies
+function handleAcceptCookies() {
+  Cryptique.init({
+    siteId: 'your-site-id',
+    autoEvents: true
+  });
+}
+
+// When user declines cookies
+function handleDeclineCookies() {
+  Cryptique.optOut();
+}
+
+// For data deletion requests
+function handleDeletionRequest() {
+  Cryptique.people.deleteUser();
+  Cryptique.reset();
+}
+```
+
+---
+
+## Related Pages
+
+<CardGroup cols={2}>
+  <Card title="Initialization" icon="play" href="/guide/initialization">
+    Configure SDK options
+  </Card>
+  <Card title="Auto-Tracked Events" icon="bolt" href="/guide/auto-events">
+    See what's tracked automatically
+  </Card>
+  <Card title="Privacy" icon="shield" href="/guide/privacy">
+    Privacy and compliance info
+  </Card>
+  <Card title="Data Limits" icon="ruler" href="/guide/data-limits">
+    Property constraints
+  </Card>
+</CardGroup>

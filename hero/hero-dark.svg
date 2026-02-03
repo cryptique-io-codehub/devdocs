@@ -1,0 +1,7 @@
+<svg width="800" height="400" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="400" fill="#1a1a2e"/>
+  <rect x="50" y="100" width="300" height="200" rx="8" fill="#8E8E8E" opacity="0.1"/>
+  <rect x="450" y="100" width="300" height="200" rx="8" fill="#8E8E8E" opacity="0.1"/>
+  <text x="400" y="220" text-anchor="middle" font-family="Raleway, sans-serif" font-size="24" font-weight="700" fill="#FFFFFF">Unified Web3 Analytics</text>
+  <text x="400" y="260" text-anchor="middle" font-family="Raleway, sans-serif" font-size="14" fill="#8E8E8E">Off-chain behavior + On-chain transactions</text>
+</svg>
