@@ -41,19 +41,19 @@ Track the complete auth journey:
 
 ```javascript
 // Signup started
-cryptique.track('signup_started', {
+Cryptique.track('signup_started', {
   signup_method: 'email',  // or 'google', 'wallet'
   referral_source: getReferralSource()
 });
 
 // Signup completed
-cryptique.track('signup_completed', {
+Cryptique.track('signup_completed', {
   signup_method: 'email',
   time_to_complete_seconds: 45
 });
 
 // Identify the user
-cryptique.identify(user.id, {
+Cryptique.identify(user.id, {
   email: user.email,
   name: user.name,
   signup_date: new Date().toISOString(),
@@ -61,7 +61,7 @@ cryptique.identify(user.id, {
 });
 
 // Set persistent properties
-cryptique.people.set_once({
+Cryptique.people.set_once({
   first_seen: new Date().toISOString(),
   original_referrer: document.referrer
 });
@@ -73,7 +73,7 @@ Track wallet interactions:
 
 ```javascript
 // Wallet connection initiated
-cryptique.track('wallet_connect_initiated', {
+Cryptique.track('wallet_connect_initiated', {
   wallet_type: 'metamask',
   trigger_location: 'navbar'  // or 'modal', 'onboarding'
 });
@@ -81,25 +81,26 @@ cryptique.track('wallet_connect_initiated', {
 // Wallet connected successfully
 async function onWalletConnected(address, provider) {
   // Track with SDK
-  cryptique.wallet.connect(address, {
+  Cryptique.walletAddress(address);
+  Cryptique.track('wallet_connected', {
     wallet_type: getWalletType(provider),
     chain_id: await provider.getChainId()
   });
   
   // Optional: set user properties
-  cryptique.people.set({
+  Cryptique.people.set({
     primary_wallet: address,
     last_wallet_connect: new Date().toISOString()
   });
   
-  cryptique.people.increment({
+  Cryptique.people.increment({
     wallet_connect_count: 1
   });
 }
 
 // Wallet connection failed
 function onWalletError(error) {
-  cryptique.track('wallet_connect_failed', {
+  Cryptique.track('wallet_connect_failed', {
     error_type: error.code,
     error_message: error.message,
     wallet_type: 'metamask'
@@ -108,14 +109,12 @@ function onWalletError(error) {
 
 // Wallet disconnected
 function onWalletDisconnected(address) {
-  cryptique.wallet.disconnect(address);
+  Cryptique.track('wallet_disconnected', { address });
 }
 
 // Chain changed
 function onChainChanged(chainId, address) {
-  cryptique.wallet.chainChanged(address, chainId);
-  
-  cryptique.track('chain_changed', {
+  Cryptique.track('chain_changed', {
     new_chain_id: chainId,
     wallet_address: address
   });
@@ -128,7 +127,7 @@ Track the complete swap journey:
 
 ```javascript
 // Token selected
-cryptique.track('token_selected', {
+Cryptique.track('token_selected', {
   token_symbol: 'ETH',
   token_address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
   selection_type: 'input',  // or 'output'
@@ -136,7 +135,7 @@ cryptique.track('token_selected', {
 });
 
 // Swap quoted
-cryptique.track('swap_quoted', {
+Cryptique.track('swap_quoted', {
   input_token: 'ETH',
   output_token: 'USDC',
   input_amount: 1.5,
@@ -147,7 +146,7 @@ cryptique.track('swap_quoted', {
 });
 
 // Swap initiated (user clicked swap)
-cryptique.track('swap_initiated', {
+Cryptique.track('swap_initiated', {
   input_token: 'ETH',
   output_token: 'USDC',
   input_amount: 1.5,
@@ -156,14 +155,14 @@ cryptique.track('swap_initiated', {
 });
 
 // Transaction approval requested
-cryptique.track('transaction_approval_requested', {
+Cryptique.track('transaction_approval_requested', {
   token: 'USDC',
   spender: '0x...router',
   amount: 'unlimited'  // or specific amount
 });
 
 // Swap completed (after on-chain confirmation)
-cryptique.track('swap_completed', {
+Cryptique.track('swap_completed', {
   input_token: 'ETH',
   output_token: 'USDC',
   input_amount: 1.5,
@@ -175,7 +174,7 @@ cryptique.track('swap_completed', {
 });
 
 // Swap failed
-cryptique.track('swap_failed', {
+Cryptique.track('swap_failed', {
   input_token: 'ETH',
   output_token: 'USDC',
   input_amount: 1.5,
@@ -188,7 +187,7 @@ cryptique.track('swap_failed', {
 
 ```javascript
 // Collection viewed
-cryptique.track('collection_viewed', {
+Cryptique.track('collection_viewed', {
   collection_name: 'Cool Cats',
   collection_address: '0x...',
   items_available: 500,
@@ -196,7 +195,7 @@ cryptique.track('collection_viewed', {
 });
 
 // Mint initiated
-cryptique.track('mint_initiated', {
+Cryptique.track('mint_initiated', {
   collection_name: 'Cool Cats',
   quantity: 2,
   total_price_eth: 0.10,
@@ -204,7 +203,7 @@ cryptique.track('mint_initiated', {
 });
 
 // Mint completed
-cryptique.track('mint_completed', {
+Cryptique.track('mint_completed', {
   collection_name: 'Cool Cats',
   quantity: 2,
   token_ids: [1234, 1235],
@@ -229,7 +228,7 @@ const ONBOARDING_STEPS = [
 function trackOnboardingStep(step, additionalProps = {}) {
   const stepIndex = ONBOARDING_STEPS.indexOf(step);
   
-  cryptique.track('onboarding_step_completed', {
+  Cryptique.track('onboarding_step_completed', {
     step_name: step,
     step_number: stepIndex + 1,
     total_steps: ONBOARDING_STEPS.length,
@@ -237,7 +236,7 @@ function trackOnboardingStep(step, additionalProps = {}) {
   });
   
   // Update user property
-  cryptique.people.set({
+  Cryptique.people.set({
     onboarding_step: step,
     onboarding_progress: Math.round((stepIndex + 1) / ONBOARDING_STEPS.length * 100)
   });
@@ -245,13 +244,13 @@ function trackOnboardingStep(step, additionalProps = {}) {
 
 // On completion
 function completeOnboarding() {
-  cryptique.track('onboarding_completed', {
+  Cryptique.track('onboarding_completed', {
     total_time_seconds: timeSinceStart,
     steps_completed: completedSteps.length,
     skipped_steps: skippedSteps
   });
   
-  cryptique.people.set({
+  Cryptique.people.set({
     onboarding_completed: true,
     onboarding_completed_date: new Date().toISOString()
   });
@@ -265,7 +264,7 @@ Track errors for debugging:
 ```javascript
 // Generic error tracking
 function trackError(error, context) {
-  cryptique.track('error_occurred', {
+  Cryptique.track('error_occurred', {
     error_type: error.name,
     error_message: error.message,
     error_code: error.code,
@@ -276,7 +275,7 @@ function trackError(error, context) {
 
 // Transaction error
 function trackTransactionError(error, txDetails) {
-  cryptique.track('transaction_error', {
+  Cryptique.track('transaction_error', {
     error_type: classifyError(error),
     error_message: error.message,
     transaction_type: txDetails.type,
@@ -311,7 +310,8 @@ function WalletTracker() {
   // Track connection state changes
   useEffect(() => {
     if (isConnected && address) {
-      cryptique.wallet.connect(address, {
+      Cryptique.walletAddress(address);
+      Cryptique.track('wallet_connected', {
         chain_id: chain?.id,
         wallet_type: connectors[0]?.name || 'unknown'
       });
@@ -321,7 +321,7 @@ function WalletTracker() {
   // Track disconnection
   const handleDisconnect = () => {
     if (address) {
-      cryptique.wallet.disconnect(address);
+      Cryptique.track('wallet_disconnected', { address });
     }
     disconnect();
   };
@@ -338,7 +338,7 @@ function WalletTracker() {
 
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { getCryptique } from '@/lib/cryptique';
+import Cryptique from 'cryptique-sdk';
 
 export function AnalyticsProvider({ children }) {
   const pathname = usePathname();
@@ -346,14 +346,11 @@ export function AnalyticsProvider({ children }) {
   
   // Track page views on route change
   useEffect(() => {
-    const cryptique = getCryptique();
-    if (cryptique) {
-      // Auto page_view should handle this, but for SPAs:
-      cryptique.track('page_view', {
-        page_path: pathname,
-        query_string: searchParams.toString()
-      });
-    }
+    // Auto page_view should handle this, but for SPAs:
+    Cryptique.track('page_view', {
+      page_path: pathname,
+      query_string: searchParams.toString()
+    });
   }, [pathname, searchParams]);
   
   return children;
@@ -364,25 +361,25 @@ export function AnalyticsProvider({ children }) {
 
 ```javascript
 // composables/useTracking.js
-import { inject, onMounted, watch } from 'vue';
+import { watch } from 'vue';
 import { useRoute } from 'vue-router';
+import Cryptique from 'cryptique-sdk';
 
 export function useTracking() {
-  const cryptique = inject('cryptique');
   const route = useRoute();
   
   // Track route changes
   watch(
     () => route.fullPath,
     (newPath) => {
-      cryptique.track('page_view', {
+      Cryptique.track('page_view', {
         page_path: newPath
       });
     }
   );
   
   const trackEvent = (name, properties) => {
-    cryptique.track(name, properties);
+    Cryptique.track(name, properties);
   };
   
   return { trackEvent };
@@ -400,7 +397,7 @@ Enable debug logging:
 script.setAttribute('debug', 'true');
 
 // npm
-const cryptique = new Cryptique({
+await Cryptique.init({
   siteId: 'YOUR_SITE_ID',
   debug: true  // Logs all events to console
 });

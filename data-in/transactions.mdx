@@ -9,14 +9,10 @@ Cryptique indexes transactions from your smart contracts and automatically links
 
 ## How It Works
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Your Contract  │────→│    Indexer      │────→│  User Profile   │
-│  (Blockchain)   │     │                 │     │                 │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-         │                      │                       │
-    Transaction            Decode &              Link via
-    emitted               Normalize          wallet_address
+```mermaid
+flowchart LR
+    A[Your Contract<br/>Blockchain] -->|Transaction emitted| B[Indexer<br/>Decode & Normalize]
+    B -->|Link via wallet_address| C[User Profile]
 ```
 
 1. **Index**: Cryptique monitors your contracts for new transactions
@@ -103,7 +99,7 @@ When a user connects their wallet, all transactions from that wallet are attribu
 
 ```
 User connects wallet:
-cryptique.wallet.connect('0x1234...');
+Cryptique.walletAddress('0x1234...');
 
 Profile created:
 ├── distinct_id: "user_12345"

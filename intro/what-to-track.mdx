@@ -140,20 +140,20 @@ Beyond auto-events, track custom events for key actions:
 
 ```javascript
 // Feature usage
-cryptique.track('feature_used', {
+Cryptique.track('feature_used', {
   feature_name: 'swap_calculator',
   input_token: 'ETH',
   output_token: 'USDC'
 });
 
 // Conversion milestones
-cryptique.track('onboarding_completed', {
+Cryptique.track('onboarding_completed', {
   steps_completed: 5,
   time_to_complete: 180
 });
 
 // Errors and friction
-cryptique.track('transaction_failed', {
+Cryptique.track('transaction_failed', {
   error_type: 'insufficient_funds',
   attempted_amount: 1000
 });
@@ -193,18 +193,18 @@ Use consistent `snake_case` naming:
 <Tabs>
   <Tab title="✅ Good">
     ```javascript
-    cryptique.track('swap_completed', { ... });
-    cryptique.track('nft_minted', { ... });
-    cryptique.track('liquidity_added', { ... });
-    cryptique.track('onboarding_step_completed', { ... });
+    Cryptique.track('swap_completed', { ... });
+    Cryptique.track('nft_minted', { ... });
+    Cryptique.track('liquidity_added', { ... });
+    Cryptique.track('onboarding_step_completed', { ... });
     ```
   </Tab>
   <Tab title="❌ Avoid">
     ```javascript
-    cryptique.track('SwapCompleted', { ... });     // PascalCase
-    cryptique.track('swap-completed', { ... });    // kebab-case
-    cryptique.track('Swap Completed', { ... });    // Spaces
-    cryptique.track('swap', { ... });              // Too vague
+    Cryptique.track('SwapCompleted', { ... });     // PascalCase
+    Cryptique.track('swap-completed', { ... });    // kebab-case
+    Cryptique.track('Swap Completed', { ... });    // Spaces
+    Cryptique.track('swap', { ... });              // Too vague
     ```
   </Tab>
 </Tabs>

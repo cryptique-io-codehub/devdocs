@@ -214,13 +214,13 @@ Some properties can be overridden when tracking events:
 
 ```javascript
 // Override location for server-side events
-cryptique.track('server_event', {
+Cryptique.track('server_event', {
   country: 'GB',
   city: 'London'
 });
 
 // Override page info for SPA
-cryptique.track('virtual_page_view', {
+Cryptique.track('virtual_page_view', {
   current_url: '/app/dashboard',
   page_title: 'Dashboard'
 });

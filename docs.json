@@ -68,8 +68,7 @@
               "data-in/sdk-reference/track",
               "data-in/sdk-reference/identify",
               "data-in/sdk-reference/people",
-              "data-in/sdk-reference/wallet",
-              "data-in/sdk-reference/utilities"
+              "data-in/sdk-reference/wallet"
             ]
           },
           {
@@ -136,8 +135,7 @@
           {
             "group": "TAG MANAGERS",
             "pages": [
-              "integrations/google-tag-manager",
-              "integrations/other-tag-managers"
+              "integrations/google-tag-manager"
             ]
           }
         ]

@@ -7,16 +7,15 @@ description: "Understanding Cryptique's unified data model for Web3 analytics"
 
 Cryptique's data model is designed to solve the unique challenges of Web3 analytics by unifying three types of data into cohesive user profiles:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     USER PROFILE                             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
-│  │   Events    │  │   Wallets   │  │   Transactions      │  │
-│  │ (off-chain) │←→│ (connected) │←→│   (on-chain)        │  │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
-│         ↑               ↑                    ↑               │
-│    distinct_id    wallet_address       wallet_address        │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Profile["USER PROFILE"]
+        E[Events<br/>off-chain<br/>distinct_id]
+        W[Wallets<br/>connected<br/>wallet_address]
+        T[Transactions<br/>on-chain<br/>wallet_address]
+    end
+    E <--> W
+    W <--> T
 ```
 
 ## Core Concepts
@@ -40,7 +39,7 @@ Events are discrete actions that users take. They form the foundation of behavio
 
 **Event Types**:
 - **Auto-events**: Automatically captured (page_view, click, scroll, etc.)
-- **Custom events**: Tracked via `cryptique.track()`
+- **Custom events**: Tracked via `Cryptique.track()`
 - **Transaction events**: Generated from indexed smart contracts
 
 See [Events & Properties](/data-in/events-and-properties) for details.
@@ -118,7 +117,7 @@ When a user connects their wallet:
 distinct_id: "anon_xyz789"
 
 // User connects wallet
-cryptique.wallet.connect("0x1234...");
+Cryptique.walletAddress("0x1234...");
 
 // Profile now linked
 {
@@ -131,14 +130,15 @@ cryptique.wallet.connect("0x1234...");
 
 Once a wallet is linked, all transactions from that wallet are attributed to the user:
 
-```
-User Profile (distinct_id: "anon_xyz789")
-├── Events: page_view, click, wallet_connect
-├── Wallet: 0x1234...
-└── Transactions: 
-    ├── Swap on Jan 15 (0xabc...)
-    ├── Stake on Jan 16 (0xdef...)
-    └── Claim on Jan 20 (0xghi...)
+```mermaid
+flowchart TB
+    P[User Profile<br/>distinct_id: anon_xyz789]
+    P --> E[Events<br/>page_view, click, wallet_connect]
+    P --> W[Wallet: 0x1234...]
+    P --> T[Transactions]
+    T --> T1[Swap Jan 15]
+    T --> T2[Stake Jan 16]
+    T --> T3[Claim Jan 20]
 ```
 
 ### Multiple Wallets
@@ -146,8 +146,8 @@ User Profile (distinct_id: "anon_xyz789")
 Users can connect multiple wallets:
 
 ```javascript
-cryptique.wallet.connect("0x1234..."); // First wallet
-cryptique.wallet.connect("0xabcd..."); // Second wallet
+Cryptique.walletAddress("0x1234..."); // First wallet
+Cryptique.walletAddress("0xabcd..."); // Second wallet
 
 // Profile now has both
 {
@@ -201,20 +201,25 @@ Session properties are inherited by all events within the session:
 
 ## Data Flow
 
-```
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│   Website    │     │  Cryptique   │     │  Dashboard   │
-│    /dApp     │────→│    API       │────→│  & Reports   │
-└──────────────┘     └──────────────┘     └──────────────┘
-       │                    │                    │
-       │ Events             │ Process            │ Query
-       │ (SDK)              │ Link               │ Analyze
-       │                    │ Enrich             │
-       ▼                    ▼                    ▼
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│  Blockchain  │     │   CQ Intel   │     │    User      │
-│   Indexer    │────→│ Merge Engine │────→│   Profiles   │
-└──────────────┘     └──────────────┘     └──────────────┘
+```mermaid
+flowchart LR
+    subgraph Collection["Collection"]
+        A[Website / dApp]
+        B[Blockchain Indexer]
+    end
+    subgraph Processing["Processing"]
+        C[Cryptique API]
+        D[CQ Intel Merge Engine]
+    end
+    subgraph Output["Output"]
+        E[Dashboard & Reports]
+        F[User Profiles]
+    end
+    A -->|Events SDK| C
+    B -->|Transactions| D
+    C --> D
+    D --> F
+    D --> E
 ```
 
 1. **Collection**: SDK sends events; indexer captures transactions

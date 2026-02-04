@@ -58,7 +58,8 @@ Choose your installation method:
     ```javascript
     import Cryptique from 'cryptique-sdk';
 
-    const cryptique = new Cryptique({
+    // Initialize (async)
+    await Cryptique.init({
       siteId: 'YOUR_SITE_ID',
       autoEvents: true
     });
@@ -93,7 +94,7 @@ Beyond auto-events, track specific actions that matter to your product:
 
 ```javascript
 // Track a custom event
-cryptique.track('swap_initiated', {
+Cryptique.track('swap_initiated', {
   input_token: 'ETH',
   output_token: 'USDC',
   amount: 1.5
@@ -106,10 +107,7 @@ When a user connects their wallet:
 
 ```javascript
 // After wallet connection (e.g., via wagmi, ethers, web3-react)
-cryptique.wallet.connect(walletAddress, {
-  wallet_type: 'metamask',
-  chain_id: 1
-});
+Cryptique.walletAddress(walletAddress);
 ```
 
 If you're using standard wallet libraries, Cryptique can auto-detect wallet connections. Enable with:
@@ -130,7 +128,10 @@ If you're using standard wallet libraries, Cryptique can auto-detect wallet conn
 When a user logs in or you know their identity:
 
 ```javascript
-cryptique.identify('user_12345', {
+Cryptique.identify('user_12345');
+
+// Set user properties
+Cryptique.people.set({
   email: 'user@example.com',
   plan: 'pro',
   signup_date: '2024-01-15'
@@ -173,11 +174,6 @@ Here's a complete example for a DeFi app:
     script.setAttribute('site-id', 'mydefi-app-42');
     script.setAttribute('auto-events', 'true');
     document.head.appendChild(script);
-    
-    // Wait for SDK to load
-    script.onload = function() {
-      console.log('Cryptique loaded');
-    };
   </script>
 </head>
 <body>
@@ -186,7 +182,7 @@ Here's a complete example for a DeFi app:
   <script>
     // Track custom events when they happen
     function onSwapComplete(txHash, inputToken, outputToken, amount) {
-      cryptique.track('swap_completed', {
+      Cryptique.track('swap_completed', {
         transaction_hash: txHash,
         input_token: inputToken,
         output_token: outputToken,
@@ -200,7 +196,8 @@ Here's a complete example for a DeFi app:
         method: 'eth_requestAccounts' 
       });
       
-      cryptique.wallet.connect(accounts[0], {
+      Cryptique.walletAddress(accounts[0]);
+      Cryptique.track('wallet_connected', {
         wallet_type: 'metamask',
         chain_id: await ethereum.request({ method: 'eth_chainId' })
       });
@@ -228,7 +225,7 @@ Here's a complete example for a DeFi app:
   </Accordion>
   
   <Accordion title="Wallet events not tracking">
-    1. Ensure wallet.connect() is called after wallet connection
+    1. Ensure Cryptique.walletAddress() is called after wallet connection
     2. Pass a valid wallet address (0x...)
     3. Check that wallet_connect isn't in disabled auto-events
   </Accordion>

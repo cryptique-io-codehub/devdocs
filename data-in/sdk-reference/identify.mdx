@@ -107,8 +107,8 @@ Cryptique.identify('0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21');
     
     ```javascript
     // On app initialization
-    function initApp() {
-      Cryptique.init({ siteId: 'your-site-id' });
+    async function initApp() {
+      await Cryptique.init({ siteId: 'your-site-id' });
       
       // If user is already logged in
       const currentUser = getCurrentUser();
@@ -204,8 +204,8 @@ When you call `identify()`:
 ```mermaid
 flowchart LR
     A[Anonymous User] --> B{identify called}
-    B --> |New ID| C[Create Identified Profile]
-    B --> |Existing ID| D[Merge with Existing Profile]
+    B -->|New ID| C[Create Identified Profile]
+    B -->|Existing ID| D[Merge with Existing Profile]
     D --> E[All sessions unified]
 ```
 
@@ -236,8 +236,8 @@ function onClick() {
 }
 
 // Good - Identify once per session
-function initApp() {
-  Cryptique.init({ siteId: 'your-site-id' });
+async function initApp() {
+  await Cryptique.init({ siteId: 'your-site-id' });
   
   if (currentUser) {
     Cryptique.identify(currentUser.id);
@@ -268,7 +268,7 @@ useEffect(() => {
 
 ```javascript
 // Initialize
-Cryptique.init({ siteId: 'your-site-id' });
+await Cryptique.init({ siteId: 'your-site-id' });
 
 // Check for existing session
 const user = getCurrentUser();
@@ -305,10 +305,10 @@ function logout() {
 ## Related Methods
 
 <CardGroup cols={2}>
-  <Card title="User Properties" icon="user-gear" href="/guide/sdk-reference/people">
+  <Card title="User Properties" icon="user-gear" href="/data-in/sdk-reference/people">
     Set persistent user attributes
   </Card>
-  <Card title="Wallet Methods" icon="wallet" href="/guide/sdk-reference/wallet">
+  <Card title="Wallet Methods" icon="wallet" href="/data-in/sdk-reference/wallet">
     Track wallet connections
   </Card>
 </CardGroup>

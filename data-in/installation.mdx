@@ -7,256 +7,338 @@ description: "Multiple ways to install Cryptique on your website or dApp"
 
 Cryptique can be installed via CDN script, npm package, or through tag managers. Choose the method that best fits your tech stack.
 
-## CDN Installation (Recommended)
+<Tabs>
+  <Tab title="CDN (Recommended)">
+    ## CDN Installation
 
-The fastest way to get started. Add this script to your HTML:
+    The fastest way to get started. Add this script to your HTML `<head>`:
 
-```html
-<script>
-  var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
-  script.setAttribute('site-id', 'YOUR_SITE_ID');
-  script.setAttribute('auto-events', 'true');
-  document.head.appendChild(script);
-</script>
-```
+    ```html
+    <script>
+      var script = document.createElement('script');
+      script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+      script.setAttribute('site-id', 'YOUR_SITE_ID');
+      script.setAttribute('auto-events', 'true');
+      document.head.appendChild(script);
+    </script>
+    ```
 
-### Configuration Attributes
+    ### Configuration Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `site-id` | string | required | Your unique site identifier |
-| `auto-events` | boolean | `true` | Enable automatic event tracking |
-| `auto-events-disabled-paths` | string | `''` | Comma-separated paths to exclude (e.g., `/admin,/checkout`) |
-| `auto-events-disabled-events` | string | `''` | Comma-separated events to disable (e.g., `copy,input_change`) |
+    | Attribute | Type | Default | Description |
+    |-----------|------|---------|-------------|
+    | `site-id` | string | required | Your unique site identifier |
+    | `auto-events` | boolean | `true` | Enable automatic event tracking |
+    | `auto-events-disabled-paths` | string | `''` | Comma-separated paths to exclude |
+    | `auto-events-disabled-events` | string | `''` | Comma-separated events to disable |
 
-### Full Configuration Example
+    ### Full Configuration Example
 
-```html
-<script>
-  var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
-  script.setAttribute('site-id', 'myapp-com-42');
-  script.setAttribute('auto-events', 'true');
-  script.setAttribute('auto-events-disabled-paths', '/admin,/internal');
-  script.setAttribute('auto-events-disabled-events', 'copy,input_change');
-  document.head.appendChild(script);
-</script>
-```
+    ```html
+    <script>
+      var script = document.createElement('script');
+      script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+      script.setAttribute('site-id', 'myapp-com-42');
+      script.setAttribute('auto-events', 'true');
+      script.setAttribute('auto-events-disabled-paths', '/admin,/internal');
+      script.setAttribute('auto-events-disabled-events', 'copy,input_change');
+      document.head.appendChild(script);
+    </script>
+    ```
 
-### Placement
+    ### Complete HTML Example
 
-Place the script in the `<head>` section for best results:
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>My App</title>
-  
-  <!-- Cryptique - load early for complete tracking -->
-  <script>
-    var script = document.createElement('script');
-    script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
-    script.setAttribute('site-id', 'YOUR_SITE_ID');
-    script.setAttribute('auto-events', 'true');
-    document.head.appendChild(script);
-  </script>
-  
-  <!-- Other head elements -->
-</head>
-<body>
-  <!-- Your content -->
-</body>
-</html>
-```
-
-## npm Installation
-
-For JavaScript/TypeScript projects with a build system:
-
-```bash
-npm install cryptique-sdk
-```
-
-Or with yarn:
-
-```bash
-yarn add cryptique-sdk
-```
-
-### Basic Usage
-
-```javascript
-import Cryptique from 'cryptique-sdk';
-
-// Initialize
-const cryptique = new Cryptique({
-  siteId: 'YOUR_SITE_ID',
-  autoEvents: true
-});
-
-// Track events
-cryptique.track('button_clicked', { button_name: 'signup' });
-```
-
-### Configuration Options
-
-```javascript
-const cryptique = new Cryptique({
-  // Required
-  siteId: 'YOUR_SITE_ID',
-  
-  // Optional
-  autoEvents: true,                    // Enable auto-tracking
-  autoEventsDisabledPaths: [           // Paths to exclude
-    '/admin',
-    '/checkout'
-  ],
-  autoEventsDisabledEvents: [          // Events to disable
-    'copy',
-    'input_change'
-  ],
-  debug: false                         // Enable console logging
-});
-```
-
-### React Integration
-
-```jsx
-// cryptique.js - Create a singleton instance
-import Cryptique from 'cryptique-sdk';
-
-export const cryptique = new Cryptique({
-  siteId: process.env.REACT_APP_CRYPTIQUE_SITE_ID,
-  autoEvents: true
-});
-
-// App.jsx - Initialize on mount
-import { useEffect } from 'react';
-import { cryptique } from './cryptique';
-
-function App() {
-  useEffect(() => {
-    // SDK initializes automatically
-    // Optionally identify user when logged in
-    if (user) {
-      cryptique.identify(user.id, {
-        email: user.email,
-        plan: user.plan
-      });
-    }
-  }, [user]);
-
-  return <YourApp />;
-}
-```
-
-### Next.js Integration
-
-```jsx
-// lib/cryptique.js
-import Cryptique from 'cryptique-sdk';
-
-let cryptique;
-
-export function getCryptique() {
-  if (typeof window === 'undefined') return null;
-  
-  if (!cryptique) {
-    cryptique = new Cryptique({
-      siteId: process.env.NEXT_PUBLIC_CRYPTIQUE_SITE_ID,
-      autoEvents: true
-    });
-  }
-  
-  return cryptique;
-}
-
-// app/layout.jsx (App Router) or _app.jsx (Pages Router)
-'use client';
-import { useEffect } from 'react';
-import { getCryptique } from '@/lib/cryptique';
-
-export default function RootLayout({ children }) {
-  useEffect(() => {
-    getCryptique(); // Initialize on client
-  }, []);
-
-  return (
+    ```html
+    <!DOCTYPE html>
     <html>
-      <body>{children}</body>
+    <head>
+      <meta charset="utf-8">
+      <title>My App</title>
+      
+      <!-- Cryptique - load early for complete tracking -->
+      <script>
+        var script = document.createElement('script');
+        script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+        script.setAttribute('site-id', 'YOUR_SITE_ID');
+        script.setAttribute('auto-events', 'true');
+        document.head.appendChild(script);
+      </script>
+    </head>
+    <body>
+      <!-- Your content -->
+    </body>
     </html>
-  );
-}
-```
+    ```
 
-### Vue Integration
+    After loading via CDN, the global `Cryptique` object is available:
 
-```javascript
-// plugins/cryptique.js
-import Cryptique from 'cryptique-sdk';
+    ```javascript
+    // Track events
+    Cryptique.track('button_clicked', { button_name: 'signup' });
 
-export default {
-  install(app) {
-    const cryptique = new Cryptique({
-      siteId: import.meta.env.VITE_CRYPTIQUE_SITE_ID,
+    // Identify users
+    Cryptique.identify('user_123');
+
+    // Set user properties
+    Cryptique.people.set({ plan: 'pro' });
+    ```
+  </Tab>
+
+  <Tab title="npm Package">
+    ## npm Installation
+
+    For JavaScript/TypeScript projects with a build system:
+
+    ```bash
+    npm install cryptique-sdk
+    ```
+
+    Or with yarn:
+
+    ```bash
+    yarn add cryptique-sdk
+    ```
+
+    ### Basic Usage
+
+    ```javascript
+    import Cryptique from 'cryptique-sdk';
+
+    // Initialize (async – returns the same Cryptique instance)
+    await Cryptique.init({
+      siteId: 'YOUR_SITE_ID',
       autoEvents: true
     });
-    
-    app.config.globalProperties.$cryptique = cryptique;
-    app.provide('cryptique', cryptique);
-  }
-};
 
-// main.js
-import { createApp } from 'vue';
-import App from './App.vue';
-import cryptique from './plugins/cryptique';
+    // Use the global Cryptique object
+    Cryptique.track('button_clicked', { button_name: 'signup' });
+    Cryptique.identify('user_123');
+    Cryptique.people.set({ plan: 'pro' });
+    ```
 
-createApp(App).use(cryptique).mount('#app');
+    ### Configuration Options
 
-// Component usage
-import { inject } from 'vue';
+    ```javascript
+    import Cryptique from 'cryptique-sdk';
 
-const cryptique = inject('cryptique');
-cryptique.track('feature_used', { feature: 'swap' });
-```
+    await Cryptique.init({
+      // Required
+      siteId: 'YOUR_SITE_ID',
+      
+      // Optional
+      autoEvents: true,                    // Enable auto-tracking
+      autoEventsDisabledPaths: [           // Paths to exclude
+        '/admin',
+        '/checkout'
+      ],
+      autoEventsDisabledEvents: [          // Events to disable
+        'copy',
+        'input_change'
+      ],
+      debug: false                         // Enable console logging
+    });
+    ```
 
-## Google Tag Manager
+    ### React Integration
 
-### Setup Steps
+    ```jsx
+    // lib/cryptique.js
+    import Cryptique from 'cryptique-sdk';
 
-1. **Create a new tag** in Google Tag Manager
-2. Choose **Custom HTML** as the tag type
-3. Paste the following code:
+    let initialized = false;
 
-```html
-<script>
-  var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
-  script.setAttribute('site-id', 'YOUR_SITE_ID');
-  script.setAttribute('auto-events', 'true');
-  document.head.appendChild(script);
-</script>
-```
+    export async function initCryptique() {
+      if (initialized) return;
+      
+      await Cryptique.init({
+        siteId: process.env.REACT_APP_CRYPTIQUE_SITE_ID,
+        autoEvents: true
+      });
+      
+      initialized = true;
+    }
 
-4. **Set the trigger** to "All Pages" or your preferred trigger
-5. **Save** and **Publish** the container
+    // App.jsx
+    import { useEffect } from 'react';
+    import Cryptique from 'cryptique-sdk';
+    import { initCryptique } from './lib/cryptique';
 
-See the [Google Tag Manager guide](/integrations/google-tag-manager) for advanced configurations.
+    function App() {
+      useEffect(() => {
+        initCryptique();
+      }, []);
 
-## Other Tag Managers
+      useEffect(() => {
+        if (user) {
+          Cryptique.identify(user.id);
+          Cryptique.people.set({
+            email: user.email,
+            plan: user.plan
+          });
+        }
+      }, [user]);
 
-Cryptique works with any tag manager that supports custom HTML/JavaScript:
+      return <YourApp />;
+    }
+    ```
 
-- **Segment**: Use the custom destination feature
-- **Tealium**: Add as a custom tag
-- **Adobe Launch**: Create a custom extension
-- **Matomo Tag Manager**: Add as custom HTML
+    ### Next.js Integration
 
-See [Other Tag Managers](/integrations/other-tag-managers) for specific instructions.
+    ```jsx
+    // lib/cryptique.js
+    import Cryptique from 'cryptique-sdk';
+
+    let initialized = false;
+
+    export async function initCryptique() {
+      if (typeof window === 'undefined') return;
+      if (initialized) return;
+      
+      await Cryptique.init({
+        siteId: process.env.NEXT_PUBLIC_CRYPTIQUE_SITE_ID,
+        autoEvents: true
+      });
+      
+      initialized = true;
+    }
+
+    // app/layout.jsx (App Router)
+    'use client';
+    import { useEffect } from 'react';
+    import { initCryptique } from '@/lib/cryptique';
+
+    export default function RootLayout({ children }) {
+      useEffect(() => {
+        initCryptique();
+      }, []);
+
+      return (
+        <html>
+          <body>{children}</body>
+        </html>
+      );
+    }
+
+    // Any component
+    import Cryptique from 'cryptique-sdk';
+
+    function MyComponent() {
+      const handleClick = () => {
+        Cryptique.track('feature_used', { feature: 'swap' });
+      };
+
+      return <button onClick={handleClick}>Swap</button>;
+    }
+    ```
+
+    ### Vue Integration
+
+    ```javascript
+    // plugins/cryptique.js
+    import Cryptique from 'cryptique-sdk';
+
+    export default {
+      async install(app) {
+        await Cryptique.init({
+          siteId: import.meta.env.VITE_CRYPTIQUE_SITE_ID,
+          autoEvents: true
+        });
+        
+        app.config.globalProperties.$cryptique = Cryptique;
+        app.provide('cryptique', Cryptique);
+      }
+    };
+
+    // main.js
+    import { createApp } from 'vue';
+    import App from './App.vue';
+    import cryptiquePlugin from './plugins/cryptique';
+
+    const app = createApp(App);
+    app.use(cryptiquePlugin);
+    app.mount('#app');
+
+    // Component usage
+    import Cryptique from 'cryptique-sdk';
+
+    Cryptique.track('feature_used', { feature: 'swap' });
+    ```
+  </Tab>
+
+  <Tab title="Google Tag Manager">
+    ## Google Tag Manager
+
+    Deploy Cryptique via GTM without modifying your codebase.
+
+    ### Setup Steps
+
+    <Steps>
+      <Step title="Create New Tag">
+        In GTM, go to **Tags** → **New** → **Tag Configuration** → **Custom HTML**
+      </Step>
+      
+      <Step title="Add Script">
+        Paste the following code:
+
+        ```html
+        <script>
+          var script = document.createElement('script');
+          script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+          script.setAttribute('site-id', 'YOUR_SITE_ID');
+          script.setAttribute('auto-events', 'true');
+          document.head.appendChild(script);
+        </script>
+        ```
+      </Step>
+      
+      <Step title="Set Trigger">
+        Click **Triggering** → Select **All Pages**
+      </Step>
+      
+      <Step title="Save and Publish">
+        Click **Save**, then **Submit** to publish
+      </Step>
+    </Steps>
+
+    ### Full Configuration
+
+    ```html
+    <script>
+      var script = document.createElement('script');
+      script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+      script.setAttribute('site-id', 'YOUR_SITE_ID');
+      script.setAttribute('auto-events', 'true');
+      script.setAttribute('auto-events-disabled-paths', '/admin,/internal');
+      script.setAttribute('auto-events-disabled-events', 'copy,input_change');
+      document.head.appendChild(script);
+    </script>
+    ```
+
+    ### Custom Events via Data Layer
+
+    Push events from your site to GTM, then forward to Cryptique:
+
+    **On your website:**
+    ```javascript
+    dataLayer.push({
+      event: 'cryptique_track',
+      eventName: 'button_clicked',
+      eventProperties: { button_name: 'signup' }
+    });
+    ```
+
+    **GTM Custom HTML Tag:**
+    ```html
+    <script>
+      if (window.Cryptique) {
+        Cryptique.track('{{DL - eventName}}', {{DL - eventProperties}});
+      }
+    </script>
+    ```
+
+    See the [Google Tag Manager guide](/integrations/google-tag-manager) for advanced configurations.
+  </Tab>
+</Tabs>
 
 ## Verification
 

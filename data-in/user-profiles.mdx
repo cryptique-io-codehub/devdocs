@@ -54,7 +54,7 @@ User profiles in Cryptique aggregate all data about a single user: their events,
 Link a distinct_id to user properties:
 
 ```javascript
-cryptique.identify('user_12345', {
+Cryptique.identify('user_12345', {
   email: 'user@example.com',
   name: 'John Doe',
   plan: 'pro',
@@ -73,7 +73,7 @@ cryptique.identify('user_12345', {
 Set profile properties (overwrites existing):
 
 ```javascript
-cryptique.people.set({
+Cryptique.people.set({
   plan: 'enterprise',
   company: 'Acme Corp',
   team_size: 50
@@ -85,7 +85,7 @@ cryptique.people.set({
 Set properties only if not already set:
 
 ```javascript
-cryptique.people.set_once({
+Cryptique.people.set_once({
   first_purchase_date: '2024-01-15',
   referral_source: 'twitter',
   original_plan: 'free'
@@ -97,7 +97,7 @@ cryptique.people.set_once({
 Increment numeric properties:
 
 ```javascript
-cryptique.people.increment({
+Cryptique.people.increment({
   login_count: 1,
   total_swaps: 5,
   lifetime_volume_usd: 1500.00
@@ -109,7 +109,7 @@ cryptique.people.increment({
 Add items to list properties:
 
 ```javascript
-cryptique.people.append({
+Cryptique.people.append({
   favorite_tokens: 'ARB',
   visited_pages: '/swap'
 });
@@ -120,7 +120,7 @@ cryptique.people.append({
 Add unique items to list properties:
 
 ```javascript
-cryptique.people.union({
+Cryptique.people.union({
   connected_chains: ['ethereum', 'arbitrum'],
   used_features: ['swap', 'bridge']
 });
@@ -131,7 +131,7 @@ cryptique.people.union({
 Remove items from list properties:
 
 ```javascript
-cryptique.people.remove({
+Cryptique.people.remove({
   watchlist: 'DOGE'
 });
 ```
@@ -141,7 +141,7 @@ cryptique.people.remove({
 Delete properties from profile:
 
 ```javascript
-cryptique.people.unset(['temporary_flag', 'deprecated_field']);
+Cryptique.people.unset(['temporary_flag', 'deprecated_field']);
 ```
 
 ### people.delete()
@@ -149,7 +149,7 @@ cryptique.people.unset(['temporary_flag', 'deprecated_field']);
 Delete entire profile:
 
 ```javascript
-cryptique.people.delete();
+Cryptique.people.delete();
 ```
 
 <Warning>
@@ -174,7 +174,7 @@ distinct_id: "anon_a1b2c3d4e5f6"
 After calling `identify()`:
 
 ```javascript
-cryptique.identify('user_12345');
+Cryptique.identify('user_12345');
 // distinct_id becomes: "user_12345"
 ```
 
@@ -182,19 +182,23 @@ cryptique.identify('user_12345');
 
 When an anonymous user identifies, their history is linked:
 
-```
-Before identify():
-├── anon_xyz789 (anonymous)
-│   ├── page_view (Jan 1)
-│   ├── click (Jan 1)
-│   └── wallet_connect (Jan 2)
-
-After identify('user_12345'):
-├── user_12345 (identified)
-│   ├── page_view (Jan 1)      ← merged
-│   ├── click (Jan 1)          ← merged
-│   ├── wallet_connect (Jan 2) ← merged
-│   └── purchase (Jan 2)       ← new
+```mermaid
+flowchart LR
+    subgraph Before["Before identify()"]
+        A[anon_xyz789 anonymous]
+        A --> A1[page_view]
+        A --> A2[click]
+        A --> A3[wallet_connect]
+    end
+    A -->|identify called| ID[identify user_12345]
+    ID --> B
+    subgraph After["After identify('user_12345')"]
+        B[user_12345 identified]
+        B --> B1[page_view merged]
+        B --> B2[click merged]
+        B --> B3[wallet_connect merged]
+        B --> B4[purchase new]
+    end
 ```
 
 ## Wallet Linking
@@ -204,10 +208,7 @@ After identify('user_12345'):
 When using `wallet.connect()`, wallets are automatically linked to profiles:
 
 ```javascript
-cryptique.wallet.connect('0x1234...', {
-  wallet_type: 'metamask',
-  chain_id: 1
-});
+Cryptique.walletAddress('0x1234...');
 
 // Profile now includes:
 // {
@@ -221,8 +222,8 @@ cryptique.wallet.connect('0x1234...', {
 Users can connect multiple wallets:
 
 ```javascript
-cryptique.wallet.connect('0x1234...'); // First wallet
-cryptique.wallet.connect('0xabcd...'); // Second wallet
+Cryptique.walletAddress('0x1234...'); // First wallet
+Cryptique.walletAddress('0xabcd...'); // Second wallet
 
 // Profile:
 // {
@@ -235,14 +236,15 @@ cryptique.wallet.connect('0xabcd...'); // Second wallet
 
 Once linked, all transactions from user's wallets are attributed to their profile:
 
-```
-User Profile (distinct_id: "user_12345")
-├── Properties: email, plan, etc.
-├── Wallets: ["0x1234...", "0xabcd..."]
-└── Transactions:
-    ├── 0x1234... → Swap (Jan 15)
-    ├── 0x1234... → Stake (Jan 16)
-    └── 0xabcd... → Mint (Jan 17)
+```mermaid
+flowchart TB
+    P[User Profile<br/>distinct_id: user_12345]
+    P --> Props[Properties: email, plan, etc.]
+    P --> W[Wallets: 0x1234..., 0xabcd...]
+    P --> T[Transactions]
+    T --> T1[0x1234... → Swap Jan 15]
+    T --> T2[0x1234... → Stake Jan 16]
+    T --> T3[0xabcd... → Mint Jan 17]
 ```
 
 ## Wallet Enrichment
@@ -308,10 +310,10 @@ Search: user@example.com
 
 ```javascript
 // Profile property - describes the user
-cryptique.people.set({ plan: 'pro' });
+Cryptique.people.set({ plan: 'pro' });
 
 // Event property - describes this specific action
-cryptique.track('feature_used', {
+Cryptique.track('feature_used', {
   feature_name: 'advanced_charts',  // event context
   // plan: 'pro' - available from profile in reports
 });
@@ -323,7 +325,7 @@ cryptique.track('feature_used', {
 
 ```javascript
 // ✅ Good - Useful for segmentation
-cryptique.identify('user_12345', {
+Cryptique.identify('user_12345', {
   plan: 'pro',
   company_size: 'enterprise',
   industry: 'defi',
@@ -331,7 +333,7 @@ cryptique.identify('user_12345', {
 });
 
 // ❌ Avoid - Not useful
-cryptique.identify('user_12345', {
+Cryptique.identify('user_12345', {
   random_id: 'abc123',
   internal_flag: true
 });
@@ -341,29 +343,29 @@ cryptique.identify('user_12345', {
 
 ```javascript
 // ✅ set() for current state
-cryptique.people.set({ plan: 'pro' });
+Cryptique.people.set({ plan: 'pro' });
 
 // ✅ set_once() for first occurrence
-cryptique.people.set_once({ first_purchase_date: '2024-01-15' });
+Cryptique.people.set_once({ first_purchase_date: '2024-01-15' });
 
 // ✅ increment() for counters
-cryptique.people.increment({ login_count: 1 });
+Cryptique.people.increment({ login_count: 1 });
 
 // ❌ Don't use set() for counters
-cryptique.people.set({ login_count: 47 }); // Race condition!
+Cryptique.people.set({ login_count: 47 }); // Race condition!
 ```
 
 ### Handle privacy
 
 ```javascript
 // ✅ Only collect necessary data
-cryptique.identify('user_12345', {
+Cryptique.identify('user_12345', {
   plan: 'pro',
   country: 'US'
 });
 
 // ❌ Don't collect sensitive data unnecessarily
-cryptique.identify('user_12345', {
+Cryptique.identify('user_12345', {
   ssn: '123-45-6789',        // Never!
   credit_card: '4111...',    // Never!
   password: '...'            // Never!

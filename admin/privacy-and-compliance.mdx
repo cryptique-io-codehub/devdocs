@@ -117,27 +117,6 @@ window.addEventListener('CookiebotOnAccept', function(e) {
 });
 ```
 
-### Opt-Out Mechanism
-
-Provide users a way to opt out:
-
-```javascript
-// User opts out
-function optOutCryptique() {
-  if (window.cryptique) {
-    window.cryptique.optOut();
-  }
-  localStorage.setItem('cryptique_opt_out', 'true');
-}
-
-// Check on page load
-if (localStorage.getItem('cryptique_opt_out') === 'true') {
-  // Don't load Cryptique
-} else {
-  loadCryptique();
-}
-```
-
 ## Data Retention
 
 ### Retention Periods
@@ -259,7 +238,7 @@ For California Consumer Privacy Act:
 
 ✅ **Right to know**: Access user data via search
 ✅ **Right to delete**: Delete user profiles
-✅ **Right to opt-out**: Provide opt-out mechanism
+✅ **Right to opt-out**: Honor user preference (e.g. do not load SDK when user opts out)
 
 ### Cookie Usage
 
@@ -330,7 +309,7 @@ Contact support for compliance documentation.
 3. ✅ Implement consent if required
 4. ✅ Configure data retention
 5. ✅ Exclude sensitive paths
-6. ✅ Test opt-out mechanism
+6. ✅ Test that opt-out is honored (e.g. SDK not loaded when user opts out)
 
 ### Ongoing
 
@@ -353,7 +332,7 @@ We use Cryptique for product analytics. Cryptique collects:
 - Wallet addresses (if you connect a wallet)
 
 This data helps us improve our product. We do not sell your data.
-You can opt out of analytics by [your opt-out method].
+You can opt out of analytics by disabling or not loading the analytics script.
 
 For more information, see Cryptique's privacy policy at 
 https://cryptique.io/privacy

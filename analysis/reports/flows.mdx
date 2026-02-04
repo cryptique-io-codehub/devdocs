@@ -66,11 +66,12 @@ Flows (also called Sankey diagrams) visualize the paths users take through your 
 
 See what users do **after** an event:
 
-```
-                    ┌─→ swap_completed (40%)
-wallet_connect ─────┼─→ page_view: /pools (25%)
-                    ├─→ page_view: /docs (20%)
-                    └─→ session_end (15%)
+```mermaid
+flowchart LR
+    A[wallet_connect] --> B[swap_completed<br/>40%]
+    A --> C[page_view: /pools<br/>25%]
+    A --> D[page_view: /docs<br/>20%]
+    A --> E[session_end<br/>15%]
 ```
 
 **Use for:**
@@ -82,11 +83,12 @@ wallet_connect ─────┼─→ page_view: /pools (25%)
 
 See what users do **before** an event:
 
-```
-page_view: /landing (30%) ─┐
-page_view: /docs (25%) ────┼─→ wallet_connect
-referral_link (25%) ───────┤
-direct_visit (20%) ────────┘
+```mermaid
+flowchart LR
+    A[page_view: /landing<br/>30%] --> E[wallet_connect]
+    B[page_view: /docs<br/>25%] --> E
+    C[referral_link<br/>25%] --> E
+    D[direct_visit<br/>20%] --> E
 ```
 
 **Use for:**
@@ -98,12 +100,31 @@ direct_visit (20%) ────────┘
 
 See the complete journey around an event:
 
-```
-[Before]                  [Event]              [After]
-landing (30%) ──┐                      ┌──→ swap_init (40%)
-docs (25%) ─────┼──→ wallet_connect ───┼──→ pool_view (25%)
-referral (25%) ─┤                      ├──→ docs (20%)
-direct (20%) ───┘                      └──→ leave (15%)
+```mermaid
+flowchart LR
+    subgraph Before["Before"]
+        A1[landing 30%]
+        A2[docs 25%]
+        A3[referral 25%]
+        A4[direct 20%]
+    end
+    subgraph Event["Event"]
+        B[wallet_connect]
+    end
+    subgraph After["After"]
+        C1[swap_init 40%]
+        C2[pool_view 25%]
+        C3[docs 20%]
+        C4[leave 15%]
+    end
+    A1 --> B
+    A2 --> B
+    A3 --> B
+    A4 --> B
+    B --> C1
+    B --> C2
+    B --> C3
+    B --> C4
 ```
 
 **Use for:**
@@ -115,12 +136,11 @@ direct (20%) ───┘                      └──→ leave (15%)
 
 ### Sankey Structure
 
-```
-                         ┌──→ Event B (500 users, 50%)
-Event A (1000 users) ────┤
-                         ├──→ Event C (300 users, 30%)
-                         │
-                         └──→ Event D (200 users, 20%)
+```mermaid
+flowchart LR
+    A[Event A<br/>1000 users] --> B[Event B<br/>500 users, 50%]
+    A --> C[Event C<br/>300 users, 30%]
+    A --> D[Event D<br/>200 users, 20%]
 ```
 
 **Wider paths** = More users taking that route
@@ -128,15 +148,31 @@ Event A (1000 users) ────┤
 
 ### Multi-Step Flows
 
-```
-Step 1          Step 2            Step 3
-                ┌──→ swap ────────┬──→ success (80%)
-connect ────────┤                 └──→ fail (20%)
-                │
-                ├──→ pool ────────┬──→ add_liq (60%)
-                │                 └──→ leave (40%)
-                │
-                └──→ leave ───────── (end)
+```mermaid
+flowchart LR
+    subgraph Step1["Step 1"]
+        A[connect]
+    end
+    subgraph Step2["Step 2"]
+        B1[swap]
+        B2[pool]
+        B3[leave]
+    end
+    subgraph Step3["Step 3"]
+        C1[success 80%]
+        C2[fail 20%]
+        C3[add_liq 60%]
+        C4[leave 40%]
+        C5[end]
+    end
+    A --> B1
+    B1 --> C1
+    B1 --> C2
+    A --> B2
+    B2 --> C3
+    B2 --> C4
+    A --> B3
+    B3 --> C5
 ```
 
 ## Configuration Options
@@ -226,67 +262,65 @@ See recent behavior patterns
 
 ### Post-Wallet Connection
 
-```
-Starting Event: wallet_connect
-Direction: 5 Steps After
+**Starting Event:** `wallet_connect` · **Direction:** 5 Steps After
 
-What do users do after connecting?
-├── 40% → swap_initiated
-│         └── 75% → transaction (swap)
-├── 25% → pool_viewed
-│         └── 50% → liquidity_added
-├── 20% → docs_viewed
-│         └── 30% → wallet_connect (different wallet?)
-└── 15% → session_end
-          └── (left without action)
+```mermaid
+flowchart TB
+    A[wallet_connect] --> B[swap_initiated 40%]
+    A --> C[pool_viewed 25%]
+    A --> D[docs_viewed 20%]
+    A --> E[session_end 15%]
+    B --> B1[transaction swap 75%]
+    C --> C1[liquidity_added 50%]
+    D --> D1[wallet_connect 30%]
 ```
 
 ### Pre-Transaction Path
 
-```
-Starting Event: Transaction (any)
-Direction: 5 Steps Before
+**Starting Event:** Transaction (any) · **Direction:** 5 Steps Before
 
-What leads to on-chain transactions?
-├── swap_initiated (60%)
-│   └── swap_quoted (85%)
-│       └── token_selected (90%)
-├── liquidity_add_clicked (20%)
-│   └── pool_viewed (75%)
-└── stake_clicked (20%)
-    └── staking_page_viewed (80%)
+```mermaid
+flowchart TB
+    A1[token_selected 90%] --> A2[swap_quoted 85%] --> A3[swap_initiated 60%] --> T[Transaction]
+    B1[pool_viewed 75%] --> B2[liquidity_add_clicked 20%] --> T
+    C1[staking_page_viewed 80%] --> C2[stake_clicked 20%] --> T
 ```
 
 ### Cross-Chain Exploration
 
-```
-Starting Event: chain_changed
-Direction: Steps Before & After
-Breakdown: new_chain
+**Starting Event:** `chain_changed` · **Breakdown:** new_chain
 
-Before changing to Arbitrum:
-├── swap_failed (gas error) on Ethereum (40%)
-├── price_comparison_viewed (35%)
-└── gas_estimate_viewed (25%)
-
-After changing to Arbitrum:
-├── swap_completed (65%)
-└── returned_to_ethereum (35%)
+```mermaid
+flowchart LR
+    subgraph Before["Before → Arbitrum"]
+        A1[swap_failed Ethereum 40%]
+        A2[price_comparison_viewed 35%]
+        A3[gas_estimate_viewed 25%]
+    end
+    E[chain_changed]
+    subgraph After["After"]
+        B1[swap_completed 65%]
+        B2[returned_to_ethereum 35%]
+    end
+    A1 --> E
+    A2 --> E
+    A3 --> E
+    E --> B1
+    E --> B2
 ```
 
 ### NFT Journey
 
-```
-Starting Event: nft_viewed
-Direction: 5 Steps After
-Filter: collection = "CoolCats"
+**Starting Event:** `nft_viewed` · **Filter:** collection = "CoolCats"
 
-├── 35% → additional_nft_viewed
-├── 30% → wallet_connect
-│         └── 60% → mint_initiated
-│                   └── 70% → transaction (mint)
-├── 20% → collection_explored
-└── 15% → session_end
+```mermaid
+flowchart TB
+    A[nft_viewed] --> B[additional_nft_viewed 35%]
+    A --> C[wallet_connect 30%]
+    A --> D[collection_explored 20%]
+    A --> E[session_end 15%]
+    C --> C1[mint_initiated 60%]
+    C1 --> C2[transaction mint 70%]
 ```
 
 ## Analyzing Flows
@@ -314,39 +348,44 @@ If 20% of users go: checkout → settings → checkout
 **Exit Points:**
 Where do users leave?
 
+```mermaid
+flowchart LR
+    A[swap_initiated] --> B[session_end 25%]
 ```
-swap_initiated → session_end (25%)
 → Users leaving before completing—investigate UX
-```
 
 **Detours:**
 Where do users go instead of converting?
 
+```mermaid
+flowchart LR
+    subgraph Expected["Expected"]
+        A1[swap_page] --> B1[swap_completed]
+    end
+    subgraph Actual["Actual"]
+        A2[swap_page] --> B2[docs 40%]
+    end
 ```
-Expected: swap_page → swap_completed
-Actual: swap_page → docs (40%)
 → Users need more information before swapping
-```
 
 ### Comparing Segments
 
 Use breakdowns to compare:
 
+```mermaid
+flowchart TB
+    subgraph Mobile["Mobile after wallet_connect"]
+        M[wallet_connect] --> M1[swap 25%]
+        M --> M2[leave 40%]
+        M --> M3[browse 35%]
+    end
+    subgraph Desktop["Desktop after wallet_connect"]
+        D[wallet_connect] --> D1[swap 45%]
+        D --> D2[leave 20%]
+        D --> D3[browse 35%]
+    end
 ```
-Mobile vs Desktop after wallet_connect:
-
-Mobile:
-├── swap: 25%
-├── leave: 40%
-└── browse: 35%
-
-Desktop:
-├── swap: 45%
-├── leave: 20%
-└── browse: 35%
-
 → Mobile users leaving more—mobile UX issue?
-```
 
 ## Best Practices
 

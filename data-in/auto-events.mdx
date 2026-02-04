@@ -12,8 +12,6 @@ When `auto-events` is enabled, Cryptique automatically captures user interaction
 | Event | Description | Key Properties |
 |-------|-------------|----------------|
 | `page_view` | Page load or navigation | `current_url`, `page_title`, `referrer` |
-| `session_start` | New session begins | `session_id`, `initial_referrer` |
-| `session_end` | Session ends (30-min timeout) | `session_duration`, `page_count` |
 | `click` | Element clicked | `element_name`, `element_id`, `element_class` |
 | `scroll` | Scroll depth milestones | `scroll_depth`, `scroll_direction` |
 | `form_submit` | Form submission | `form_id`, `form_name`, `form_action` |
@@ -41,29 +39,6 @@ Captured on every page load and client-side navigation (SPA).
 ```
 
 **SPA Support**: Automatically detects History API navigation (`pushState`, `replaceState`) and hash changes.
-
-### session_start / session_end
-
-Sessions group user activity with a 30-minute inactivity timeout.
-
-```json
-{
-  "event_name": "session_start",
-  "properties": {
-    "session_id": "abc123xyz",
-    "initial_referrer": "https://twitter.com/...",
-    "landing_page": "/",
-    "utm_source": "twitter",
-    "utm_medium": "social",
-    "utm_campaign": "launch"
-  }
-}
-```
-
-**Session Rules**:
-- New session starts after 30 minutes of inactivity
-- New session starts at midnight (user's local time)
-- New session starts when UTM parameters change
 
 ### click
 
@@ -177,7 +152,7 @@ Captures wallet connection state changes.
 ```
 
 <Note>
-For automatic wallet detection to work, ensure your wallet integration fires standard events. For custom implementations, use `cryptique.wallet.connect()`.
+For automatic wallet detection to work, ensure your wallet integration fires standard events. For custom implementations, use `Cryptique.walletAddress()`.
 </Note>
 
 ## Configuration
@@ -269,7 +244,7 @@ Auto-events capture generic interactions. Add custom events for business-specifi
 ```javascript
 // Auto-event captures: click on element with class "swap-btn"
 // Custom event adds context:
-cryptique.track('swap_initiated', {
+Cryptique.track('swap_initiated', {
   input_token: 'ETH',
   output_token: 'USDC',
   amount: 1.5,

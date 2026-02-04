@@ -135,10 +135,10 @@ dataLayer.push({
 **GTM Tag (Custom HTML):**
 ```html
 <script>
-  if (window.cryptique) {
+  if (window.Cryptique) {
     var eventName = '{{DL - eventName}}';
     var eventProps = '{{DL - eventProperties}}';
-    window.cryptique.track(eventName, eventProps);
+    window.Cryptique.track(eventName, eventProps);
   }
 </script>
 ```
@@ -153,8 +153,8 @@ After Cryptique loads, you can track directly:
 <script>
   // Wait for Cryptique to be available
   function trackWithCryptique(eventName, properties) {
-    if (window.cryptique) {
-      window.cryptique.track(eventName, properties);
+    if (window.Cryptique) {
+      window.Cryptique.track(eventName, properties);
     } else {
       setTimeout(function() {
         trackWithCryptique(eventName, properties);
@@ -177,8 +177,8 @@ Create a tag to identify users when they log in:
 
 ```html
 <script>
-  if (window.cryptique && '{{User ID}}') {
-    window.cryptique.identify('{{User ID}}', {
+  if (window.Cryptique && '{{User ID}}') {
+    window.Cryptique.identify('{{User ID}}', {
       email: '{{User Email}}',
       name: '{{User Name}}',
       plan: '{{User Plan}}'
@@ -195,8 +195,8 @@ Track wallet connections:
 
 ```html
 <script>
-  if (window.cryptique && '{{Wallet Address}}') {
-    window.cryptique.setWallet('{{Wallet Address}}');
+  if (window.Cryptique && '{{Wallet Address}}') {
+    window.Cryptique.walletAddress('{{Wallet Address}}');
   }
 </script>
 ```
@@ -258,7 +258,7 @@ For tags that depend on Cryptique:
 ```html
 <script>
   function waitForCryptique(callback) {
-    if (window.cryptique) {
+    if (window.Cryptique) {
       callback();
     } else {
       setTimeout(function() {
@@ -269,7 +269,7 @@ For tags that depend on Cryptique:
   
   waitForCryptique(function() {
     // Your code that needs Cryptique
-    window.cryptique.track('dependent_event');
+    window.Cryptique.track('dependent_event');
   });
 </script>
 ```
@@ -291,10 +291,10 @@ In browser console:
 
 ```javascript
 // Check if Cryptique loaded
-console.log(window.cryptique); // Should show Cryptique object
+console.log(window.Cryptique); // Should show Cryptique object
 
 // Check initialization
-console.log(window.cryptique.getSiteId()); // Should show your Site ID
+console.log(window.Cryptique.getSiteId()); // Should show your Site ID
 ```
 
 ### Network Tab

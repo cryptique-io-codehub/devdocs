@@ -26,39 +26,9 @@ This data is captured in session data without any code required.
 
 ---
 
-## Cryptique.connectWallet()
-
-Trigger the wallet connection flow programmatically.
-
-```javascript
-Cryptique.connectWallet()
-```
-
-### Returns
-
-`void` - The wallet address is captured automatically when the user connects.
-
-### Example
-
-```javascript
-// Button click handler
-function handleConnectClick() {
-  Cryptique.connectWallet();
-}
-```
-
-```jsx
-// React component
-<button onClick={() => Cryptique.connectWallet()}>
-  Connect Wallet
-</button>
-```
-
----
-
 ## Cryptique.walletAddress()
 
-Manually associate a wallet address with the current user. Use this when you already have the wallet address from your own connection flow.
+Associate a wallet address with the current user. Use this when you have the wallet address from your connection flow.
 
 ```javascript
 Cryptique.walletAddress(address)
@@ -134,7 +104,7 @@ Cryptique.walletAddress('0x222...');
 
 ## Wallet Disconnect Behavior
 
-There is no explicit `Cryptique.disconnectWallet()` method. Disconnection is handled automatically:
+There is no explicit disconnect method. Disconnection is handled automatically:
 
 1. SDK listens to `accountsChanged` events
 2. When accounts become empty (disconnected), session data updates
@@ -191,9 +161,9 @@ When a wallet is connected, these fields are captured in session data:
       useEffect(() => {
         if (isConnected && address) {
           Cryptique.walletAddress(address);
-          Cryptique.track('Wallet Connected', {
+          Cryptique.track('wallet_connected', {
             address: address,
-            walletType: connector?.name
+            wallet_type: connector?.name
           });
         }
       }, [isConnected, address, connector]);
@@ -233,9 +203,9 @@ When a wallet is connected, these fields are captured in session data:
       
       // Track with Cryptique
       Cryptique.walletAddress(address);
-      Cryptique.track('Wallet Connected', {
+      Cryptique.track('wallet_connected', {
         address: address,
-        chainId: Number(network.chainId)
+        chain_id: Number(network.chainId)
       });
       
       return { address, provider, signer };
@@ -265,7 +235,7 @@ When a wallet is connected, these fields are captured in session data:
     modal.subscribeProvider(({ address, isConnected }) => {
       if (isConnected && address) {
         Cryptique.walletAddress(address);
-        Cryptique.track('Wallet Connected', { address });
+        Cryptique.track('wallet_connected', { address });
       }
     });
     ```
@@ -283,10 +253,10 @@ When a wallet is connected, these fields are captured in session data:
 function handleWalletConnect(address, chainId) {
   Cryptique.walletAddress(address);
   
-  Cryptique.track('Wallet Connected', {
+  Cryptique.track('wallet_connected', {
     address: address,
-    chainId: chainId,
-    connectionMethod: 'metamask'
+    chain_id: chainId,
+    connection_method: 'metamask'
   });
 }
 ```
@@ -296,9 +266,9 @@ function handleWalletConnect(address, chainId) {
 ```javascript
 // Track chain switches
 window.ethereum?.on('chainChanged', (chainId) => {
-  Cryptique.track('Chain Switched', {
-    newChainId: parseInt(chainId, 16),
-    chainName: getChainName(chainId)
+  Cryptique.track('chain_switched', {
+    new_chain_id: parseInt(chainId, 16),
+    chain_name: getChainName(chainId)
   });
 });
 ```
@@ -309,7 +279,7 @@ window.ethereum?.on('chainChanged', (chainId) => {
 // If user has multiple wallets, track the primary one
 function setPrimaryWallet(address) {
   Cryptique.people.set({
-    primaryWallet: address
+    primary_wallet: address
   });
 }
 ```
@@ -319,7 +289,7 @@ function setPrimaryWallet(address) {
 ## Related Methods
 
 <CardGroup cols={2}>
-  <Card title="Identify Users" icon="user" href="/guide/sdk-reference/identify">
+  <Card title="Identify Users" icon="user" href="/data-in/sdk-reference/identify">
     Link wallets to user identities
   </Card>
   <Card title="Wallet Enrichment" icon="database" href="/integrations/wallet-enrichment">

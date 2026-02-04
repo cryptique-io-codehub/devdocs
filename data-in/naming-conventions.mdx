@@ -13,15 +13,15 @@ Consistent naming makes your data easier to understand, query, and maintain. Thi
 
 ```javascript
 // ✅ Correct
-cryptique.track('swap_completed');
-cryptique.track('nft_minted');
-cryptique.track('liquidity_added');
+Cryptique.track('swap_completed');
+Cryptique.track('nft_minted');
+Cryptique.track('liquidity_added');
 
 // ❌ Avoid
-cryptique.track('SwapCompleted');      // PascalCase
-cryptique.track('swap-completed');     // kebab-case
-cryptique.track('Swap Completed');     // Title Case with spaces
-cryptique.track('swapcompleted');      // No separation
+Cryptique.track('SwapCompleted');      // PascalCase
+Cryptique.track('swap-completed');     // kebab-case
+Cryptique.track('Swap Completed');     // Title Case with spaces
+Cryptique.track('swapcompleted');      // No separation
 ```
 
 ### Use Action Verbs
@@ -205,7 +205,7 @@ updated_at: '2024-01-16T14:20:00Z'
 ### Identity Properties
 
 ```javascript
-cryptique.identify('user_12345', {
+Cryptique.identify('user_12345', {
   // Standard identity
   email: 'user@example.com',
   username: 'defi_whale',
@@ -220,7 +220,7 @@ cryptique.identify('user_12345', {
 ### Lifecycle Properties
 
 ```javascript
-cryptique.people.set({
+Cryptique.people.set({
   // Dates
   signup_date: '2024-01-01',
   first_purchase_date: '2024-01-15',
@@ -238,7 +238,7 @@ cryptique.people.set({
 ### Web3 Properties
 
 ```javascript
-cryptique.people.set({
+Cryptique.people.set({
   // Wallet info
   primary_chain: 'ethereum',
   connected_wallet_count: 2,
@@ -263,18 +263,18 @@ cryptique.people.set({
 'clicked_button_abc123'
 
 // ✅ Use properties instead
-cryptique.track('token_viewed', { token_address: '0x1234...' });
-cryptique.track('button_clicked', { button_id: 'abc123' });
+Cryptique.track('token_viewed', { token_address: '0x1234...' });
+Cryptique.track('button_clicked', { button_id: 'abc123' });
 ```
 
 ### Dynamic Event Names
 
 ```javascript
 // ❌ Don't generate event names dynamically
-cryptique.track(`${action}_${object}`);  // Could create thousands of events
+Cryptique.track(`${action}_${object}`);  // Could create thousands of events
 
 // ✅ Use a standard event with properties
-cryptique.track('user_action', {
+Cryptique.track('user_action', {
   action_type: action,
   target_object: object
 });
@@ -301,8 +301,8 @@ cryptique.track('user_action', {
 'wallet_0x1234_connected'
 
 // ✅ Use properties
-cryptique.track('user_logged_in', { user_id: '12345' });
-cryptique.track('wallet_connected', { wallet_address: '0x1234...' });
+Cryptique.track('user_logged_in', { user_id: '12345' });
+Cryptique.track('wallet_connected', { wallet_address: '0x1234...' });
 ```
 
 ## Naming Checklist

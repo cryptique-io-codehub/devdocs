@@ -71,54 +71,46 @@ In Cryptique, funnels are uniquely powerful because they can combine **off-chain
 
 Each funnel step is an event or transaction:
 
-```
-Step 1: page_view
-  └── where: uri = "/swap"
-  
-Step 2: wallet_connect
-  └── (any wallet connection)
-  
-Step 3: swap_initiated
-  └── where: input_token = "ETH"
-  
-Step 4: [Transaction] swapExactTokensForTokens
-  └── from contract: "Swap Router"
+```mermaid
+flowchart LR
+    S1[Step 1: page_view<br/>uri = /swap] --> S2[Step 2: wallet_connect]
+    S2 --> S3[Step 3: swap_initiated<br/>input_token = ETH]
+    S3 --> S4[Step 4: Transaction<br/>swapExactTokensForTokens<br/>Swap Router]
 ```
 
 ### Conversion Window
 
 Users must complete all steps within the window:
 
+```mermaid
+flowchart TB
+    subgraph UserA["User A — Converted ✓"]
+        A1[Day 1: page_view] --> A2[Day 3: wallet_connect] --> A3[Day 5: swap_initiated] --> A4[Day 6: Transaction]
+    end
+    subgraph UserB["User B — Not converted ✗"]
+        B1[Day 1: page_view] --> B2[Day 2: wallet_connect]
+        B2 -.->|Day 10: too late| B3[swap_initiated ✗]
+    end
 ```
-Conversion Window: 7 days
 
-User A:
-├── Day 1: page_view ✓
-├── Day 3: wallet_connect ✓
-├── Day 5: swap_initiated ✓
-└── Day 6: Transaction ✓
-→ Converted! (6 days)
-
-User B:
-├── Day 1: page_view ✓
-├── Day 2: wallet_connect ✓
-├── Day 10: swap_initiated ✗
-→ Did NOT convert (too late)
-```
+**Conversion Window: 7 days** — User A completed in 6 days; User B missed the window.
 
 ### Step Order
 
 Steps must occur in the defined order:
 
+```mermaid
+flowchart LR
+    A[Step 1: A] --> B[Step 2: B] --> C[Step 3: C] --> OK[Converted ✓]
 ```
-Step 1: A
-Step 2: B
-Step 3: C
+**Valid:** A → B → C
 
-User actions: A → B → C → Converted ✓
-User actions: A → C → B → NOT Converted ✗
-User actions: B → A → C → NOT Converted ✗
+```mermaid
+flowchart LR
+    A2[A] --> C2[C] --> B2[B]
+    B3[B] --> A3[A] --> C3[C]
 ```
+**Invalid:** A → C → B or B → A → C (order matters)
 
 ## Measurements
 
@@ -126,15 +118,11 @@ User actions: B → A → C → NOT Converted ✗
 
 Percentage of users who complete each step:
 
+```mermaid
+flowchart LR
+    S1[Step 1<br/>10,000 users<br/>100%] --> S2[Step 2<br/>3,500 users<br/>35%] --> S3[Step 3<br/>1,200 users<br/>12%] --> S4[Step 4<br/>800 users<br/>8%]
 ```
-Funnel Conversion:
-├── Step 1: 10,000 users (100%)
-├── Step 2: 3,500 users (35%)
-├── Step 3: 1,200 users (12%)
-└── Step 4: 800 users (8%)
-
-Overall Conversion: 8%
-```
+**Overall Conversion: 8%**
 
 ### Step-by-Step Rate
 
@@ -224,12 +212,13 @@ Funnel by user type:
 
 See the funnel as a visual diagram:
 
+```mermaid
+flowchart LR
+    L[Landing Page<br/>10,000 · 100%] --> W[Wallet Connect<br/>3,500 · 35%]
+    W --> S[Swap Init<br/>1,200 · 12%]
+    S --> T[Transaction<br/>800 · 8%]
 ```
-[Landing Page] → [Wallet Connect] → [Swap Init] → [Transaction]
-   10,000          3,500             1,200          800
-   100%            35%               12%            8%
-                   ↓ 65% drop        ↓ 23% drop     ↓ 4% drop
-```
+*65% drop → 23% drop → 4% drop between steps*
 
 ### Line Chart
 
