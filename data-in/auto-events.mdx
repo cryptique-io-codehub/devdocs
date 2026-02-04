@@ -1,0 +1,310 @@
+---
+title: "Auto-Events"
+description: "Events automatically captured by Cryptique without additional code"
+---
+
+## Overview
+
+When `auto-events` is enabled, Cryptique automatically captures user interactions without requiring any additional code. This provides comprehensive behavioral data out of the box.
+
+## Automatic Events
+
+| Event | Description | Key Properties |
+|-------|-------------|----------------|
+| `page_view` | Page load or navigation | `current_url`, `page_title`, `referrer` |
+| `session_start` | New session begins | `session_id`, `initial_referrer` |
+| `session_end` | Session ends (30-min timeout) | `session_duration`, `page_count` |
+| `click` | Element clicked | `element_name`, `element_id`, `element_class` |
+| `scroll` | Scroll depth milestones | `scroll_depth`, `scroll_direction` |
+| `form_submit` | Form submission | `form_id`, `form_name`, `form_action` |
+| `input_change` | Form field changed | `input_name`, `input_type` |
+| `copy` | Text copied | `copied_text` (truncated) |
+| `wallet_connect` | Wallet connected | `wallet_address`, `wallet_type` |
+| `wallet_disconnect` | Wallet disconnected | `wallet_address` |
+
+## Event Details
+
+### page_view
+
+Captured on every page load and client-side navigation (SPA).
+
+```json
+{
+  "event_name": "page_view",
+  "properties": {
+    "current_url": "https://app.example.com/swap",
+    "page_title": "Swap Tokens | Example DEX",
+    "referrer": "https://google.com/search?q=...",
+    "uri": "/swap"
+  }
+}
+```
+
+**SPA Support**: Automatically detects History API navigation (`pushState`, `replaceState`) and hash changes.
+
+### session_start / session_end
+
+Sessions group user activity with a 30-minute inactivity timeout.
+
+```json
+{
+  "event_name": "session_start",
+  "properties": {
+    "session_id": "abc123xyz",
+    "initial_referrer": "https://twitter.com/...",
+    "landing_page": "/",
+    "utm_source": "twitter",
+    "utm_medium": "social",
+    "utm_campaign": "launch"
+  }
+}
+```
+
+**Session Rules**:
+- New session starts after 30 minutes of inactivity
+- New session starts at midnight (user's local time)
+- New session starts when UTM parameters change
+
+### click
+
+Captures clicks on interactive elements.
+
+```json
+{
+  "event_name": "click",
+  "properties": {
+    "element_name": "swap_button",
+    "element_id": "btn-swap",
+    "element_class": "btn btn-primary",
+    "element_tag": "BUTTON",
+    "element_text": "Swap Now",
+    "element_href": null,
+    "current_url": "https://app.example.com/swap"
+  }
+}
+```
+
+**Captured Elements**:
+- Buttons (`<button>`)
+- Links (`<a>`)
+- Elements with `onclick` handlers
+- Elements with `role="button"`
+
+### scroll
+
+Tracks scroll depth at 25%, 50%, 75%, and 100% milestones.
+
+```json
+{
+  "event_name": "scroll",
+  "properties": {
+    "scroll_depth": 50,
+    "scroll_direction": "down",
+    "page_height": 3200,
+    "viewport_height": 800
+  }
+}
+```
+
+**Note**: Each milestone is tracked once per page view.
+
+### form_submit
+
+Captures form submissions.
+
+```json
+{
+  "event_name": "form_submit",
+  "properties": {
+    "form_id": "signup-form",
+    "form_name": "newsletter_signup",
+    "form_action": "/api/subscribe",
+    "form_method": "POST"
+  }
+}
+```
+
+<Warning>
+Form field values are NOT captured automatically to protect sensitive data. Use custom events to track specific non-sensitive fields.
+</Warning>
+
+### input_change
+
+Tracks form field interactions (focus/blur).
+
+```json
+{
+  "event_name": "input_change",
+  "properties": {
+    "input_name": "email",
+    "input_type": "email",
+    "input_id": "email-field",
+    "form_id": "signup-form"
+  }
+}
+```
+
+### copy
+
+Tracks text copy actions (Ctrl+C, right-click copy).
+
+```json
+{
+  "event_name": "copy",
+  "properties": {
+    "copied_text": "0x1234...abcd",
+    "source_element": "wallet-address"
+  }
+}
+```
+
+**Privacy**: Long text is truncated to 100 characters.
+
+### wallet_connect / wallet_disconnect
+
+Captures wallet connection state changes.
+
+```json
+{
+  "event_name": "wallet_connect",
+  "properties": {
+    "wallet_address": "0x1234567890abcdef1234567890abcdef12345678",
+    "wallet_type": "metamask",
+    "chain_id": 1,
+    "is_reconnect": false
+  }
+}
+```
+
+<Note>
+For automatic wallet detection to work, ensure your wallet integration fires standard events. For custom implementations, use `cryptique.wallet.connect()`.
+</Note>
+
+## Configuration
+
+### Disable Specific Events
+
+Disable events you don't need:
+
+```html
+<script>
+  var script = document.createElement('script');
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.setAttribute('site-id', 'YOUR_SITE_ID');
+  script.setAttribute('auto-events', 'true');
+  script.setAttribute('auto-events-disabled-events', 'copy,input_change,scroll');
+  document.head.appendChild(script);
+</script>
+```
+
+### Exclude Paths
+
+Prevent tracking on specific pages:
+
+```html
+<script>
+  var script = document.createElement('script');
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.setAttribute('site-id', 'YOUR_SITE_ID');
+  script.setAttribute('auto-events', 'true');
+  script.setAttribute('auto-events-disabled-paths', '/admin,/internal,/debug');
+  document.head.appendChild(script);
+</script>
+```
+
+**Path Matching**:
+- `/admin` matches `/admin`, `/admin/users`, `/admin/settings`
+- Paths are matched from the start
+- Case-sensitive
+
+### Disable All Auto-Events
+
+For complete manual control:
+
+```html
+<script>
+  var script = document.createElement('script');
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.setAttribute('site-id', 'YOUR_SITE_ID');
+  script.setAttribute('auto-events', 'false');
+  document.head.appendChild(script);
+</script>
+```
+
+## Best Practices
+
+### Recommended Configuration
+
+For most Web3 apps:
+
+```html
+<script>
+  var script = document.createElement('script');
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.setAttribute('site-id', 'YOUR_SITE_ID');
+  script.setAttribute('auto-events', 'true');
+  // Disable noisy events that may not be useful
+  script.setAttribute('auto-events-disabled-events', 'input_change');
+  // Exclude admin/internal pages
+  script.setAttribute('auto-events-disabled-paths', '/admin');
+  document.head.appendChild(script);
+</script>
+```
+
+### When to Disable Auto-Events
+
+Consider disabling for:
+
+| Scenario | Recommendation |
+|----------|----------------|
+| High-traffic marketing pages | Keep `page_view`, disable `click`, `scroll` |
+| Data-entry heavy apps | Disable `input_change` |
+| Admin dashboards | Exclude path entirely |
+| Sensitive pages | Disable `copy`, exclude path |
+
+### Supplement with Custom Events
+
+Auto-events capture generic interactions. Add custom events for business-specific actions:
+
+```javascript
+// Auto-event captures: click on element with class "swap-btn"
+// Custom event adds context:
+cryptique.track('swap_initiated', {
+  input_token: 'ETH',
+  output_token: 'USDC',
+  amount: 1.5,
+  slippage: 0.5
+});
+```
+
+## Data Captured
+
+### Every Auto-Event Includes
+
+These properties are attached to all auto-events:
+
+| Property | Description |
+|----------|-------------|
+| `session_id` | Current session identifier |
+| `distinct_id` | User identifier |
+| `timestamp` | Event time (ISO 8601) |
+| `current_url` | Page URL |
+| `browser_name` | e.g., Chrome, Firefox |
+| `browser_version` | Browser version |
+| `os` | Operating system |
+| `device_type` | desktop, mobile, tablet |
+| `country`, `city` | Geographic location |
+| `utm_*` | UTM parameters if present |
+
+See [Default Properties](/data-in/default-properties) for the complete list.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Track Custom Events" icon="code" href="/data-in/sdk-reference/track">
+    Add business-specific events
+  </Card>
+  <Card title="Default Properties" icon="list" href="/data-in/default-properties">
+    See all auto-captured properties
+  </Card>
+</CardGroup>

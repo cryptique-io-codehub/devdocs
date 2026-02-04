@@ -1,0 +1,394 @@
+---
+title: "Google Tag Manager"
+description: "Deploy Cryptique via Google Tag Manager"
+---
+
+## Overview
+
+Google Tag Manager (GTM) provides a flexible way to deploy Cryptique without modifying your website's source code. This guide covers setup, configuration, and best practices.
+
+## Quick Setup
+
+<Steps>
+  <Step title="Open Google Tag Manager">
+    Go to [tagmanager.google.com](https://tagmanager.google.com) and select your container
+  </Step>
+  
+  <Step title="Create New Tag">
+    Click **Tags** → **New** → **Tag Configuration** → **Custom HTML**
+  </Step>
+  
+  <Step title="Add Cryptique Script">
+    Paste the following code:
+    
+    ```html
+    <script>
+      var script = document.createElement('script');
+      script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+      script.setAttribute('site-id', 'YOUR_SITE_ID');
+      script.setAttribute('auto-events', 'true');
+      document.head.appendChild(script);
+    </script>
+    ```
+    
+    Replace `YOUR_SITE_ID` with your actual Site ID from Cryptique dashboard.
+  </Step>
+  
+  <Step title="Set Trigger">
+    Click **Triggering** → **All Pages** (or your preferred trigger)
+  </Step>
+  
+  <Step title="Save and Publish">
+    Click **Save**, then **Submit** to publish your changes
+  </Step>
+</Steps>
+
+## Configuration Options
+
+### Basic Configuration
+
+```html
+<script>
+  var script = document.createElement('script');
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.setAttribute('site-id', 'YOUR_SITE_ID');
+  script.setAttribute('auto-events', 'true');
+  document.head.appendChild(script);
+</script>
+```
+
+### Full Configuration
+
+```html
+<script>
+  var script = document.createElement('script');
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.setAttribute('site-id', 'YOUR_SITE_ID');
+  script.setAttribute('auto-events', 'true');
+  script.setAttribute('auto-events-disabled-paths', '/admin,/internal,/checkout');
+  script.setAttribute('auto-events-disabled-events', 'copy,input_change');
+  document.head.appendChild(script);
+</script>
+```
+
+### Configuration Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `site-id` | string | required | Your Cryptique site identifier |
+| `auto-events` | boolean | `true` | Enable automatic event tracking |
+| `auto-events-disabled-paths` | string | `''` | Comma-separated URL paths to exclude |
+| `auto-events-disabled-events` | string | `''` | Comma-separated auto-events to disable |
+
+## Using GTM Variables
+
+You can use GTM variables in your configuration:
+
+### Site ID from Variable
+
+1. Create a **Constant** variable for your Site ID
+2. Reference it in the tag:
+
+```html
+<script>
+  var script = document.createElement('script');
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.setAttribute('site-id', '{{Cryptique Site ID}}');
+  script.setAttribute('auto-events', 'true');
+  document.head.appendChild(script);
+</script>
+```
+
+### Environment-Based Configuration
+
+Use GTM's environment feature for staging vs production:
+
+```html
+<script>
+  var siteId = '{{Cryptique Site ID}}'; // Different per environment
+  var script = document.createElement('script');
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.setAttribute('site-id', siteId);
+  script.setAttribute('auto-events', 'true');
+  document.head.appendChild(script);
+</script>
+```
+
+## Custom Event Tracking
+
+### Via Data Layer
+
+Push events to GTM's data layer, then forward to Cryptique:
+
+**On your website:**
+```javascript
+dataLayer.push({
+  event: 'cryptique_event',
+  eventName: 'button_clicked',
+  eventProperties: {
+    button_name: 'signup',
+    button_location: 'header'
+  }
+});
+```
+
+**GTM Tag (Custom HTML):**
+```html
+<script>
+  if (window.cryptique) {
+    var eventName = '{{DL - eventName}}';
+    var eventProps = '{{DL - eventProperties}}';
+    window.cryptique.track(eventName, eventProps);
+  }
+</script>
+```
+
+**Trigger:** Custom Event = `cryptique_event`
+
+### Direct Tracking
+
+After Cryptique loads, you can track directly:
+
+```html
+<script>
+  // Wait for Cryptique to be available
+  function trackWithCryptique(eventName, properties) {
+    if (window.cryptique) {
+      window.cryptique.track(eventName, properties);
+    } else {
+      setTimeout(function() {
+        trackWithCryptique(eventName, properties);
+      }, 100);
+    }
+  }
+  
+  trackWithCryptique('gtm_custom_event', {
+    source: 'gtm',
+    trigger: '{{Trigger Name}}'
+  });
+</script>
+```
+
+## User Identification
+
+### Identify Users via GTM
+
+Create a tag to identify users when they log in:
+
+```html
+<script>
+  if (window.cryptique && '{{User ID}}') {
+    window.cryptique.identify('{{User ID}}', {
+      email: '{{User Email}}',
+      name: '{{User Name}}',
+      plan: '{{User Plan}}'
+    });
+  }
+</script>
+```
+
+**Trigger:** Custom Event = `user_logged_in`
+
+### Wallet Connection
+
+Track wallet connections:
+
+```html
+<script>
+  if (window.cryptique && '{{Wallet Address}}') {
+    window.cryptique.setWallet('{{Wallet Address}}');
+  }
+</script>
+```
+
+**Trigger:** Custom Event = `wallet_connected`
+
+## Trigger Configurations
+
+### All Pages (Recommended)
+
+Load Cryptique on every page:
+
+1. Trigger Type: **Page View**
+2. Trigger fires on: **All Page Views**
+
+### Specific Pages Only
+
+Load only on certain pages:
+
+1. Trigger Type: **Page View**
+2. Trigger fires on: **Some Page Views**
+3. Condition: `Page Path` contains `/app`
+
+### Exclude Pages
+
+Exclude admin or internal pages:
+
+1. Create trigger: Page View - Some Page Views
+2. Condition: `Page Path` does not contain `/admin`
+3. AND `Page Path` does not contain `/internal`
+
+### Consent-Based Loading
+
+Load only after consent:
+
+1. Trigger Type: **Custom Event**
+2. Event name: `consent_granted`
+
+```javascript
+// After user grants consent
+dataLayer.push({ event: 'consent_granted' });
+```
+
+## Tag Sequencing
+
+### Load Order
+
+Ensure Cryptique loads before dependent tags:
+
+1. Open your Cryptique tag
+2. Go to **Advanced Settings** → **Tag Sequencing**
+3. Check "Fire a tag before [Cryptique] fires" if needed
+4. Check "Fire a tag after [Cryptique] fires" for dependent tags
+
+### Wait for Cryptique
+
+For tags that depend on Cryptique:
+
+```html
+<script>
+  function waitForCryptique(callback) {
+    if (window.cryptique) {
+      callback();
+    } else {
+      setTimeout(function() {
+        waitForCryptique(callback);
+      }, 50);
+    }
+  }
+  
+  waitForCryptique(function() {
+    // Your code that needs Cryptique
+    window.cryptique.track('dependent_event');
+  });
+</script>
+```
+
+## Debugging
+
+### GTM Preview Mode
+
+1. Click **Preview** in GTM
+2. Navigate to your website
+3. GTM debug panel shows:
+   - Tag firing status
+   - Variable values
+   - Data layer events
+
+### Verify Cryptique Loading
+
+In browser console:
+
+```javascript
+// Check if Cryptique loaded
+console.log(window.cryptique); // Should show Cryptique object
+
+// Check initialization
+console.log(window.cryptique.getSiteId()); // Should show your Site ID
+```
+
+### Network Tab
+
+Check for requests to:
+- `cdn.cryptique.io` (script load)
+- `api.cryptique.io` (event tracking)
+
+## Common Issues
+
+<AccordionGroup>
+  <Accordion title="Tag not firing">
+    1. Check trigger conditions in GTM Preview
+    2. Verify container is published
+    3. Check for JavaScript errors in console
+  </Accordion>
+  
+  <Accordion title="Events not appearing in Cryptique">
+    1. Verify Site ID is correct
+    2. Check domain is whitelisted in Cryptique
+    3. Look for blocked requests (ad blockers)
+    4. Verify in Network tab that API calls succeed
+  </Accordion>
+  
+  <Accordion title="Double tracking">
+    1. Ensure Cryptique is only loaded once
+    2. Check for duplicate tags in GTM
+    3. Don't load via both GTM and direct script
+  </Accordion>
+  
+  <Accordion title="Script blocked by CSP">
+    Add to your Content Security Policy:
+    ```
+    script-src 'self' https://cdn.cryptique.io;
+    connect-src 'self' https://api.cryptique.io;
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+### Use Folders
+
+Organize your Cryptique tags:
+
+```
+Tags/
+├── Cryptique/
+│   ├── Cryptique - Base Script
+│   ├── Cryptique - Identify User
+│   ├── Cryptique - Track Signup
+│   └── Cryptique - Track Purchase
+```
+
+### Naming Convention
+
+Use clear, consistent names:
+
+```
+✅ Good:
+"Cryptique - Base Script (All Pages)"
+"Cryptique - Track Button Click"
+"Cryptique - Identify Logged In User"
+
+❌ Poor:
+"Tag 1"
+"New Tag"
+"Custom HTML"
+```
+
+### Version Control
+
+Use GTM's built-in versioning:
+
+1. Add descriptions to each version
+2. Name versions meaningfully: "Added Cryptique tracking"
+3. Use workspaces for team collaboration
+
+### Testing
+
+Always test before publishing:
+
+1. Use GTM Preview mode
+2. Test on staging environment first
+3. Verify events appear in Cryptique
+4. Check for console errors
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Auto-Events" icon="bolt" href="/data-in/auto-events">
+    Configure automatic tracking
+  </Card>
+  <Card title="SDK Reference" icon="code" href="/data-in/sdk-reference/track">
+    Track custom events
+  </Card>
+</CardGroup>

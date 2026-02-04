@@ -1,0 +1,361 @@
+---
+title: "Sites & Contracts"
+description: "Configure tracked websites and smart contracts"
+---
+
+## Overview
+
+Cryptique tracks data from two sources: websites (sites) and blockchain smart contracts. This guide covers how to configure and manage both.
+
+## Sites
+
+Sites are the websites or web applications you want to track with Cryptique.
+
+### Adding a Site
+
+<Steps>
+  <Step title="Go to Settings">
+    Navigate to **Settings** → **Sites**
+  </Step>
+  
+  <Step title="Add New Site">
+    Click **Add Site**
+  </Step>
+  
+  <Step title="Configure Site">
+    - **Name**: Human-readable name (e.g., "Production App")
+    - **Domain**: Your website domain (e.g., `app.example.com`)
+  </Step>
+  
+  <Step title="Get Site ID">
+    After creation, you'll receive a **Site ID** to use in your tracking code
+  </Step>
+</Steps>
+
+### Site Configuration
+
+```
+Site: Production App
+├── Site ID: prod-app-12345
+├── Domain: app.example.com
+├── Status: Active
+├── Created: Jan 1, 2024
+└── Last Event: 2 minutes ago
+```
+
+### Multiple Sites
+
+One team can have multiple sites:
+
+```
+Team Sites:
+├── Production (app.example.com)
+│   └── Site ID: prod-app-12345
+├── Staging (staging.example.com)
+│   └── Site ID: staging-app-67890
+└── Marketing (www.example.com)
+    └── Site ID: marketing-site-abcde
+```
+
+**Use cases for multiple sites:**
+- Separate production and staging
+- Track multiple products
+- Different domains for different regions
+
+### Domain Whitelist
+
+For security, Cryptique only accepts events from whitelisted domains:
+
+```
+Allowed Domains for prod-app-12345:
+├── app.example.com ✓
+├── www.example.com ✓
+└── *.example.com (wildcard) ✓
+```
+
+Add domains that should be allowed to send events with this Site ID.
+
+### Site Settings
+
+| Setting | Description |
+|---------|-------------|
+| **Auto-enhance** | Enable/disable wallet enrichment |
+| **Auto-events** | Default auto-event configuration |
+| **Allowed domains** | Domains that can send events |
+| **Data retention** | How long to keep event data |
+
+## Smart Contracts
+
+Smart contracts let you track on-chain transactions and link them to user behavior.
+
+### Adding a Contract
+
+<Steps>
+  <Step title="Go to Contracts">
+    Navigate to **Settings** → **Contracts**
+  </Step>
+  
+  <Step title="Add Contract">
+    Click **Add Contract**
+  </Step>
+  
+  <Step title="Enter Details">
+    - **Name**: Human-readable name (e.g., "Swap Router")
+    - **Address**: Contract address (e.g., `0x1234...abcd`)
+    - **Chain**: Select blockchain network
+    - **ABI** (optional): Contract ABI for method decoding
+  </Step>
+  
+  <Step title="Save">
+    Contract transactions will start appearing in your data
+  </Step>
+</Steps>
+
+### Contract Configuration
+
+```
+Contract: Swap Router
+├── Address: 0x1234567890abcdef...
+├── Chain: Ethereum
+├── Status: Active
+├── ABI: Uploaded ✓
+├── Methods Tracked: swapExactTokensForTokens, swapTokensForExactTokens
+└── Last Transaction: 5 minutes ago
+```
+
+### Supported Chains
+
+Cryptique supports 35 chains for smart contract tracking:
+
+<AccordionGroup>
+  <Accordion title="EVM Chains">
+    - Ethereum
+    - Polygon
+    - Arbitrum
+    - Optimism
+    - Base
+    - Avalanche
+    - BNB Chain
+    - Fantom
+    - Gnosis
+    - And more...
+  </Accordion>
+  
+  <Accordion title="Layer 2s">
+    - Arbitrum One
+    - Arbitrum Nova
+    - Optimism
+    - Base
+    - zkSync Era
+    - Polygon zkEVM
+    - Linea
+    - Scroll
+    - And more...
+  </Accordion>
+</AccordionGroup>
+
+See [Chain Support](/integrations/overview) for the complete list.
+
+### Contract Naming
+
+Use consistent names across contracts for cross-protocol analysis:
+
+```
+✅ Good naming:
+├── "Swap Router" (on Ethereum)
+├── "Swap Router" (on Polygon)
+├── "Swap Router" (on Arbitrum)
+└── All appear as "Swap Router" in reports
+
+❌ Poor naming:
+├── "Uniswap V3 Router ETH"
+├── "Polygon Swap"
+├── "Arb Router Contract"
+└── Appears as separate entities
+```
+
+Consistent naming lets you:
+- Filter by contract name across all chains
+- Compare performance across chains
+- Create unified reports
+
+### ABI Upload
+
+Upload the contract ABI to decode method names and parameters:
+
+**Without ABI:**
+```
+Transaction:
+├── Method: 0x38ed1739
+├── Input: 0x00000...
+└── (Raw data only)
+```
+
+**With ABI:**
+```
+Transaction:
+├── Method: swapExactTokensForTokens
+├── Parameters:
+│   ├── amountIn: 1000000000000000000
+│   ├── amountOutMin: 950000000
+│   ├── path: [0xETH..., 0xUSDC...]
+│   └── deadline: 1707994800
+└── (Human-readable)
+```
+
+### Multi-Chain Contracts
+
+For contracts deployed on multiple chains, add each deployment:
+
+```
+Swap Router (Multi-chain):
+├── Ethereum: 0x1234...
+├── Polygon: 0x5678...
+├── Arbitrum: 0x9abc...
+└── Base: 0xdef0...
+```
+
+Use the same **Name** for all deployments to enable cross-chain analysis.
+
+## Data Flow
+
+### Site → Contract Attribution
+
+When a user:
+1. Visits your site (tracked via Site ID)
+2. Connects their wallet (captured via SDK)
+3. Makes a transaction (tracked via Contract)
+
+Cryptique links all three via the wallet address, creating complete attribution.
+
+```
+User Journey:
+├── [Site] page_view (landing)
+├── [Site] wallet_connect (0x1234...)
+├── [Site] swap_initiated
+└── [Contract] swapExactTokensForTokens (0x1234...)
+
+→ Full attribution: Landing → Wallet → Transaction
+```
+
+### Cross-Site Tracking
+
+If a user visits multiple sites with the same wallet:
+
+```
+User: 0x1234...
+├── Site A: 15 events
+├── Site B: 8 events
+└── Contract: 5 transactions
+
+→ Unified user profile across sites
+```
+
+## Managing Sites & Contracts
+
+### Edit Configuration
+
+1. Go to **Settings** → **Sites** or **Contracts**
+2. Click the item to edit
+3. Modify settings
+4. Save changes
+
+### Archive vs Delete
+
+**Archive**: Stops tracking new data but preserves historical data
+**Delete**: Removes configuration (historical data retained per retention policy)
+
+<Warning>
+Deleting a site removes the Site ID. Any tracking code using that ID will stop working.
+</Warning>
+
+### Status Monitoring
+
+Check health of your sites and contracts:
+
+```
+Sites Status:
+├── prod-app-12345: ✅ Active (1,234 events/hour)
+├── staging-67890: ⚠️ Low activity (2 events/hour)
+└── old-site-xyz: ❌ No events (30+ days)
+
+Contracts Status:
+├── Swap Router (ETH): ✅ Active (45 txns/hour)
+├── Swap Router (POLY): ✅ Active (120 txns/hour)
+└── Old Contract: ❌ No transactions (60+ days)
+```
+
+## Best Practices
+
+### Site Organization
+
+```
+✅ Recommended:
+├── One site per environment (prod, staging, dev)
+├── Separate sites for distinct products
+├── Consistent naming convention
+
+❌ Avoid:
+├── One site for everything (hard to filter)
+├── Duplicate sites for same domain
+├── Cryptic Site IDs in production code
+```
+
+### Contract Organization
+
+```
+✅ Recommended:
+├── Consistent names across chains
+├── Upload ABIs for better data
+├── Group related contracts logically
+├── Archive unused contracts
+
+❌ Avoid:
+├── Different names for same contract on different chains
+├── Tracking contracts you don't own (unless needed)
+├── Leaving stale contracts active
+```
+
+### Security
+
+- Keep Site IDs confidential (treat like API keys)
+- Use domain whitelisting
+- Regularly audit active sites and contracts
+- Remove unused configurations
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Events not appearing for site">
+    1. Verify Site ID in tracking code
+    2. Check domain is whitelisted
+    3. Ensure SDK is loading correctly
+    4. Check browser console for errors
+  </Accordion>
+  
+  <Accordion title="Contract transactions not tracked">
+    1. Verify contract address is correct
+    2. Check chain selection
+    3. Ensure contract is active on-chain
+    4. Wait a few minutes for indexing
+  </Accordion>
+  
+  <Accordion title="Method names showing as hex">
+    Upload the contract ABI to decode method names and parameters.
+  </Accordion>
+  
+  <Accordion title="Cross-chain data not linking">
+    Ensure contracts use the same **Name** across all chains for unified reporting.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Smart Contract Indexing" icon="file-contract" href="/integrations/smart-contracts">
+    Deep dive into contract tracking
+  </Card>
+  <Card title="Wallet Enrichment" icon="wallet" href="/integrations/wallet-enrichment">
+    Enrich user profiles with on-chain data
+  </Card>
+</CardGroup>

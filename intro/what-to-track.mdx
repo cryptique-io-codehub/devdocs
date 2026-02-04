@@ -1,0 +1,312 @@
+---
+title: "What to Track"
+description: "A guide to planning your Cryptique implementation for maximum insight"
+---
+
+## Overview
+
+A successful analytics implementation starts with understanding **what questions you want to answer**. This guide helps you plan which events, properties, and integrations will give you the insights you need.
+
+## The Three Data Types
+
+Cryptique unifies three types of data into complete user profiles:
+
+### 1. Events (Off-Chain Behavior)
+
+Events are actions users take on your website or dApp:
+
+| Event Type | Examples | Why Track It |
+|------------|----------|--------------|
+| **Page views** | Landing page, docs, pricing | Understand content engagement |
+| **Feature usage** | Button clicks, form submissions | Measure product adoption |
+| **Conversions** | Signup, wallet connect, purchase | Track funnel progression |
+| **Engagement** | Scroll depth, time on page, video plays | Assess content quality |
+
+### 2. User Properties (Who They Are)
+
+Properties describe your users:
+
+| Property Type | Examples | Why Track It |
+|---------------|----------|--------------|
+| **Identity** | Email, username, user_id | Identify returning users |
+| **Demographics** | Country, language, device | Segment by audience |
+| **Behavior** | Plan type, signup date, referral source | Segment by lifecycle |
+| **Web3** | Connected wallets, primary chain | Segment by crypto profile |
+
+### 3. Transactions (On-Chain Activity)
+
+Blockchain transactions from your smart contracts:
+
+| Transaction Type | Examples | Why Track It |
+|------------------|----------|--------------|
+| **Token swaps** | DEX trades, token purchases | Measure trading engagement |
+| **NFT actions** | Mints, transfers, listings | Track collector behavior |
+| **DeFi operations** | Staking, LP provision, borrowing | Measure protocol usage |
+| **Custom contracts** | Game actions, governance votes | Track app-specific behavior |
+
+## Planning Your Implementation
+
+### Step 1: Define Your Key Questions
+
+Start by listing the questions you want to answer:
+
+<AccordionGroup>
+  <Accordion title="Acquisition Questions">
+    - Which channels drive the most wallet connections?
+    - What's the conversion rate from landing page to first transaction?
+    - How does paid traffic compare to organic for on-chain conversions?
+    - Which content pieces lead to the highest-value users?
+  </Accordion>
+  
+  <Accordion title="Activation Questions">
+    - What percentage of users who connect a wallet make a transaction?
+    - How long does it take from signup to first transaction?
+    - What actions predict successful activation?
+    - Where do users drop off in the onboarding flow?
+  </Accordion>
+  
+  <Accordion title="Engagement Questions">
+    - How often do active users transact?
+    - Which features correlate with higher transaction frequency?
+    - What's the retention curve for new users?
+    - Are power users using the product differently?
+  </Accordion>
+  
+  <Accordion title="Revenue Questions">
+    - What's the lifetime value by acquisition source?
+    - Which user segments generate the most protocol revenue?
+    - How does on-chain activity correlate with TVL?
+    - What predicts a user becoming a high-value trader?
+  </Accordion>
+</AccordionGroup>
+
+### Step 2: Map Questions to Events
+
+For each question, identify what events you need:
+
+**Question**: *"Which channels drive the most wallet connections?"*
+
+**Events needed**:
+- `page_view` with UTM properties (auto-captured)
+- `wallet_connected` (auto-captured when using wallet.connect())
+
+**Properties needed**:
+- `utm_source`, `utm_medium`, `utm_campaign` (auto-captured)
+- `wallet_address`, `wallet_type` (auto-captured)
+
+---
+
+**Question**: *"What's the conversion rate from landing page to first transaction?"*
+
+**Events needed**:
+- `page_view` on landing page (auto-captured)
+- `wallet_connected` (auto-captured)
+- On-chain transaction (captured via smart contract indexing)
+
+**Setup required**:
+- Add your smart contract address in the dashboard
+
+### Step 3: Choose Your Auto-Events
+
+Cryptique captures 10 event types automatically. Enable what's relevant:
+
+| Auto-Event | Enable If... |
+|------------|-------------|
+| `page_view` | You have a multi-page site or dApp |
+| `session_start` / `session_end` | You want session-based analysis |
+| `click` | You want to track button/link clicks |
+| `scroll` | Content engagement matters (blogs, docs) |
+| `form_submit` | You have signup or contact forms |
+| `input_change` | You want granular form field tracking |
+| `copy` | Users copy addresses, codes, or content |
+| `wallet_connect` / `wallet_disconnect` | You have Web3 wallet integration |
+
+Configure in your SDK initialization:
+
+```html
+<script>
+  var script = document.createElement('script');
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.setAttribute('site-id', 'your-site-id');
+  script.setAttribute('auto-events', 'true');
+  script.setAttribute('auto-events-disabled-events', 'copy,input_change');
+  document.head.appendChild(script);
+</script>
+```
+
+### Step 4: Plan Custom Events
+
+Beyond auto-events, track custom events for key actions:
+
+```javascript
+// Feature usage
+cryptique.track('feature_used', {
+  feature_name: 'swap_calculator',
+  input_token: 'ETH',
+  output_token: 'USDC'
+});
+
+// Conversion milestones
+cryptique.track('onboarding_completed', {
+  steps_completed: 5,
+  time_to_complete: 180
+});
+
+// Errors and friction
+cryptique.track('transaction_failed', {
+  error_type: 'insufficient_funds',
+  attempted_amount: 1000
+});
+```
+
+### Step 5: Set Up Smart Contracts
+
+Add your contracts to capture on-chain transactions:
+
+1. Go to **Settings → Smart Contracts** in the dashboard
+2. Click **Add Contract**
+3. Enter:
+   - Contract address
+   - Chain (Ethereum, Polygon, Base, etc.)
+   - A friendly name (e.g., "Token Swap Contract")
+4. Cryptique automatically indexes all transactions
+
+Supported chains for smart contracts:
+- **EVM**: Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BSC, Fantom, and 20+ more
+- **Non-EVM**: Solana, Sui, Aptos, Near, and more
+
+### Step 6: Configure Wallet Enrichment
+
+Enable wallet enrichment to automatically add user properties:
+
+- **Wallet age**: When the wallet was first active
+- **Transaction count**: Total transactions across chains
+- **Token holdings**: Major tokens and NFTs held
+- **Activity patterns**: Trading frequency, DeFi usage
+
+Enrichment available on 9 chains: Ethereum, Polygon, BSC, Arbitrum, Optimism, Avalanche, Base, Fantom, Linea.
+
+## Event Naming Conventions
+
+Use consistent `snake_case` naming:
+
+<Tabs>
+  <Tab title="✅ Good">
+    ```javascript
+    cryptique.track('swap_completed', { ... });
+    cryptique.track('nft_minted', { ... });
+    cryptique.track('liquidity_added', { ... });
+    cryptique.track('onboarding_step_completed', { ... });
+    ```
+  </Tab>
+  <Tab title="❌ Avoid">
+    ```javascript
+    cryptique.track('SwapCompleted', { ... });     // PascalCase
+    cryptique.track('swap-completed', { ... });    // kebab-case
+    cryptique.track('Swap Completed', { ... });    // Spaces
+    cryptique.track('swap', { ... });              // Too vague
+    ```
+  </Tab>
+</Tabs>
+
+**Property naming**:
+- Use `snake_case`: `token_amount`, `wallet_type`, `referral_source`
+- Be specific: `input_token` not just `token`
+- Include units where relevant: `amount_usd`, `duration_seconds`
+
+## Recommended Events by Category
+
+### DeFi Protocol
+
+```javascript
+// Core actions
+'swap_initiated'
+'swap_completed'
+'liquidity_added'
+'liquidity_removed'
+'stake_initiated'
+'stake_completed'
+'unstake_completed'
+'reward_claimed'
+
+// User journey
+'pool_viewed'
+'token_selected'
+'slippage_adjusted'
+'transaction_approved'
+'transaction_failed'
+```
+
+### NFT Marketplace
+
+```javascript
+// Core actions
+'nft_viewed'
+'nft_favorited'
+'offer_made'
+'offer_accepted'
+'nft_listed'
+'nft_purchased'
+'nft_minted'
+
+// User journey
+'collection_viewed'
+'search_performed'
+'filter_applied'
+'wallet_connected'
+```
+
+### Web3 Game
+
+```javascript
+// Core actions
+'game_started'
+'level_completed'
+'item_purchased'
+'item_equipped'
+'battle_completed'
+'reward_earned'
+
+// User journey
+'tutorial_started'
+'tutorial_completed'
+'character_created'
+'guild_joined'
+```
+
+## Implementation Checklist
+
+<Steps>
+  <Step title="Install the SDK">
+    Add the CDN script or npm package to your site
+  </Step>
+  <Step title="Configure auto-events">
+    Enable/disable auto-events based on your needs
+  </Step>
+  <Step title="Add custom events">
+    Track key conversion and engagement events
+  </Step>
+  <Step title="Set up user identification">
+    Call `identify()` when users log in
+  </Step>
+  <Step title="Add smart contracts">
+    Index your contracts to capture on-chain data
+  </Step>
+  <Step title="Enable wallet enrichment">
+    Turn on enrichment for deeper user profiles
+  </Step>
+  <Step title="Verify in dashboard">
+    Check that events are flowing correctly
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/intro/quickstart">
+    Get tracking in 5 minutes
+  </Card>
+  <Card title="Installation" icon="download" href="/data-in/installation">
+    Detailed installation options
+  </Card>
+</CardGroup>

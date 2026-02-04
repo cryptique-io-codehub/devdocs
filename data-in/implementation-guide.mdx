@@ -1,0 +1,467 @@
+---
+title: "Implementation Guide"
+description: "Patterns and best practices for implementing Cryptique analytics"
+---
+
+## Overview
+
+This guide covers implementation patterns for common Web3 analytics scenarios. Use these patterns to ensure comprehensive, accurate tracking.
+
+## Implementation Workflow
+
+<Steps>
+  <Step title="Plan Your Events">
+    Define what you want to measure before writing code
+  </Step>
+  <Step title="Install SDK">
+    Add Cryptique to your application
+  </Step>
+  <Step title="Configure Auto-Events">
+    Enable/disable automatic tracking
+  </Step>
+  <Step title="Add Custom Events">
+    Track business-specific actions
+  </Step>
+  <Step title="Set Up Identification">
+    Link users across sessions
+  </Step>
+  <Step title="Integrate Wallets">
+    Connect wallet events to user profiles
+  </Step>
+  <Step title="Verify & Iterate">
+    Test tracking and refine
+  </Step>
+</Steps>
+
+## Common Patterns
+
+### Authentication Flow
+
+Track the complete auth journey:
+
+```javascript
+// Signup started
+cryptique.track('signup_started', {
+  signup_method: 'email',  // or 'google', 'wallet'
+  referral_source: getReferralSource()
+});
+
+// Signup completed
+cryptique.track('signup_completed', {
+  signup_method: 'email',
+  time_to_complete_seconds: 45
+});
+
+// Identify the user
+cryptique.identify(user.id, {
+  email: user.email,
+  name: user.name,
+  signup_date: new Date().toISOString(),
+  signup_method: 'email'
+});
+
+// Set persistent properties
+cryptique.people.set_once({
+  first_seen: new Date().toISOString(),
+  original_referrer: document.referrer
+});
+```
+
+### Wallet Connection Flow
+
+Track wallet interactions:
+
+```javascript
+// Wallet connection initiated
+cryptique.track('wallet_connect_initiated', {
+  wallet_type: 'metamask',
+  trigger_location: 'navbar'  // or 'modal', 'onboarding'
+});
+
+// Wallet connected successfully
+async function onWalletConnected(address, provider) {
+  // Track with SDK
+  cryptique.wallet.connect(address, {
+    wallet_type: getWalletType(provider),
+    chain_id: await provider.getChainId()
+  });
+  
+  // Optional: set user properties
+  cryptique.people.set({
+    primary_wallet: address,
+    last_wallet_connect: new Date().toISOString()
+  });
+  
+  cryptique.people.increment({
+    wallet_connect_count: 1
+  });
+}
+
+// Wallet connection failed
+function onWalletError(error) {
+  cryptique.track('wallet_connect_failed', {
+    error_type: error.code,
+    error_message: error.message,
+    wallet_type: 'metamask'
+  });
+}
+
+// Wallet disconnected
+function onWalletDisconnected(address) {
+  cryptique.wallet.disconnect(address);
+}
+
+// Chain changed
+function onChainChanged(chainId, address) {
+  cryptique.wallet.chainChanged(address, chainId);
+  
+  cryptique.track('chain_changed', {
+    new_chain_id: chainId,
+    wallet_address: address
+  });
+}
+```
+
+### DeFi Swap Flow
+
+Track the complete swap journey:
+
+```javascript
+// Token selected
+cryptique.track('token_selected', {
+  token_symbol: 'ETH',
+  token_address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+  selection_type: 'input',  // or 'output'
+  search_query: searchTerm || null
+});
+
+// Swap quoted
+cryptique.track('swap_quoted', {
+  input_token: 'ETH',
+  output_token: 'USDC',
+  input_amount: 1.5,
+  output_amount: 1485.50,
+  exchange_rate: 990.33,
+  slippage_setting: 0.5,
+  route_provider: 'uniswap'
+});
+
+// Swap initiated (user clicked swap)
+cryptique.track('swap_initiated', {
+  input_token: 'ETH',
+  output_token: 'USDC',
+  input_amount: 1.5,
+  output_amount_expected: 1485.50,
+  slippage_setting: 0.5
+});
+
+// Transaction approval requested
+cryptique.track('transaction_approval_requested', {
+  token: 'USDC',
+  spender: '0x...router',
+  amount: 'unlimited'  // or specific amount
+});
+
+// Swap completed (after on-chain confirmation)
+cryptique.track('swap_completed', {
+  input_token: 'ETH',
+  output_token: 'USDC',
+  input_amount: 1.5,
+  output_amount_actual: 1483.20,
+  slippage_actual: 0.15,
+  transaction_hash: txHash,
+  gas_used: gasUsed,
+  gas_price_gwei: gasPriceGwei
+});
+
+// Swap failed
+cryptique.track('swap_failed', {
+  input_token: 'ETH',
+  output_token: 'USDC',
+  input_amount: 1.5,
+  error_type: 'slippage_exceeded',  // or 'user_rejected', 'insufficient_gas'
+  error_message: error.message
+});
+```
+
+### NFT Mint Flow
+
+```javascript
+// Collection viewed
+cryptique.track('collection_viewed', {
+  collection_name: 'Cool Cats',
+  collection_address: '0x...',
+  items_available: 500,
+  price_eth: 0.05
+});
+
+// Mint initiated
+cryptique.track('mint_initiated', {
+  collection_name: 'Cool Cats',
+  quantity: 2,
+  total_price_eth: 0.10,
+  mint_type: 'public'  // or 'whitelist', 'allowlist'
+});
+
+// Mint completed
+cryptique.track('mint_completed', {
+  collection_name: 'Cool Cats',
+  quantity: 2,
+  token_ids: [1234, 1235],
+  total_price_eth: 0.10,
+  transaction_hash: txHash
+});
+```
+
+### Onboarding Flow
+
+Track multi-step onboarding:
+
+```javascript
+const ONBOARDING_STEPS = [
+  'welcome',
+  'connect_wallet',
+  'verify_email',
+  'set_preferences',
+  'first_action'
+];
+
+function trackOnboardingStep(step, additionalProps = {}) {
+  const stepIndex = ONBOARDING_STEPS.indexOf(step);
+  
+  cryptique.track('onboarding_step_completed', {
+    step_name: step,
+    step_number: stepIndex + 1,
+    total_steps: ONBOARDING_STEPS.length,
+    ...additionalProps
+  });
+  
+  // Update user property
+  cryptique.people.set({
+    onboarding_step: step,
+    onboarding_progress: Math.round((stepIndex + 1) / ONBOARDING_STEPS.length * 100)
+  });
+}
+
+// On completion
+function completeOnboarding() {
+  cryptique.track('onboarding_completed', {
+    total_time_seconds: timeSinceStart,
+    steps_completed: completedSteps.length,
+    skipped_steps: skippedSteps
+  });
+  
+  cryptique.people.set({
+    onboarding_completed: true,
+    onboarding_completed_date: new Date().toISOString()
+  });
+}
+```
+
+### Error Tracking
+
+Track errors for debugging:
+
+```javascript
+// Generic error tracking
+function trackError(error, context) {
+  cryptique.track('error_occurred', {
+    error_type: error.name,
+    error_message: error.message,
+    error_code: error.code,
+    context: context,
+    page: window.location.pathname
+  });
+}
+
+// Transaction error
+function trackTransactionError(error, txDetails) {
+  cryptique.track('transaction_error', {
+    error_type: classifyError(error),
+    error_message: error.message,
+    transaction_type: txDetails.type,
+    chain_id: txDetails.chainId,
+    gas_estimate: txDetails.gasEstimate
+  });
+}
+
+// Classify errors for better analysis
+function classifyError(error) {
+  if (error.code === 4001) return 'user_rejected';
+  if (error.code === -32603) return 'internal_error';
+  if (error.message.includes('insufficient funds')) return 'insufficient_funds';
+  if (error.message.includes('gas')) return 'gas_error';
+  return 'unknown';
+}
+```
+
+## Framework-Specific Patterns
+
+### React with Wagmi
+
+```jsx
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { useEffect } from 'react';
+
+function WalletTracker() {
+  const { address, isConnected, chain } = useAccount();
+  const { connect, connectors } = useConnect();
+  const { disconnect } = useDisconnect();
+  
+  // Track connection state changes
+  useEffect(() => {
+    if (isConnected && address) {
+      cryptique.wallet.connect(address, {
+        chain_id: chain?.id,
+        wallet_type: connectors[0]?.name || 'unknown'
+      });
+    }
+  }, [isConnected, address, chain]);
+  
+  // Track disconnection
+  const handleDisconnect = () => {
+    if (address) {
+      cryptique.wallet.disconnect(address);
+    }
+    disconnect();
+  };
+  
+  return (/* ... */);
+}
+```
+
+### Next.js App Router
+
+```jsx
+// app/providers.jsx
+'use client';
+
+import { useEffect } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { getCryptique } from '@/lib/cryptique';
+
+export function AnalyticsProvider({ children }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  
+  // Track page views on route change
+  useEffect(() => {
+    const cryptique = getCryptique();
+    if (cryptique) {
+      // Auto page_view should handle this, but for SPAs:
+      cryptique.track('page_view', {
+        page_path: pathname,
+        query_string: searchParams.toString()
+      });
+    }
+  }, [pathname, searchParams]);
+  
+  return children;
+}
+```
+
+### Vue 3 Composition API
+
+```javascript
+// composables/useTracking.js
+import { inject, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
+
+export function useTracking() {
+  const cryptique = inject('cryptique');
+  const route = useRoute();
+  
+  // Track route changes
+  watch(
+    () => route.fullPath,
+    (newPath) => {
+      cryptique.track('page_view', {
+        page_path: newPath
+      });
+    }
+  );
+  
+  const trackEvent = (name, properties) => {
+    cryptique.track(name, properties);
+  };
+  
+  return { trackEvent };
+}
+```
+
+## Testing Your Implementation
+
+### Debug Mode
+
+Enable debug logging:
+
+```javascript
+// CDN
+script.setAttribute('debug', 'true');
+
+// npm
+const cryptique = new Cryptique({
+  siteId: 'YOUR_SITE_ID',
+  debug: true  // Logs all events to console
+});
+```
+
+### Verification Checklist
+
+<Steps>
+  <Step title="Check Live Events">
+    Go to Dashboard → Live Events and perform actions
+  </Step>
+  <Step title="Verify User Profiles">
+    Check that identify() creates/updates profiles
+  </Step>
+  <Step title="Test Wallet Linking">
+    Connect wallet and verify it appears on profile
+  </Step>
+  <Step title="Check Properties">
+    Verify all expected properties are present
+  </Step>
+  <Step title="Test Error Cases">
+    Trigger errors and verify tracking
+  </Step>
+</Steps>
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Events not appearing">
+    - Check Site ID is correct
+    - Verify domain is allowed in settings
+    - Check for ad blocker interference
+    - Look for console errors
+  </Accordion>
+  
+  <Accordion title="User not identified">
+    - Ensure identify() is called after SDK loads
+    - Verify distinct_id is a string
+    - Check that properties are valid JSON
+  </Accordion>
+  
+  <Accordion title="Wallet not linking">
+    - Call wallet.connect() with valid address
+    - Ensure wallet events aren't disabled
+    - Verify address format (0x...)
+  </Accordion>
+  
+  <Accordion title="Duplicate events">
+    - Check SDK isn't initialized twice
+    - Verify event handlers aren't double-bound
+    - Review SPA routing configuration
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="SDK Reference" icon="code" href="/data-in/sdk-reference/track">
+    Full method documentation
+  </Card>
+  <Card title="Build Reports" icon="chart-line" href="/analysis/reports/insights">
+    Analyze your data
+  </Card>
+</CardGroup>

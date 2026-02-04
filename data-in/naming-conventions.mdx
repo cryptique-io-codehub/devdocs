@@ -1,0 +1,408 @@
+---
+title: "Naming Conventions"
+description: "Best practices for naming events and properties in Cryptique"
+---
+
+## Overview
+
+Consistent naming makes your data easier to understand, query, and maintain. This guide covers recommended conventions for events, properties, and user attributes.
+
+## Event Naming
+
+### Use snake_case
+
+```javascript
+// ✅ Correct
+cryptique.track('swap_completed');
+cryptique.track('nft_minted');
+cryptique.track('liquidity_added');
+
+// ❌ Avoid
+cryptique.track('SwapCompleted');      // PascalCase
+cryptique.track('swap-completed');     // kebab-case
+cryptique.track('Swap Completed');     // Title Case with spaces
+cryptique.track('swapcompleted');      // No separation
+```
+
+### Use Action Verbs
+
+Events should describe **what happened**:
+
+```javascript
+// ✅ Clear actions
+'button_clicked'
+'form_submitted'
+'swap_initiated'
+'swap_completed'
+'wallet_connected'
+'token_approved'
+
+// ❌ Unclear or passive
+'button'              // What about it?
+'swap'                // Started? Finished? Viewed?
+'user_data'           // Not an action
+'page'                // Not descriptive
+```
+
+### Include Object and Action
+
+Pattern: `{object}_{action}` or `{action}_{object}`
+
+```javascript
+// Object + Action
+'pool_created'
+'token_selected'
+'position_opened'
+'order_placed'
+'notification_dismissed'
+
+// Action + Object (also acceptable)
+'created_pool'
+'selected_token'
+'opened_position'
+```
+
+### Use Past Tense for Completed Actions
+
+```javascript
+// ✅ Past tense - action completed
+'swap_completed'
+'transaction_confirmed'
+'onboarding_finished'
+
+// ✅ Present tense - action initiated
+'swap_initiated'
+'checkout_started'
+'form_submitted'
+
+// ❌ Avoid imperative/future
+'complete_swap'        // Sounds like a command
+'will_swap'            // Future tense
+```
+
+### Group Related Events
+
+Use prefixes to group related events:
+
+```javascript
+// Onboarding flow
+'onboarding_started'
+'onboarding_step_completed'
+'onboarding_skipped'
+'onboarding_finished'
+
+// Swap flow
+'swap_initiated'
+'swap_quoted'
+'swap_approved'
+'swap_completed'
+'swap_failed'
+
+// Settings
+'settings_opened'
+'settings_changed'
+'settings_saved'
+```
+
+## Property Naming
+
+### Use snake_case
+
+```javascript
+// ✅ Correct
+{
+  input_token: 'ETH',
+  output_token: 'USDC',
+  amount_usd: 1500.00,
+  slippage_percent: 0.5
+}
+
+// ❌ Avoid
+{
+  inputToken: 'ETH',       // camelCase
+  'output-token': 'USDC',  // kebab-case
+  AmountUSD: 1500.00,      // PascalCase
+  'Amount USD': 1500.00    // Spaces
+}
+```
+
+### Be Specific
+
+```javascript
+// ✅ Specific
+{
+  input_token: 'ETH',
+  output_token: 'USDC',
+  input_amount: 1.5,
+  output_amount: 1500.00
+}
+
+// ❌ Vague
+{
+  token: 'ETH',           // Which token?
+  amount: 1500.00,        // Of what?
+  value: 1.5              // Meaning unclear
+}
+```
+
+### Include Units
+
+```javascript
+// ✅ Clear units
+{
+  amount_usd: 1500.00,
+  amount_eth: 1.5,
+  duration_seconds: 180,
+  slippage_percent: 0.5,
+  gas_gwei: 30
+}
+
+// ❌ Ambiguous
+{
+  amount: 1500.00,        // USD? ETH? Tokens?
+  duration: 180,          // Seconds? Minutes?
+  slippage: 0.5           // Percent? Decimal?
+}
+```
+
+### Use Boolean Prefixes
+
+```javascript
+// ✅ Clear booleans
+{
+  is_first_purchase: true,
+  has_referral: false,
+  was_discounted: true,
+  can_stake: true
+}
+
+// ❌ Unclear
+{
+  first_purchase: true,   // Is it the first? Or details about it?
+  referral: false,        // Has one? Is one? Details?
+  discounted: true        // Was it? Can it be?
+}
+```
+
+### Use Consistent Prefixes
+
+```javascript
+// User counts
+user_count: 150
+active_user_count: 75
+
+// Totals
+total_volume: 50000
+total_transactions: 230
+
+// Timestamps
+created_at: '2024-01-15T10:30:00Z'
+updated_at: '2024-01-16T14:20:00Z'
+```
+
+## User Profile Properties
+
+### Identity Properties
+
+```javascript
+cryptique.identify('user_12345', {
+  // Standard identity
+  email: 'user@example.com',
+  username: 'defi_whale',
+  name: 'John Doe',
+  
+  // Avoid generic names
+  // ❌ id: '12345'        // Use distinct_id instead
+  // ❌ data: {...}        // Too vague
+});
+```
+
+### Lifecycle Properties
+
+```javascript
+cryptique.people.set({
+  // Dates
+  signup_date: '2024-01-01',
+  first_purchase_date: '2024-01-15',
+  last_active_date: '2024-01-20',
+  
+  // Status
+  account_status: 'active',
+  subscription_tier: 'pro',
+  
+  // Counts (use increment for these)
+  // total_purchases: 5,   // Better with increment()
+});
+```
+
+### Web3 Properties
+
+```javascript
+cryptique.people.set({
+  // Wallet info
+  primary_chain: 'ethereum',
+  connected_wallet_count: 2,
+  
+  // Activity
+  first_transaction_date: '2024-01-10',
+  favorite_protocol: 'uniswap',
+  
+  // Segments
+  trader_type: 'active',     // active, casual, whale
+  nft_collector: true
+});
+```
+
+## Anti-Patterns
+
+### High-Cardinality Event Names
+
+```javascript
+// ❌ Don't include IDs in event names
+'viewed_token_0x1234...'
+'clicked_button_abc123'
+
+// ✅ Use properties instead
+cryptique.track('token_viewed', { token_address: '0x1234...' });
+cryptique.track('button_clicked', { button_id: 'abc123' });
+```
+
+### Dynamic Event Names
+
+```javascript
+// ❌ Don't generate event names dynamically
+cryptique.track(`${action}_${object}`);  // Could create thousands of events
+
+// ✅ Use a standard event with properties
+cryptique.track('user_action', {
+  action_type: action,
+  target_object: object
+});
+```
+
+### Excessive Granularity
+
+```javascript
+// ❌ Too granular - will create noise
+'mouse_moved'
+'key_pressed'
+'scroll_pixel_changed'
+
+// ✅ Meaningful milestones
+'scroll_depth_reached'   // At 25%, 50%, 75%, 100%
+'form_field_completed'   // When moving to next field
+```
+
+### PII in Event Names
+
+```javascript
+// ❌ Never include PII in event names
+'user_john@example.com_logged_in'
+'wallet_0x1234_connected'
+
+// ✅ Use properties
+cryptique.track('user_logged_in', { user_id: '12345' });
+cryptique.track('wallet_connected', { wallet_address: '0x1234...' });
+```
+
+## Naming Checklist
+
+Before shipping tracking code, verify:
+
+<Steps>
+  <Step title="snake_case">
+    All event and property names use snake_case
+  </Step>
+  <Step title="Clear action">
+    Event names describe a specific action
+  </Step>
+  <Step title="Specific properties">
+    Properties are specific (not just `amount` or `value`)
+  </Step>
+  <Step title="Units included">
+    Numeric properties include units (`_usd`, `_seconds`, etc.)
+  </Step>
+  <Step title="Boolean prefixes">
+    Boolean properties use `is_`, `has_`, `was_`, `can_`
+  </Step>
+  <Step title="No PII in names">
+    PII is in properties, not event/property names
+  </Step>
+  <Step title="Consistent">
+    Similar events use consistent naming patterns
+  </Step>
+</Steps>
+
+## Examples by Category
+
+### E-commerce / DeFi
+
+```javascript
+// Product/token views
+'token_viewed'
+'pool_viewed'
+'product_viewed'
+
+// Cart/swap actions
+'swap_initiated'
+'item_added_to_cart'
+'cart_updated'
+
+// Checkout/transaction
+'checkout_started'
+'transaction_approved'
+'purchase_completed'
+'swap_completed'
+```
+
+### User Lifecycle
+
+```javascript
+// Onboarding
+'signup_started'
+'signup_completed'
+'email_verified'
+'profile_completed'
+
+// Engagement
+'feature_discovered'
+'tutorial_completed'
+'milestone_reached'
+
+// Retention
+'session_started'
+'returned_after_absence'
+'subscription_renewed'
+```
+
+### Web3 Specific
+
+```javascript
+// Wallet
+'wallet_connected'
+'wallet_switched'
+'chain_changed'
+
+// Transactions
+'transaction_initiated'
+'transaction_signed'
+'transaction_confirmed'
+'transaction_failed'
+
+// DeFi
+'liquidity_added'
+'liquidity_removed'
+'stake_deposited'
+'rewards_claimed'
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Implementation Guide" icon="book" href="/data-in/implementation-guide">
+    Full implementation patterns
+  </Card>
+  <Card title="Track Events" icon="code" href="/data-in/sdk-reference/track">
+    SDK track() reference
+  </Card>
+</CardGroup>

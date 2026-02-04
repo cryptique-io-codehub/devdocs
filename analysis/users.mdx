@@ -1,0 +1,326 @@
+---
+title: "Users"
+description: "Explore individual user profiles and activity timelines"
+---
+
+## Overview
+
+The Users section lets you explore individual user profiles, view complete activity timelines, and understand the full journey of any user—from their first page view to their most recent transaction.
+
+## Finding Users
+
+### Search Methods
+
+Find users by any identifier:
+
+| Search By | Example | Description |
+|-----------|---------|-------------|
+| **distinct_id** | `user_12345` | Primary user identifier |
+| **wallet_address** | `0x1234...abcd` | Any connected wallet |
+| **email** | `user@example.com` | If set via identify() |
+| **Custom property** | `username: defi_whale` | Any user property |
+
+### Search Interface
+
+```
+┌─────────────────────────────────────────────────┐
+│ Search users...                            🔍    │
+├─────────────────────────────────────────────────┤
+│                                                  │
+│ Recent Users:                                    │
+│ ├── user_12345 (2 mins ago)                     │
+│ ├── 0x1234...abcd (5 mins ago)                  │
+│ └── anon_xyz789 (10 mins ago)                   │
+│                                                  │
+│ Active Users: 1,234 in last hour                │
+│                                                  │
+└─────────────────────────────────────────────────┘
+```
+
+## User Profile View
+
+### Profile Header
+
+```
+┌─────────────────────────────────────────────────┐
+│ user_12345                                       │
+│ john@example.com                                 │
+│                                                  │
+│ First seen: Jan 1, 2024                         │
+│ Last seen: 5 minutes ago                        │
+│ Sessions: 47                                     │
+│ Events: 1,250                                    │
+│                                                  │
+│ Wallets:                                        │
+│ ├── 0x1234...abcd (primary)                     │
+│ └── 0xdef0...5678                               │
+└─────────────────────────────────────────────────┘
+```
+
+### User Properties
+
+View all properties set on the user:
+
+```
+Properties:
+├── Identity
+│   ├── email: john@example.com
+│   ├── username: defi_whale
+│   └── name: John Doe
+│
+├── Custom
+│   ├── plan: pro
+│   ├── referral_source: twitter
+│   └── onboarding_completed: true
+│
+├── Web3
+│   ├── is_web3_user: true
+│   ├── primary_wallet: 0x1234...
+│   ├── wallet_age_days: 847
+│   └── total_transactions: 523
+│
+└── Lifecycle
+    ├── first_seen: 2024-01-01
+    ├── last_seen: 2024-02-15
+    └── session_count: 47
+```
+
+### Enriched Properties
+
+If wallet enrichment is enabled:
+
+```
+Wallet Enrichment (0x1234...):
+├── wallet_age_days: 847
+├── eth_balance: 15.5
+├── total_transaction_count: 523
+├── nft_count: 42
+├── defi_protocols: ["uniswap", "aave", "compound"]
+└── is_whale: true
+```
+
+## Activity Timeline
+
+The timeline shows every event for this user in chronological order:
+
+```
+Timeline for user_12345
+───────────────────────────────────────────────────
+
+Today, 2:30 PM
+├── swap_completed
+│   ├── input_token: ETH
+│   ├── output_token: USDC
+│   └── amount: 1.5
+
+Today, 2:29 PM
+├── [Transaction] Swap Router
+│   ├── method: swapExactTokensForTokens
+│   ├── hash: 0xabc123...
+│   └── chain: ethereum
+
+Today, 2:28 PM
+├── swap_initiated
+│   └── input_token: ETH
+
+Today, 2:25 PM
+├── page_view
+│   └── uri: /swap
+
+───────────────────────────────────────────────────
+
+Yesterday, 4:15 PM
+├── wallet_connect
+│   ├── wallet_address: 0x1234...
+│   └── wallet_type: metamask
+
+Yesterday, 4:10 PM
+├── page_view
+│   ├── uri: /
+│   └── referrer: twitter.com
+
+───────────────────────────────────────────────────
+```
+
+### Timeline Features
+
+- **Expandable events**: Click to see all properties
+- **Time grouping**: Events grouped by day/session
+- **Event filtering**: Filter to specific event types
+- **Transaction highlighting**: On-chain transactions marked
+- **Infinite scroll**: Load more historical events
+
+### Filtering Timeline
+
+Filter to specific event types:
+
+```
+Show: [All Events ▼]
+├── All Events
+├── Custom Events Only
+├── Auto Events Only
+├── Transactions Only
+├── Wallet Events Only
+└── Specific Event: [search]
+```
+
+## Linked Data
+
+User profiles provide **full attribution** by linking multiple data sources:
+
+- **Events** are linked to users via `distinct_id`
+- **Transactions** are linked to users via `wallet_address`
+
+This means when a user connects their wallet, all their on-chain activity becomes attributed to their user profile, creating a complete picture from first website visit to blockchain transactions.
+
+### Connected Wallets
+
+View all wallets linked to this user:
+
+```
+Wallets (2):
+┌──────────────────────────────────────────────┐
+│ 0x1234...abcd                                │
+│ ├── Connected: Jan 2, 2024                   │
+│ ├── Transactions: 45                         │
+│ ├── Primary: Yes                             │
+│ └── Chains: ethereum, polygon, arbitrum      │
+├──────────────────────────────────────────────┤
+│ 0xdef0...5678                                │
+│ ├── Connected: Feb 1, 2024                   │
+│ ├── Transactions: 12                         │
+│ ├── Primary: No                              │
+│ └── Chains: ethereum                         │
+└──────────────────────────────────────────────┘
+```
+
+### Transactions
+
+View all on-chain transactions:
+
+```
+Transactions (57):
+├── Feb 15, 2:29 PM │ Swap Router │ swap │ 0xabc...
+├── Feb 15, 10:15 AM │ Swap Router │ swap │ 0xdef...
+├── Feb 14, 3:45 PM │ NFT Contract │ mint │ 0x123...
+├── Feb 13, 11:20 AM │ Staking │ stake │ 0x456...
+└── ... (load more)
+```
+
+### Sessions
+
+View session history:
+
+```
+Sessions (47):
+├── Today, 2:25 PM - 2:35 PM (10 min, 8 events)
+├── Yesterday, 4:10 PM - 4:45 PM (35 min, 23 events)
+├── Feb 13, 9:00 AM - 9:30 AM (30 min, 15 events)
+└── ... (load more)
+```
+
+## User Actions
+
+### From Profile Page
+
+Take actions on a user:
+
+```
+Actions:
+├── View in Cohorts → See which cohorts include this user
+├── Create Cohort → Start a cohort with this user's properties
+├── Export → Download user data as JSON
+└── Delete Profile → Remove user profile (with confirmation)
+```
+
+### Add to Cohort
+
+Create cohort based on this user's properties:
+
+```
+Create cohort like user_12345:
+├── plan = "pro"
+├── country = "US"
+└── is_web3_user = true
+
+→ Find all users matching these criteria
+```
+
+## Use Cases
+
+### Debugging User Issues
+
+When a user reports a problem:
+
+1. Search by email or wallet
+2. View their recent timeline
+3. Look for errors or unexpected events
+4. Check transaction status
+
+### Understanding Power Users
+
+Analyze your best users:
+
+1. Search by known power user ID
+2. Study their event sequence
+3. Note feature usage patterns
+4. Create cohort of similar users
+
+### Support Investigation
+
+Customer support workflow:
+
+1. User provides wallet address
+2. Search to find profile
+3. View recent activity
+4. Identify issues or patterns
+
+### Attribution Verification
+
+Verify marketing attribution:
+
+1. Find user who transacted
+2. Check initial_referrer
+3. Verify UTM parameters
+4. Confirm attribution accuracy
+
+## Privacy & Access
+
+### Who Can View Users
+
+- **Admins**: Full access to all users
+- **Users**: Can view users (configurable)
+- **Public**: No access
+
+### Sensitive Data
+
+Some properties may be redacted:
+
+```
+Properties:
+├── email: john@example.com ← Visible to admins
+├── plan: pro
+└── ssn: [REDACTED] ← Never stored (if attempted)
+```
+
+### Audit Logging
+
+User profile access is logged:
+
+```
+Audit Log:
+├── Admin A viewed user_12345 at 2:30 PM
+├── Admin B exported user_12345 at 2:45 PM
+└── ...
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Cohorts" icon="users" href="/analysis/cohorts">
+    Group users into segments
+  </Card>
+  <Card title="User Profiles" icon="user" href="/data-in/user-profiles">
+    Learn about profile data
+  </Card>
+</CardGroup>

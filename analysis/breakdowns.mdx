@@ -1,0 +1,431 @@
+---
+title: "Breakdowns"
+description: "Segment your metrics by properties for deeper analysis"
+---
+
+## Overview
+
+Breakdowns segment your metrics by property values, showing how different groups compare. Instead of seeing total swaps, see swaps broken down by chain, country, device, or any other property.
+
+## How Breakdowns Work
+
+Without breakdown:
+```
+Total Swaps: 10,000
+```
+
+With breakdown by `chain`:
+```
+Total Swaps by Chain:
+├── ethereum: 4,500 (45%)
+├── polygon: 2,800 (28%)
+├── arbitrum: 1,700 (17%)
+└── base: 1,000 (10%)
+```
+
+## Breakdown Types
+
+### Event Property Breakdowns
+
+Segment by properties attached to events:
+
+| Property | Description |
+|----------|-------------|
+| `chain` | Blockchain network |
+| `input_token` | Token being swapped from |
+| `output_token` | Token being swapped to |
+| `wallet_type` | MetaMask, WalletConnect, etc. |
+| `event_category` | Event classification |
+| Custom properties | Any property you track |
+
+```
+Event: swap_completed
+Breakdown by: input_token
+
+Result:
+├── ETH: 3,200 swaps
+├── USDC: 2,800 swaps
+├── USDT: 1,500 swaps
+└── DAI: 800 swaps
+```
+
+### User Property Breakdowns
+
+Segment by user attributes:
+
+| Property | Description |
+|----------|-------------|
+| `country` | User's country |
+| `city` | User's city |
+| `device_type` | Desktop, mobile, tablet |
+| `browser_name` | Chrome, Safari, Firefox |
+| `os` | Operating system |
+| `plan` | Subscription tier |
+| `is_web3_user` | Web3 vs Web2 user |
+| Custom properties | Any user property |
+
+```
+Metric: Unique Active Users
+Breakdown by: device_type
+
+Result:
+├── desktop: 8,500 users
+├── mobile: 3,200 users
+└── tablet: 300 users
+```
+
+### Transaction Property Breakdowns
+
+Segment by on-chain data:
+
+| Property | Description |
+|----------|-------------|
+| `chain` | Blockchain network |
+| `contract_name` | Smart contract name |
+| `method_name` | Function called |
+| `status` | Transaction status |
+| Custom properties | Indexed event parameters |
+
+```
+Metric: Total Transactions
+Breakdown by: method_name
+
+Result:
+├── swapExactTokensForTokens: 5,600
+├── addLiquidity: 2,100
+├── removeLiquidity: 1,200
+└── other: 800
+```
+
+### Time Breakdowns
+
+Segment by time periods:
+
+| Granularity | Use Case |
+|-------------|----------|
+| Hour | Intraday patterns |
+| Day | Daily trends |
+| Week | Weekly patterns |
+| Month | Monthly trends |
+| Quarter | Quarterly analysis |
+
+```
+Metric: Swap Count
+Breakdown by: Day
+
+Result:
+├── Mon: 1,500
+├── Tue: 1,800
+├── Wed: 2,100
+├── Thu: 1,900
+├── Fri: 2,300
+├── Sat: 1,200
+└── Sun: 1,000
+```
+
+## Multiple Breakdowns
+
+Apply multiple breakdowns for deeper segmentation:
+
+### Two-Level Breakdown
+
+```
+Metric: Swap Count
+Breakdown 1: chain
+Breakdown 2: device_type
+
+Result:
+├── ethereum
+│   ├── desktop: 3,200
+│   └── mobile: 1,300
+├── polygon
+│   ├── desktop: 1,900
+│   └── mobile: 900
+└── arbitrum
+    ├── desktop: 1,200
+    └── mobile: 500
+```
+
+### Three-Level Breakdown
+
+```
+Metric: Transaction Volume
+Breakdown 1: chain
+Breakdown 2: device_type
+Breakdown 3: country
+
+Result:
+├── ethereum
+│   ├── desktop
+│   │   ├── US: $450K
+│   │   ├── UK: $120K
+│   │   └── DE: $80K
+│   └── mobile
+│       ├── US: $180K
+│       └── ...
+```
+
+<Note>
+Adding more breakdowns increases complexity. Start with one breakdown and add more only when needed.
+</Note>
+
+## Breakdown Display Options
+
+### Top N Segments
+
+Show only the most significant segments:
+
+```
+Show: Top 5 chains by swap count
+
+Result:
+├── ethereum: 4,500
+├── polygon: 2,800
+├── arbitrum: 1,700
+├── base: 1,000
+└── optimism: 800
+
+(Other chains grouped or hidden)
+```
+
+### Other Grouping
+
+Combine low-volume segments:
+
+```
+Show: Top 5 + Other
+
+Result:
+├── ethereum: 4,500
+├── polygon: 2,800
+├── arbitrum: 1,700
+├── base: 1,000
+├── optimism: 800
+└── Other: 200 (combined)
+```
+
+### Sorting
+
+Sort breakdowns by:
+- **Value (descending)**: Highest first (default)
+- **Value (ascending)**: Lowest first
+- **Alphabetical**: A-Z
+- **Custom order**: Define your own
+
+## Breakdowns in Reports
+
+### Insights
+
+Breakdowns appear as:
+- **Lines** on line charts (one line per segment)
+- **Bars** on bar charts (grouped or stacked)
+- **Slices** on pie charts
+- **Rows** in tables
+
+```
+Line chart with chain breakdown:
+─── ethereum (blue line)
+─── polygon (purple line)
+─── arbitrum (orange line)
+```
+
+### Funnels
+
+Breakdowns show conversion by segment:
+
+```
+Funnel with device_type breakdown:
+
+Desktop: 100% → 40% → 25% → 15%
+Mobile:  100% → 25% → 12% → 6%
+Tablet:  100% → 35% → 20% → 12%
+```
+
+### Retention
+
+Breakdowns show retention curves by segment:
+
+```
+Retention with plan breakdown:
+
+Pro:  Day 1: 55% → Day 7: 40% → Day 30: 32%
+Free: Day 1: 35% → Day 7: 20% → Day 30: 12%
+```
+
+### Flows
+
+Breakdowns split flows by segment:
+
+```
+Flow with device_type breakdown:
+
+Desktop path: connect → swap → success (45%)
+Mobile path:  connect → swap → success (25%)
+```
+
+## Cohort Breakdowns
+
+Compare metrics across user cohorts:
+
+```
+Metric: Average Transaction Value
+Breakdown by: Cohort
+
+Result:
+├── Whales: $5,200 avg
+├── Active Traders: $450 avg
+├── Casual Users: $85 avg
+└── New Users: $42 avg
+```
+
+Creating cohorts allows you to segment by complex criteria. See [Cohorts](/analysis/cohorts) for details.
+
+## Web3 Breakdown Examples
+
+### Swap Volume by Chain
+
+```
+Event: swap_completed
+Metric: Sum of amount_usd
+Breakdown: chain
+
+Insight: Which chains drive the most volume?
+```
+
+### Transaction Count by Token
+
+```
+Event: transaction
+Metric: Total count
+Breakdown: input_token
+Filter: chain = "ethereum"
+
+Insight: Most popular tokens on Ethereum
+```
+
+### User Distribution by Wallet Type
+
+```
+Event: wallet_connect
+Metric: Unique users
+Breakdown: wallet_type
+
+Result:
+├── metamask: 65%
+├── walletconnect: 20%
+├── coinbase_wallet: 10%
+└── other: 5%
+```
+
+### Cross-Chain User Behavior
+
+```
+Metric: Unique users
+Breakdown 1: chain
+Breakdown 2: is_returning_user
+
+Insight: Which chains have better retention?
+```
+
+## Best Practices
+
+### Choose Meaningful Breakdowns
+
+```
+✅ Good breakdowns:
+├── chain (actionable: optimize for popular chains)
+├── device_type (actionable: fix mobile UX)
+├── utm_source (actionable: optimize campaigns)
+└── user_tier (actionable: pricing/features)
+
+❌ Poor breakdowns:
+├── user_id (too granular)
+├── timestamp (use time breakdown instead)
+└── random_id (meaningless)
+```
+
+### Limit Breakdown Cardinality
+
+High-cardinality properties create noise:
+
+```
+❌ Avoid: Breakdown by wallet_address (millions of values)
+✅ Better: Breakdown by wallet_type or country
+```
+
+### Use Appropriate Visualizations
+
+| Breakdown Type | Best Visualization |
+|----------------|-------------------|
+| Few segments (<5) | Pie chart |
+| Many segments (5-20) | Bar chart |
+| Time-based | Line chart |
+| Multiple levels | Table |
+
+### Start Simple
+
+Begin with one breakdown, validate insights, then add complexity:
+
+```
+1. Swaps by chain (single breakdown)
+2. Swaps by chain and device (two breakdowns)
+3. Swaps by chain, device, and country (if needed)
+```
+
+## Common Patterns
+
+### Comparison Analysis
+
+Compare performance across segments:
+
+```
+Question: Which chain has the highest conversion?
+
+Funnel by chain:
+├── Arbitrum: 18% conversion ⭐ Best
+├── Polygon: 15% conversion
+├── Ethereum: 12% conversion
+└── Base: 10% conversion
+
+Action: Investigate Arbitrum UX, replicate elsewhere
+```
+
+### Segment Discovery
+
+Find your best-performing segments:
+
+```
+Question: Who are our power users?
+
+Active users by:
+├── country: US leads with 45%
+├── device: Desktop users 3x more active
+├── plan: Pro users 5x more transactions
+
+Action: Focus on US desktop Pro users
+```
+
+### Trend Analysis
+
+See how segments change over time:
+
+```
+Question: Is mobile adoption growing?
+
+Device breakdown over 6 months:
+├── Desktop: 80% → 75% → 70%
+├── Mobile: 20% → 25% → 30%
+
+Trend: Mobile growing, invest in mobile UX
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Time Controls" icon="clock" href="/analysis/time-controls">
+    Configure time ranges
+  </Card>
+  <Card title="Filters Reference" icon="filter" href="/analysis/filters-and-operators">
+    Complete filter operators
+  </Card>
+</CardGroup>

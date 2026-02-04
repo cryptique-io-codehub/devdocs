@@ -1,0 +1,255 @@
+---
+title: "Default Properties"
+description: "Properties automatically captured on every event"
+---
+
+## Overview
+
+Cryptique automatically captures a rich set of properties on every event. These properties require no additional code and are available for filtering, breakdowns, and analysis.
+
+## Property Categories
+
+### Identifiers
+
+Core identifiers attached to every event:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `team_id` | string | Your Cryptique team identifier |
+| `session_id` | string | Current session identifier |
+| `session_db_id` | string | Internal session database ID |
+| `user_id` | string | User identifier (if identified) |
+| `distinct_id` | string | Unique user identifier |
+| `user_identity_id` | string | Internal user identity ID |
+| `website_id` | string | Site identifier |
+
+### Event Metadata
+
+Information about the event itself:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `event_type` | string | `auto`, `custom`, or `transaction` |
+| `event_name` | string | Name of the event |
+| `event_category` | string | Event category grouping |
+| `timestamp` | datetime | When the event occurred (ISO 8601) |
+
+### Location
+
+Geographic information derived from IP address:
+
+| Property | Type | Description | Example |
+|----------|------|-------------|---------|
+| `country` | string | Country code (ISO 3166-1) | `"US"`, `"GB"`, `"DE"` |
+| `city` | string | City name | `"San Francisco"` |
+| `region` | string | State/province/region | `"California"` |
+| `latitude` | number | Approximate latitude | `37.7749` |
+| `longitude` | number | Approximate longitude | `-122.4194` |
+| `timezone` | string | User's timezone | `"America/Los_Angeles"` |
+
+<Note>
+Location is approximate and based on IP geolocation. Users on VPNs may show different locations.
+</Note>
+
+### Device & Browser
+
+Client environment information:
+
+| Property | Type | Description | Example |
+|----------|------|-------------|---------|
+| `browser_name` | string | Browser name | `"Chrome"`, `"Firefox"`, `"Safari"` |
+| `browser_version` | string | Browser version | `"120.0.0"` |
+| `os` | string | Operating system | `"Windows"`, `"macOS"`, `"iOS"` |
+| `os_version` | string | OS version | `"14.2"` |
+| `device_type` | string | Device category | `"desktop"`, `"mobile"`, `"tablet"` |
+| `language` | string | Browser language | `"en-US"`, `"es-ES"` |
+
+### Screen & Viewport
+
+Display information:
+
+| Property | Type | Description | Example |
+|----------|------|-------------|---------|
+| `screen_height` | number | Screen height in pixels | `1440` |
+| `screen_width` | number | Screen width in pixels | `2560` |
+| `viewport_height` | number | Browser viewport height | `900` |
+| `viewport_width` | number | Browser viewport width | `1200` |
+| `dpi` | number | Device pixel ratio | `2` (Retina), `1` (standard) |
+
+### Page & URL
+
+Current page information:
+
+| Property | Type | Description | Example |
+|----------|------|-------------|---------|
+| `current_url` | string | Full page URL | `"https://app.example.com/swap?token=ETH"` |
+| `page_title` | string | Page title | `"Swap Tokens \| Example DEX"` |
+| `uri` | string | URL pathname | `"/swap"` |
+| `referrer` | string | Previous page URL | `"https://app.example.com/pools"` |
+| `initial_referrer` | string | First referrer in session | `"https://google.com/..."` |
+
+### UTM Parameters
+
+Campaign tracking (parsed from URL or session):
+
+| Property | Type | Description | Example |
+|----------|------|-------------|---------|
+| `utm_source` | string | Traffic source | `"twitter"`, `"google"` |
+| `utm_medium` | string | Marketing medium | `"cpc"`, `"social"`, `"email"` |
+| `utm_campaign` | string | Campaign name | `"summer_launch"` |
+| `utm_term` | string | Paid search term | `"defi swap"` |
+| `utm_content` | string | Content variant | `"banner_a"` |
+| `utm_id` | string | Campaign ID | `"camp_12345"` |
+
+**UTM Behavior**:
+- Parsed from URL on page load
+- Inherited from session if not in current URL
+- New UTM parameters start a new session
+
+### Web3 Properties
+
+Blockchain-related properties:
+
+| Property | Type | Description | Example |
+|----------|------|-------------|---------|
+| `is_web3_user` | boolean | Has connected a wallet | `true` |
+| `wallet_address` | string | Currently connected wallet | `"0x1234..."` |
+
+## Event-Specific Properties
+
+Some auto-events capture additional properties:
+
+### click Event
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `element_name` | string | Element name attribute |
+| `element_id` | string | Element ID attribute |
+| `element_class` | string | Element CSS classes |
+| `element_tag` | string | HTML tag name |
+| `element_text` | string | Element text content (truncated) |
+| `element_href` | string | Link href (for `<a>` tags) |
+
+### scroll Event
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `scroll_depth` | number | Scroll percentage (25, 50, 75, 100) |
+| `scroll_direction` | string | `"down"` or `"up"` |
+| `page_height` | number | Total page height |
+| `viewport_height` | number | Visible area height |
+
+### form_submit Event
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `form_id` | string | Form ID attribute |
+| `form_name` | string | Form name attribute |
+| `form_action` | string | Form action URL |
+| `form_method` | string | `"GET"` or `"POST"` |
+
+### input_change Event
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `input_name` | string | Input name attribute |
+| `input_type` | string | Input type (text, email, etc.) |
+| `input_id` | string | Input ID attribute |
+| `form_id` | string | Parent form ID |
+
+### wallet_connect Event
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `wallet_address` | string | Connected wallet address |
+| `wallet_type` | string | Wallet provider (metamask, etc.) |
+| `chain_id` | number | Connected chain ID |
+| `is_reconnect` | boolean | Was previously connected |
+
+### copy Event
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `copied_text` | string | Copied text (truncated to 100 chars) |
+| `source_element` | string | Element ID/class of source |
+
+## Using Default Properties
+
+### In Filters
+
+Filter events by any default property:
+
+```
+Events where:
+- country = "US"
+- AND device_type = "mobile"
+- AND utm_source = "twitter"
+```
+
+### In Breakdowns
+
+Break down metrics by default properties:
+
+```
+Page Views by:
+- browser_name → Chrome: 60%, Safari: 25%, Firefox: 15%
+- device_type → desktop: 70%, mobile: 28%, tablet: 2%
+- country → US: 40%, GB: 15%, DE: 10%, ...
+```
+
+### In Cohorts
+
+Create segments using default properties:
+
+```
+Cohort: Mobile Social Traffic
+Criteria:
+- device_type = "mobile"
+- AND utm_medium = "social"
+```
+
+## Overriding Default Properties
+
+Some properties can be overridden when tracking events:
+
+```javascript
+// Override location for server-side events
+cryptique.track('server_event', {
+  country: 'GB',
+  city: 'London'
+});
+
+// Override page info for SPA
+cryptique.track('virtual_page_view', {
+  current_url: '/app/dashboard',
+  page_title: 'Dashboard'
+});
+```
+
+<Warning>
+Only override properties when you have accurate alternative data. Most use cases don't require overrides.
+</Warning>
+
+## Privacy Considerations
+
+Default properties are designed with privacy in mind:
+
+| Property | Privacy Note |
+|----------|--------------|
+| Location | Approximate (city-level), not precise |
+| IP Address | Not stored or exposed |
+| Form values | Not captured (only form metadata) |
+| Copied text | Truncated to 100 characters |
+
+See [Privacy & Compliance](/admin/privacy-and-compliance) for more details.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Events & Properties" icon="bolt" href="/data-in/events-and-properties">
+    Custom properties guide
+  </Card>
+  <Card title="Filters & Operators" icon="filter" href="/analysis/filters-and-operators">
+    Use properties in queries
+  </Card>
+</CardGroup>

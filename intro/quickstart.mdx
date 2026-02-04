@@ -1,0 +1,252 @@
+---
+title: "Quickstart"
+description: "Get Cryptique running on your site in 5 minutes"
+---
+
+## Overview
+
+This guide will get you tracking user behavior and wallet connections in about 5 minutes. By the end, you'll have:
+
+- ✅ Automatic page view and session tracking
+- ✅ Click, scroll, and form tracking
+- ✅ Wallet connection tracking
+- ✅ Data flowing to your dashboard
+
+## Prerequisites
+
+- A Cryptique account ([sign up here](https://app.cryptique.io))
+- Access to your website's HTML or build system
+- Your Site ID from the Cryptique dashboard
+
+## Step 1: Get Your Site ID
+
+1. Log in to [app.cryptique.io](https://app.cryptique.io)
+2. Navigate to **Settings → Sites**
+3. Click **Add Site** or select an existing site
+4. Copy your **Site ID** (format: `your-domain-xx`)
+
+## Step 2: Add the Tracking Script
+
+Choose your installation method:
+
+<Tabs>
+  <Tab title="CDN (Recommended)">
+    Add this script to your HTML, just before the closing `</head>` tag:
+
+    ```html
+    <script>
+      var script = document.createElement('script');
+      script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+      script.setAttribute('site-id', 'YOUR_SITE_ID');
+      script.setAttribute('auto-events', 'true');
+      document.head.appendChild(script);
+    </script>
+    ```
+
+    Replace `YOUR_SITE_ID` with your actual Site ID.
+  </Tab>
+  
+  <Tab title="npm">
+    Install the package:
+
+    ```bash
+    npm install cryptique-sdk
+    ```
+
+    Initialize in your app:
+
+    ```javascript
+    import Cryptique from 'cryptique-sdk';
+
+    const cryptique = new Cryptique({
+      siteId: 'YOUR_SITE_ID',
+      autoEvents: true
+    });
+    ```
+  </Tab>
+  
+  <Tab title="Google Tag Manager">
+    1. In GTM, create a new **Custom HTML** tag
+    2. Paste the CDN script (from the CDN tab)
+    3. Set the trigger to **All Pages**
+    4. Save and publish
+
+    See [Google Tag Manager integration](/integrations/google-tag-manager) for detailed setup.
+  </Tab>
+</Tabs>
+
+## Step 3: Verify Installation
+
+1. Visit your website
+2. Open your browser's developer console (F12)
+3. Look for: `[Cryptique] Initialized successfully`
+4. Go to your Cryptique dashboard → **Live Events**
+5. You should see events appearing in real-time
+
+<Note>
+Events may take up to 60 seconds to appear in the dashboard. If you don't see events after 2 minutes, check the [troubleshooting guide](#troubleshooting).
+</Note>
+
+## Step 4: Track Custom Events
+
+Beyond auto-events, track specific actions that matter to your product:
+
+```javascript
+// Track a custom event
+cryptique.track('swap_initiated', {
+  input_token: 'ETH',
+  output_token: 'USDC',
+  amount: 1.5
+});
+```
+
+## Step 5: Track Wallet Connections
+
+When a user connects their wallet:
+
+```javascript
+// After wallet connection (e.g., via wagmi, ethers, web3-react)
+cryptique.wallet.connect(walletAddress, {
+  wallet_type: 'metamask',
+  chain_id: 1
+});
+```
+
+If you're using standard wallet libraries, Cryptique can auto-detect wallet connections. Enable with:
+
+```html
+<script>
+  var script = document.createElement('script');
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.setAttribute('site-id', 'YOUR_SITE_ID');
+  script.setAttribute('auto-events', 'true');
+  script.setAttribute('auto-wallet-detect', 'true');
+  document.head.appendChild(script);
+</script>
+```
+
+## Step 6: Identify Users
+
+When a user logs in or you know their identity:
+
+```javascript
+cryptique.identify('user_12345', {
+  email: 'user@example.com',
+  plan: 'pro',
+  signup_date: '2024-01-15'
+});
+```
+
+This links all their past anonymous activity to their identified profile.
+
+## What's Being Tracked?
+
+With `auto-events` enabled, Cryptique automatically captures:
+
+| Event | Description |
+|-------|-------------|
+| `page_view` | Every page load with URL, title, referrer |
+| `session_start` | When a new session begins |
+| `session_end` | When a session ends (30-min inactivity timeout) |
+| `click` | Button and link clicks with element details |
+| `scroll` | Scroll depth milestones (25%, 50%, 75%, 100%) |
+| `form_submit` | Form submissions (without sensitive field data) |
+| `input_change` | Form field interactions |
+| `copy` | Text copy actions |
+| `wallet_connect` | Wallet connection events |
+| `wallet_disconnect` | Wallet disconnection events |
+
+## Example: Complete Setup
+
+Here's a complete example for a DeFi app:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My DeFi App</title>
+  
+  <!-- Cryptique Tracking -->
+  <script>
+    var script = document.createElement('script');
+    script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+    script.setAttribute('site-id', 'mydefi-app-42');
+    script.setAttribute('auto-events', 'true');
+    document.head.appendChild(script);
+    
+    // Wait for SDK to load
+    script.onload = function() {
+      console.log('Cryptique loaded');
+    };
+  </script>
+</head>
+<body>
+  <!-- Your app content -->
+  
+  <script>
+    // Track custom events when they happen
+    function onSwapComplete(txHash, inputToken, outputToken, amount) {
+      cryptique.track('swap_completed', {
+        transaction_hash: txHash,
+        input_token: inputToken,
+        output_token: outputToken,
+        amount_usd: amount
+      });
+    }
+    
+    // Track wallet connection
+    async function connectWallet() {
+      const accounts = await ethereum.request({ 
+        method: 'eth_requestAccounts' 
+      });
+      
+      cryptique.wallet.connect(accounts[0], {
+        wallet_type: 'metamask',
+        chain_id: await ethereum.request({ method: 'eth_chainId' })
+      });
+    }
+  </script>
+</body>
+</html>
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Events not appearing in dashboard">
+    1. Check browser console for errors
+    2. Verify your Site ID is correct
+    3. Ensure the script loads before user interactions
+    4. Check that your domain is allowed in site settings
+    5. Disable ad blockers temporarily
+  </Accordion>
+  
+  <Accordion title="Script not loading">
+    1. Check for Content Security Policy (CSP) blocks
+    2. Verify the CDN URL is correct
+    3. Try the npm package instead
+  </Accordion>
+  
+  <Accordion title="Wallet events not tracking">
+    1. Ensure wallet.connect() is called after wallet connection
+    2. Pass a valid wallet address (0x...)
+    3. Check that wallet_connect isn't in disabled auto-events
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Add Smart Contracts" icon="file-contract" href="/integrations/smart-contracts">
+    Track on-chain transactions
+  </Card>
+  <Card title="Enable Wallet Enrichment" icon="wallet" href="/integrations/wallet-enrichment">
+    Get rich user profiles
+  </Card>
+  <Card title="Build Your First Report" icon="chart-line" href="/analysis/reports/insights">
+    Create insights from your data
+  </Card>
+  <Card title="SDK Reference" icon="code" href="/data-in/sdk-reference/track">
+    Full SDK documentation
+  </Card>
+</CardGroup>

@@ -1,0 +1,200 @@
+---
+title: "Reports Overview"
+description: "Understanding Cryptique's report types for Web3 analytics"
+---
+
+## Overview
+
+Cryptique provides four powerful report types, each designed to answer different types of questions about your users' behavior—both off-chain and on-chain.
+
+## Report Types
+
+<CardGroup cols={2}>
+  <Card title="Insights" icon="chart-line" href="/analysis/reports/insights">
+    **Visualize trends and compositions**
+    
+    Answer questions like:
+    - How many users swapped this week?
+    - What's the breakdown of users by chain?
+    - How is retention trending over time?
+  </Card>
+  
+  <Card title="Funnels" icon="filter" href="/analysis/reports/funnels">
+    **Measure conversion through steps**
+    
+    Answer questions like:
+    - What % of users who connect a wallet make a transaction?
+    - Where do users drop off in onboarding?
+    - How long does it take to convert?
+  </Card>
+  
+  <Card title="Retention" icon="calendar-check" href="/analysis/reports/retention">
+    **Measure engagement over time**
+    
+    Answer questions like:
+    - How many users return after 7 days?
+    - What's our weekly transaction retention?
+    - Are power users more retained?
+  </Card>
+  
+  <Card title="Flows" icon="diagram-project" href="/analysis/reports/flows">
+    **See paths users take**
+    
+    Answer questions like:
+    - What do users do after connecting a wallet?
+    - What paths lead to conversion?
+    - Where do users go after viewing pricing?
+  </Card>
+</CardGroup>
+
+## Common Features
+
+All reports share these capabilities:
+
+### Filtering
+
+Narrow your analysis to specific users or events:
+
+```
+Show me:
+- Users from United States
+- Who are on the "pro" plan
+- And connected a wallet in the last 30 days
+```
+
+### Breakdowns
+
+Segment your data by properties:
+
+```
+Break down by:
+- Country → See metrics per country
+- Device type → Compare mobile vs desktop
+- Wallet type → MetaMask vs WalletConnect
+```
+
+### Time Controls
+
+Analyze any time period:
+
+- **Date range**: Last 7 days, last 30 days, custom range
+- **Granularity**: Hourly, daily, weekly, monthly
+- **Comparison**: Compare to previous period
+
+### Cross-Data Analysis
+
+Combine off-chain and on-chain data:
+
+```
+Funnel:
+1. page_view (website)
+2. wallet_connect (website)  
+3. swap_initiated (website)
+4. swapExactTokensForTokens (blockchain transaction)
+```
+
+## Choosing the Right Report
+
+| Question Type | Report | Example |
+|--------------|--------|---------|
+| "How many?" / "How much?" | Insights | Total swaps this month |
+| "What percentage convert?" | Funnels | Conversion rate to first transaction |
+| "Do users come back?" | Retention | 7-day retention after signup |
+| "What path do users take?" | Flows | Actions after wallet connection |
+
+## Building Reports
+
+### Quick Start
+
+<Steps>
+  <Step title="Select Report Type">
+    Choose Insights, Funnels, Retention, or Flows
+  </Step>
+  <Step title="Add Events">
+    Select the events or transactions to analyze
+  </Step>
+  <Step title="Choose Measurement">
+    Unique users, total count, property aggregation
+  </Step>
+  <Step title="Apply Filters">
+    Narrow to specific segments
+  </Step>
+  <Step title="Add Breakdowns">
+    Segment by properties
+  </Step>
+  <Step title="Select Visualization">
+    Choose chart type and time range
+  </Step>
+</Steps>
+
+### Example: Cross-Chain Analysis
+
+Analyze user behavior across different blockchains:
+
+1. Create an **Insights** report
+2. Select event: `swap_completed`
+3. Breakdown by: `chain`
+4. Visualization: Stacked bar chart
+
+Result: See swap volume by Ethereum, Polygon, Arbitrum, etc.
+
+### Example: Wallet Connection Funnel
+
+Track the path from landing to on-chain transaction:
+
+1. Create a **Funnels** report
+2. Step 1: `page_view` (landing page)
+3. Step 2: `wallet_connect`
+4. Step 3: `swap_initiated`
+5. Step 4: Transaction from "Swap Router" contract
+6. Filter by: `utm_source = twitter`
+
+Result: See conversion rate from Twitter traffic to actual swaps.
+
+## Saving & Sharing
+
+### Save Reports
+
+Save frequently-used reports for quick access:
+
+1. Build your report
+2. Click **Save**
+3. Name your report
+4. Choose visibility (personal or team)
+
+### Add to Boards
+
+Combine multiple reports on a dashboard:
+
+1. Open a saved report
+2. Click **Add to Board**
+3. Select existing board or create new
+4. Arrange on the board
+
+See [Boards](/analysis/boards) for more details.
+
+### Share Reports
+
+Share with team members:
+
+1. Save the report
+2. Click **Share**
+3. Enter email addresses
+4. Set permissions (view or edit)
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Insights" icon="chart-line" href="/analysis/reports/insights">
+    Visualize trends and metrics
+  </Card>
+  <Card title="Funnels" icon="filter" href="/analysis/reports/funnels">
+    Measure conversion rates
+  </Card>
+  <Card title="Retention" icon="calendar-check" href="/analysis/reports/retention">
+    Track user engagement
+  </Card>
+  <Card title="Flows" icon="diagram-project" href="/analysis/reports/flows">
+    Understand user paths
+  </Card>
+</CardGroup>

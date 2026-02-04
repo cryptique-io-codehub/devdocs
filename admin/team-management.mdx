@@ -1,0 +1,257 @@
+---
+title: "Team Management"
+description: "Manage team members, roles, and permissions"
+---
+
+## Overview
+
+Cryptique uses a role-based access system to manage team permissions. This guide covers user roles, invitations, and team administration.
+
+## User Roles
+
+Cryptique has three user roles with different permission levels:
+
+### Super User (Team Owner)
+
+The Super User is the team owner with full administrative control:
+
+| Permission | Access |
+|------------|--------|
+| Billing management | ✅ Full access |
+| Team deletion | ✅ Can delete team |
+| Admin capabilities | ✅ All admin permissions |
+| Invite users | ✅ Yes |
+| Manage integrations | ✅ Yes |
+| View all data | ✅ Yes |
+
+<Note>
+The Super User role is fixed and cannot be transferred. The person who created the team is automatically the Super User.
+</Note>
+
+### Admin
+
+Admins can manage team settings and users but cannot access billing:
+
+| Permission | Access |
+|------------|--------|
+| Billing management | ❌ No access |
+| Team deletion | ❌ Cannot delete |
+| Invite users | ✅ Yes |
+| Remove users | ✅ Yes (except Super User) |
+| Manage integrations | ✅ Yes |
+| Configure settings | ✅ Yes |
+| View all data | ✅ Yes |
+| Create/edit reports | ✅ Yes |
+| Manage sites & contracts | ✅ Yes |
+
+### User
+
+Standard users have access to analytics features:
+
+| Permission | Access |
+|------------|--------|
+| Billing management | ❌ No access |
+| Team deletion | ❌ Cannot delete |
+| Invite users | ❌ No |
+| Manage integrations | ❌ No |
+| Configure settings | ❌ No |
+| View all data | ✅ Yes |
+| Create/edit reports | ✅ Yes |
+| View user profiles | ✅ Yes |
+
+## Role Comparison
+
+| Capability | Super User | Admin | User |
+|------------|:----------:|:-----:|:----:|
+| View analytics | ✅ | ✅ | ✅ |
+| Create reports | ✅ | ✅ | ✅ |
+| Create boards | ✅ | ✅ | ✅ |
+| View user profiles | ✅ | ✅ | ✅ |
+| Invite team members | ✅ | ✅ | ❌ |
+| Remove team members | ✅ | ✅ | ❌ |
+| Manage sites | ✅ | ✅ | ❌ |
+| Manage contracts | ✅ | ✅ | ❌ |
+| Configure auto-enhance | ✅ | ✅ | ❌ |
+| Manage integrations | ✅ | ✅ | ❌ |
+| Access billing | ✅ | ❌ | ❌ |
+| Delete team | ✅ | ❌ | ❌ |
+
+## Inviting Team Members
+
+### Send Invitation
+
+<Steps>
+  <Step title="Go to Team Settings">
+    Navigate to **Settings** → **Team**
+  </Step>
+  
+  <Step title="Click Invite">
+    Click **Invite Team Member**
+  </Step>
+  
+  <Step title="Enter Details">
+    - Email address
+    - Select role (Admin or User)
+  </Step>
+  
+  <Step title="Send Invitation">
+    Click **Send Invite**
+    
+    The user receives an email with a link to join your team.
+  </Step>
+</Steps>
+
+### Invitation Status
+
+Track pending invitations:
+
+```
+Team Members:
+├── john@example.com (Admin) - Active
+├── jane@example.com (User) - Active
+├── bob@example.com (User) - Pending (sent 2 days ago)
+└── alice@example.com (Admin) - Pending (sent 1 hour ago)
+```
+
+### Resend or Cancel
+
+For pending invitations:
+- **Resend**: Send another invitation email
+- **Cancel**: Remove the pending invitation
+
+## Managing Team Members
+
+### Change User Role
+
+Admins and Super Users can change roles:
+
+1. Go to **Settings** → **Team**
+2. Find the user
+3. Click role dropdown
+4. Select new role (Admin or User)
+
+<Warning>
+You cannot change the Super User's role or demote yourself if you're the only Admin.
+</Warning>
+
+### Remove Team Member
+
+1. Go to **Settings** → **Team**
+2. Find the user to remove
+3. Click **Remove** (trash icon)
+4. Confirm removal
+
+**What happens when removed:**
+- User loses access immediately
+- Personal saved reports become inaccessible
+- Shared reports remain for the team
+- User can be re-invited later
+
+### Transfer Ownership
+
+Currently, the Super User role cannot be transferred. Contact support if you need to change team ownership.
+
+## Team Structure
+
+### One Team, Multiple Sites
+
+A single team can manage multiple sites:
+
+```
+Team: Acme Corp
+├── Sites:
+│   ├── acme-dex.com
+│   ├── acme-nft.io
+│   └── staging.acme-dex.com
+│
+├── Contracts:
+│   ├── Acme Swap Router (ethereum)
+│   ├── Acme NFT Collection (ethereum)
+│   └── Acme Staking (polygon)
+│
+└── Team Members:
+    ├── owner@acme.com (Super User)
+    ├── dev@acme.com (Admin)
+    └── analyst@acme.com (User)
+```
+
+All team members have access to all sites and contracts within the team.
+
+### Audit Logging
+
+All team actions are logged:
+
+```
+Audit Log:
+├── Feb 15, 2:30 PM │ owner@acme.com │ Invited dev@acme.com as Admin
+├── Feb 15, 10:00 AM │ dev@acme.com │ Added site: staging.acme-dex.com
+├── Feb 14, 4:45 PM │ owner@acme.com │ Changed analyst@acme.com role to User
+└── Feb 14, 3:00 PM │ dev@acme.com │ Removed contract: Old Router
+```
+
+## Best Practices
+
+### Role Assignment
+
+```
+✅ Recommended:
+- 1 Super User (team owner, handles billing)
+- 1-2 Admins (technical leads, manage settings)
+- Remaining team as Users (analysts, marketers)
+
+❌ Avoid:
+- Everyone as Admin (security risk)
+- No backup Admin (single point of failure)
+```
+
+### Access Management
+
+- **Review regularly**: Audit team members quarterly
+- **Remove promptly**: Remove access when people leave
+- **Least privilege**: Give minimum necessary permissions
+- **Document roles**: Keep track of who has what access
+
+### Security
+
+- Use strong passwords
+- Enable 2FA when available
+- Don't share accounts
+- Use individual invitations (not shared links)
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Invitation email not received">
+    1. Check spam/junk folder
+    2. Verify email address is correct
+    3. Resend the invitation
+    4. Try a different email address
+  </Accordion>
+  
+  <Accordion title="Cannot change user role">
+    - Only Super Users and Admins can change roles
+    - Cannot modify the Super User's role
+    - Cannot demote yourself if you're the last Admin
+  </Accordion>
+  
+  <Accordion title="Removed user still has access">
+    - Ask user to clear browser cache
+    - Session may take a few minutes to expire
+    - Contact support if issue persists
+  </Accordion>
+  
+  <Accordion title="Need to transfer ownership">
+    Contact Cryptique support to transfer the Super User role to another team member.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Sites & Contracts" icon="globe" href="/admin/sites-and-contracts">
+    Manage tracked sites and smart contracts
+  </Card>
+  <Card title="Privacy & Compliance" icon="shield" href="/admin/privacy-and-compliance">
+    Data privacy settings
+  </Card>
+</CardGroup>

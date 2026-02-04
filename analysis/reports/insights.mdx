@@ -1,0 +1,391 @@
+---
+title: "Insights"
+description: "Visualize trends and compositions within your data"
+---
+
+## Overview
+
+Insights is a powerful and flexible tool for visualizing trends and compositions in your data. Analyze events, cohorts, user profiles, and transactions with a wide variety of chart types and measurements.
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Product Analytics">
+    - How is my WAU (Weekly Active Users) changing over time?
+    - How often do users swap tokens? (frequency analysis)
+    - What's the distribution of users across chains? (breakdown)
+    - How many transactions were made on Ethereum vs Polygon?
+  </Accordion>
+  
+  <Accordion title="Web3 Specific">
+    - How many unique wallets connected this week?
+    - What's the total transaction volume by token?
+    - Which chains have the highest user engagement?
+    - How has gas spending changed over time?
+  </Accordion>
+  
+  <Accordion title="Marketing">
+    - Which campaigns drive the most wallet connections?
+    - What's the conversion rate from Twitter vs Discord traffic?
+    - How do different referral sources compare in transaction value?
+  </Accordion>
+</AccordionGroup>
+
+## Quick Start
+
+<Steps>
+  <Step title="Define Your Metric">
+    Select what you want to measure. Click **Add Metric** and choose:
+    - **Event**: Analyze event occurrences (e.g., `swap_completed`)
+    - **Transaction**: Analyze on-chain transactions
+    - **Profile**: Analyze user properties
+    - **Cohort**: Analyze cohort membership
+  </Step>
+  
+  <Step title="Choose Measurement">
+    Decide how to measure:
+    - **Unique Users**: Count distinct users
+    - **Total Count**: Count all occurrences
+    - **Property Sum/Avg**: Aggregate a numeric property
+    - **Sessions**: Count unique sessions
+  </Step>
+  
+  <Step title="Apply Filters">
+    Narrow your data:
+    - Filter by event properties
+    - Filter by user properties
+    - Filter by transaction properties
+  </Step>
+  
+  <Step title="Add Breakdowns">
+    Segment your metric:
+    - By user property (country, plan, etc.)
+    - By event property (chain, token, etc.)
+    - By time (day, week, month)
+  </Step>
+  
+  <Step title="Choose Visualization">
+    Select the best chart:
+    - Line chart for trends
+    - Bar chart for comparisons
+    - Pie chart for compositions
+    - Table for detailed data
+  </Step>
+</Steps>
+
+## Measurements
+
+### Event-Based Measurements
+
+| Measurement | Description | Example |
+|-------------|-------------|---------|
+| **Unique Users** | Count of distinct users who did the event | "How many users swapped?" |
+| **Total Count** | Total number of times event occurred | "How many swaps happened?" |
+| **Event Property Sum** | Sum of a numeric property | "Total volume swapped (USD)" |
+| **Event Property Average** | Average of a numeric property | "Average swap size" |
+| **Sessions** | Count of distinct sessions | "Sessions with a swap" |
+
+### Profile-Based Measurements
+
+| Measurement | Description | Example |
+|-------------|-------------|---------|
+| **Profile Count** | Count of user profiles matching criteria | "Users with pro plan" |
+| **Property Sum** | Sum of user profile property | "Total lifetime value" |
+| **Property Average** | Average of user profile property | "Average wallet age" |
+
+### Transaction-Based Measurements
+
+| Measurement | Description | Example |
+|-------------|-------------|---------|
+| **Unique Wallets** | Count of distinct wallet addresses | "Unique wallets transacting" |
+| **Total Transactions** | Count of all transactions | "Total swaps on-chain" |
+| **Transaction Value Sum** | Sum of transaction values | "Total ETH swapped" |
+| **Gas Sum** | Total gas spent | "Gas used by users" |
+
+## Filters
+
+Filter your data to focus on specific segments:
+
+### Event Filters
+
+```
+Events where:
+├── event_name = "swap_completed"
+├── AND chain = "ethereum"
+├── AND amount_usd > 100
+└── AND timestamp in last 30 days
+```
+
+### User Property Filters
+
+```
+Users where:
+├── plan = "pro"
+├── AND country = "US"
+└── AND is_web3_user = true
+```
+
+### Transaction Filters
+
+```
+Transactions where:
+├── contract_name = "Swap Router"
+├── AND method_name = "swapExactTokensForTokens"
+└── AND status = "confirmed"
+```
+
+See [Filters & Operators](/analysis/filters-and-operators) for the complete operator reference.
+
+## Breakdowns
+
+Breakdowns segment your metric by a property value:
+
+### Single Breakdown
+
+```
+Total Swaps broken down by Chain:
+├── ethereum: 1,234
+├── polygon: 892
+├── arbitrum: 567
+└── base: 445
+```
+
+### Multiple Breakdowns
+
+```
+Total Swaps by Chain and Token:
+├── ethereum
+│   ├── ETH: 800
+│   ├── USDC: 300
+│   └── DAI: 134
+├── polygon
+│   ├── MATIC: 500
+│   └── USDC: 392
+└── ...
+```
+
+### Breakdown Properties
+
+You can break down by:
+- **Event properties**: `chain`, `input_token`, `wallet_type`
+- **User properties**: `country`, `plan`, `device_type`
+- **Transaction properties**: `method_name`, `contract_name`
+- **Time**: Day, week, month
+
+## Visualizations
+
+Cryptique offers 9 chart types to visualize your data:
+
+### Time-Series Charts
+
+For viewing metrics over time:
+
+| Chart | Best For |
+|-------|----------|
+| **Line** | Trends over time, comparing multiple metrics |
+| **Stacked Line** | Composition trends, showing parts of a whole over time |
+| **Column** | Discrete time periods, comparing specific days/weeks |
+| **Stacked Column** | Composition by time period, part-to-whole by day/week |
+
+### Comparison Charts
+
+For viewing totals and comparisons:
+
+| Chart | Best For |
+|-------|----------|
+| **Bar** | Horizontal comparisons, ranking categories |
+| **Stacked Bar** | Composition within horizontal categories |
+| **Pie** | Part-to-whole relationships, distribution |
+| **Cards** | Single headline metrics, KPIs at a glance |
+| **Table** | Detailed data, multiple dimensions, drill-down |
+
+## Advanced Features
+
+### Multiple Metrics
+
+Compare multiple metrics in one report:
+
+```
+Metric A: Unique users who viewed pool
+Metric B: Unique users who added liquidity
+Metric C: Unique users who transacted on-chain
+
+→ See conversion through the journey
+```
+
+### Formulas
+
+Create calculated metrics:
+
+```
+Formula: (Metric B / Metric A) * 100
+
+Where:
+- Metric A = Users who connected wallet
+- Metric B = Users who transacted
+
+Result: Wallet-to-transaction conversion rate
+```
+
+### Time Comparisons
+
+Compare current period to previous:
+
+```
+This Week vs Last Week:
+├── Swaps: 1,234 (+15%)
+├── Unique Users: 567 (+8%)
+└── Volume: $1.2M (-3%)
+```
+
+### Cohort Comparison
+
+Compare metrics across cohorts:
+
+```
+Swap frequency by user type:
+├── Whales (>$10k volume): 12.5 swaps/week
+├── Active ($1k-$10k): 4.2 swaps/week
+└── Casual (<$1k): 1.1 swaps/week
+```
+
+## Table Features
+
+When using table visualization:
+
+### Sorting
+
+Click column headers to sort:
+- **A-Z**: Alphabetical ascending
+- **Z-A**: Alphabetical descending
+- **Value ↑**: Lowest to highest
+- **Value ↓**: Highest to lowest
+
+### Dynamic Segments
+
+Control how many segments to display:
+- Show top 5, 10, 20, or all
+- Automatically updates as data changes
+
+### Totals & Subtotals
+
+- **Overall**: Total across all segments
+- **Sub-totals**: Totals within each breakdown group
+
+## Web3-Specific Examples
+
+### Transaction Volume by Chain
+
+```
+Event: Transaction
+Measurement: Sum of value (ETH)
+Breakdown: chain
+Visualization: Bar chart
+
+Result:
+├── ethereum: 1,234 ETH
+├── arbitrum: 892 ETH
+├── polygon: 567 ETH
+└── base: 445 ETH
+```
+
+### Wallet Connection Trend
+
+```
+Event: wallet_connect
+Measurement: Unique users
+Time: Last 30 days, daily
+Visualization: Line chart
+
+Result: See daily wallet connections trend
+```
+
+### Top Tokens by Swap Count
+
+```
+Event: swap_completed
+Measurement: Total count
+Breakdown: output_token
+Filter: chain = "ethereum"
+Visualization: Horizontal bar
+
+Result: Ranked list of tokens by swap popularity
+```
+
+### Cross-Chain User Analysis
+
+```
+Event: Transaction
+Measurement: Unique wallets
+Breakdown: chain
+Filter: Users where session_count > 5
+
+Result: Active users per chain
+```
+
+## Best Practices
+
+### Start Simple
+
+Begin with one metric and basic filters, then add complexity:
+
+```
+1. Total swaps (simple count)
+2. + Filter by chain = "ethereum"
+3. + Breakdown by token
+4. + Compare to last period
+```
+
+### Use Meaningful Comparisons
+
+Compare like with like:
+
+```
+✅ Good: Compare swap_completed across chains
+✅ Good: Compare wallet_connect by utm_source
+
+❌ Misleading: Compare daily vs weekly metrics
+❌ Misleading: Compare different time periods without normalizing
+```
+
+### Name Your Reports
+
+Save reports with clear names:
+
+```
+✅ "Weekly Swap Volume by Chain"
+✅ "Twitter Campaign - Wallet Connections"
+✅ "Power User Transaction Frequency"
+
+❌ "Report 1"
+❌ "Test"
+```
+
+## Saving & Sharing
+
+### Save Report
+
+1. Click **Save** after building your report
+2. Enter a descriptive name
+3. Choose visibility:
+   - **Personal**: Only you can see
+   - **Team**: All team members can see
+
+### Add to Board
+
+1. Click **Add to Board**
+2. Select existing board or create new
+3. Position and resize as needed
+
+Charts in Cryptique are always part of boards. Use boards to organize related visualizations together.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Funnels" icon="filter" href="/analysis/reports/funnels">
+    Measure step-by-step conversions
+  </Card>
+  <Card title="Filters Reference" icon="filter" href="/analysis/filters-and-operators">
+    All filter operators
+  </Card>
+</CardGroup>

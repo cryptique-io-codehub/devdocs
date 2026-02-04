@@ -6,7 +6,10 @@
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
-  "favicon": "/favicon.svg",
+  "favicon": {
+    "dark": "/favicon-dark.svg",
+    "light": "/favicon-light.svg"
+  },
   "colors": {
     "primary": "#4B57AA",
     "light": "#4B57AA",
@@ -50,35 +53,71 @@
         "tab": "Guide",
         "groups": [
           {
-            "group": "Getting Started",
+            "group": "INTRO",
             "pages": [
-              "guide/introduction",
-              "guide/quickstart",
-              "guide/installation"
+              "intro/what-is-cryptique",
+              "intro/what-to-track",
+              "intro/quickstart"
             ]
           },
           {
-            "group": "Configuration",
+            "group": "DATA IN",
             "pages": [
-              "guide/initialization",
-              "guide/auto-events"
+              "data-in/installation",
+              "data-in/auto-events",
+              "data-in/sdk-reference/track",
+              "data-in/sdk-reference/identify",
+              "data-in/sdk-reference/people",
+              "data-in/sdk-reference/wallet",
+              "data-in/sdk-reference/utilities"
             ]
           },
           {
-            "group": "SDK Reference",
+            "group": "DATA MODEL",
             "pages": [
-              "guide/sdk-reference/track",
-              "guide/sdk-reference/identify",
-              "guide/sdk-reference/people",
-              "guide/sdk-reference/wallet",
-              "guide/sdk-reference/utilities"
+              "data-in/data-model",
+              "data-in/events-and-properties",
+              "data-in/user-profiles",
+              "data-in/transactions",
+              "data-in/default-properties"
             ]
           },
           {
-            "group": "Technical",
+            "group": "BEST PRACTICES",
             "pages": [
-              "guide/data-limits",
-              "guide/privacy"
+              "data-in/naming-conventions",
+              "data-in/implementation-guide"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Analysis",
+        "groups": [
+          {
+            "group": "REPORTS",
+            "pages": [
+              "analysis/reports/overview",
+              "analysis/reports/insights",
+              "analysis/reports/funnels",
+              "analysis/reports/retention",
+              "analysis/reports/flows"
+            ]
+          },
+          {
+            "group": "ORGANIZATION",
+            "pages": [
+              "analysis/boards",
+              "analysis/users",
+              "analysis/cohorts"
+            ]
+          },
+          {
+            "group": "FEATURES",
+            "pages": [
+              "analysis/filters-and-operators",
+              "analysis/breakdowns",
+              "analysis/time-controls"
             ]
           }
         ]
@@ -87,11 +126,31 @@
         "tab": "Integrations",
         "groups": [
           {
-            "group": "Chain Support",
+            "group": "BLOCKCHAIN",
             "pages": [
               "integrations/overview",
-              "integrations/wallet-enrichment",
-              "integrations/smart-contracts"
+              "integrations/smart-contracts",
+              "integrations/wallet-enrichment"
+            ]
+          },
+          {
+            "group": "TAG MANAGERS",
+            "pages": [
+              "integrations/google-tag-manager",
+              "integrations/other-tag-managers"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Admin",
+        "groups": [
+          {
+            "group": "SETTINGS",
+            "pages": [
+              "admin/team-management",
+              "admin/sites-and-contracts",
+              "admin/privacy-and-compliance"
             ]
           }
         ]
@@ -100,7 +159,7 @@
         "tab": "Changelog",
         "groups": [
           {
-            "group": "Changelog",
+            "group": "Updates",
             "pages": [
               "changelog/overview"
             ]

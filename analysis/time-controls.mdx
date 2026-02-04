@@ -1,0 +1,367 @@
+---
+title: "Time Controls"
+description: "Configure time ranges and granularity for your reports"
+---
+
+## Overview
+
+Time controls let you define what time period to analyze and at what granularity to view the data. Every report in Cryptique supports flexible time configuration.
+
+## Time Range Selection
+
+### Preset Ranges
+
+Quick selection for common time periods:
+
+| Preset | Description |
+|--------|-------------|
+| **Today** | Current day (midnight to now) |
+| **Yesterday** | Previous full day |
+| **Last 7 days** | Past week including today |
+| **Last 14 days** | Past two weeks |
+| **Last 30 days** | Past month |
+| **Last 90 days** | Past quarter |
+| **Last 365 days** | Past year |
+| **This week** | Current week (Monday to now) |
+| **This month** | Current month (1st to now) |
+| **This quarter** | Current quarter |
+| **This year** | Current year (Jan 1 to now) |
+
+### Custom Date Range
+
+Select specific start and end dates:
+
+```
+Custom Range:
+├── Start: January 1, 2024
+└── End: January 31, 2024
+
+Include: All events from Jan 1 00:00 to Jan 31 23:59
+```
+
+### Rolling Windows
+
+Automatically update to show the most recent data:
+
+```
+Rolling 30 days:
+├── Always shows the last 30 days
+├── Updates automatically each day
+└── Great for dashboards
+```
+
+## Granularity
+
+Granularity controls how data is grouped in time-series views:
+
+| Granularity | Best For |
+|-------------|----------|
+| **Hourly** | Intraday patterns, short-term analysis |
+| **Daily** | Day-over-day trends, standard analysis |
+| **Weekly** | Week-over-week patterns, smoothing noise |
+| **Monthly** | Long-term trends, executive reporting |
+| **Quarterly** | Business planning, strategic analysis |
+
+### Matching Granularity to Range
+
+```
+✅ Good combinations:
+├── Last 24 hours → Hourly granularity
+├── Last 7 days → Daily granularity
+├── Last 30 days → Daily or weekly
+├── Last 90 days → Weekly granularity
+├── Last 365 days → Monthly granularity
+
+❌ Poor combinations:
+├── Last 365 days → Hourly (too many data points)
+├── Last 24 hours → Monthly (not enough data)
+```
+
+## Time Comparisons
+
+Compare current period to previous periods:
+
+### Previous Period
+
+Compare to the immediately preceding period:
+
+```
+Last 7 days vs Previous 7 days:
+├── Current: 1,234 swaps
+├── Previous: 1,100 swaps
+└── Change: +12.2%
+```
+
+### Same Period Last Year
+
+Compare to the same period one year ago:
+
+```
+January 2024 vs January 2023:
+├── Current: 45,000 users
+├── Last year: 28,000 users
+└── Change: +60.7% YoY
+```
+
+### Custom Comparison
+
+Compare any two time periods:
+
+```
+Compare:
+├── Period A: Dec 1-31, 2023 (holiday season)
+├── Period B: Nov 1-30, 2023 (pre-holiday)
+└── See: Holiday impact on metrics
+```
+
+## Session Timing
+
+Cryptique uses a **30-minute session timeout** (not configurable):
+
+```
+Session Definition:
+├── Session starts: First event from user
+├── Session continues: Events within 30 min of last event
+├── Session ends: 30 min of inactivity
+└── New session: Activity after 30 min gap
+```
+
+### Session Examples
+
+```
+User Activity Timeline:
+├── 10:00 - page_view (Session 1 starts)
+├── 10:05 - button_click (Session 1 continues)
+├── 10:15 - swap_completed (Session 1 continues)
+├── 10:45 - (30 min idle)
+├── 11:00 - page_view (Session 2 starts)
+└── 11:30 - session ends
+
+Result: 2 sessions
+```
+
+## Time-Based Filtering
+
+Filter events by time properties:
+
+### Event Timestamp
+
+```
+Filter: timestamp last 30 days
+Filter: timestamp between "2024-01-01" and "2024-01-31"
+Filter: timestamp since "2024-01-01"
+```
+
+### User First Seen
+
+```
+Filter: first_seen last 7 days
+→ Only new users from this week
+```
+
+### User Last Seen
+
+```
+Filter: last_seen before_the_last 30 days
+→ Users who haven't been active in a month
+```
+
+See [Filters & Operators](/analysis/filters-and-operators) for complete datetime operators.
+
+## Timezone Handling
+
+Cryptique automatically captures user timezone:
+
+```
+Default Property: timezone
+Example values: "America/New_York", "Europe/London", "Asia/Tokyo"
+```
+
+### Dashboard Timezone
+
+Reports display in your selected timezone:
+
+1. Go to **Settings**
+2. Select your timezone
+3. All reports adjust accordingly
+
+### UTC Storage
+
+All timestamps are stored in UTC internally:
+- Consistent data across timezones
+- No daylight saving issues
+- Accurate global comparisons
+
+## Time Patterns
+
+### Day of Week Analysis
+
+Breakdown by day to see weekly patterns:
+
+```
+Swaps by day of week:
+├── Monday: 15%
+├── Tuesday: 16%
+├── Wednesday: 17%
+├── Thursday: 16%
+├── Friday: 18%
+├── Saturday: 10%
+└── Sunday: 8%
+
+Insight: Weekday trading dominates
+```
+
+### Hour of Day Analysis
+
+Breakdown by hour for daily patterns:
+
+```
+Swaps by hour (UTC):
+├── 00-04: Low activity
+├── 04-08: Rising (Asia)
+├── 08-12: Peak (Europe)
+├── 12-16: High (US East opens)
+├── 16-20: Peak (US full)
+└── 20-00: Declining
+
+Insight: Schedule campaigns for peak hours
+```
+
+### Monthly Trends
+
+See seasonality:
+
+```
+Monthly active users:
+├── Jan: 45K
+├── Feb: 48K
+├── Mar: 52K
+├── Apr: 58K
+├── May: 55K
+├── Jun: 50K
+├── Jul: 48K
+├── Aug: 51K
+├── Sep: 60K
+├── Oct: 65K
+├── Nov: 70K
+└── Dec: 62K
+
+Insight: Q4 is your peak season
+```
+
+## Web3 Time Considerations
+
+### Block Time vs Event Time
+
+Cryptique tracks both:
+- **Event time**: When user initiated action
+- **Transaction time**: When block was mined
+
+```
+User clicks "Swap" at 10:00:00 (event_time)
+Transaction confirms at 10:00:45 (block_time)
+
+Events use event_time
+Transactions use block_time
+```
+
+### Chain-Specific Timing
+
+Different blockchains have different block times:
+
+| Chain | Avg Block Time |
+|-------|---------------|
+| Ethereum | ~12 seconds |
+| Polygon | ~2 seconds |
+| Arbitrum | ~0.25 seconds |
+| Base | ~2 seconds |
+
+For time-sensitive analysis, consider block confirmations.
+
+## Dashboard Time Controls
+
+### Global Time Selector
+
+Dashboards can have a global time selector:
+
+```
+Dashboard: Weekly Overview
+Global Time: Last 7 days
+
+All charts on dashboard use "Last 7 days"
+Override individual charts if needed
+```
+
+### Per-Chart Time
+
+Override global time for specific charts:
+
+```
+Dashboard Time: Last 7 days
+
+Chart 1: Uses dashboard time (7 days)
+Chart 2: Uses dashboard time (7 days)
+Chart 3: Custom time (Last 30 days) ← Override
+```
+
+## Best Practices
+
+### Match Time to Question
+
+```
+Question: What happened today?
+Time: Today, hourly granularity
+
+Question: How are we trending this month?
+Time: Last 30 days, daily granularity
+
+Question: Year-over-year growth?
+Time: Last 365 days, monthly granularity
+```
+
+### Use Comparisons Wisely
+
+```
+✅ Good comparisons:
+├── Week-over-week (similar periods)
+├── Month-over-month (business rhythm)
+├── Year-over-year (seasonal adjustment)
+
+❌ Poor comparisons:
+├── Monday vs Sunday (different behavior)
+├── Holiday vs normal week (outliers)
+├── Launch week vs normal (unusual activity)
+```
+
+### Account for Data Lag
+
+Recent data may be incomplete:
+
+```
+If analyzing "Today":
+├── Events appear in real-time
+├── Transactions may have confirmation lag
+├── Some aggregations update hourly
+
+Recommendation: Use "Yesterday" for complete daily data
+```
+
+### Smooth Volatility
+
+Use longer time ranges or weekly granularity to smooth noise:
+
+```
+Daily view: Volatile, hard to see trend
+Weekly view: Smoother, clear trend visible
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Reports Overview" icon="chart-line" href="/analysis/reports/overview">
+    Learn about report types
+  </Card>
+  <Card title="Boards" icon="table-columns" href="/analysis/boards">
+    Create dashboards
+  </Card>
+</CardGroup>

@@ -1,0 +1,379 @@
+---
+title: "Cohorts"
+description: "Create and manage user segments for targeted analysis"
+---
+
+## Overview
+
+Cohorts are dynamic user segments based on behaviors or attributes. Use cohorts to compare user groups, filter reports, and understand how different segments perform.
+
+## What Are Cohorts?
+
+A cohort is a saved definition of "users who match these criteria":
+
+```
+Cohort: "Power Traders"
+Definition:
+├── Has done: swap_completed
+│   └── At least 10 times
+│   └── In the last 30 days
+├── AND user property: is_whale = true
+```
+
+**Dynamic**: Cohorts automatically update as users match or unmatch the criteria.
+
+## Creating Cohorts
+
+### Visual Query Builder
+
+Build cohorts with the intuitive AND/OR interface:
+
+<Steps>
+  <Step title="Start New Cohort">
+    Navigate to **Cohorts** → **New Cohort**
+  </Step>
+  
+  <Step title="Add Criteria">
+    Click **Add Criteria** and choose:
+    - **Event**: Users who did (or didn't do) an event
+    - **User Property**: Users with specific attributes
+    - **Cohort**: Users in another cohort
+  </Step>
+  
+  <Step title="Combine with AND/OR">
+    ```
+    ┌────────────────────────────────────────┐
+    │ Users who:                              │
+    │                                         │
+    │ [Did] [swap_completed] [at least 5x]   │
+    │                                         │
+    │  ── AND ──                             │
+    │                                         │
+    │ [Have property] [plan] [=] [pro]       │
+    │                                         │
+    │  ── OR ──                              │
+    │                                         │
+    │ [Did] [premium_feature_used]           │
+    └────────────────────────────────────────┘
+    ```
+  </Step>
+  
+  <Step title="Preview & Save">
+    Preview matching users count, then save with a name
+  </Step>
+</Steps>
+
+### Criteria Types
+
+#### Event-Based Criteria
+
+```
+Users who:
+├── Did [event_name]
+│   ├── Frequency: at least N times / exactly N times / at most N times
+│   ├── Time frame: in the last N days / between dates / ever
+│   └── Where: [property filters]
+│
+└── Did NOT do [event_name]
+    └── Time frame: in the last N days / ever
+```
+
+Examples:
+```
+✓ Did "swap_completed" at least 5 times in the last 30 days
+✓ Did NOT do "wallet_connect" in the last 7 days
+✓ Did "transaction" where chain = "ethereum"
+```
+
+#### Property-Based Criteria
+
+```
+Users where:
+├── [property_name] [operator] [value]
+│
+│ Operators:
+│ ├── String: is, is_not, contains, is_set, is_not_set
+│ ├── Number: =, ≠, >, ≥, <, ≤, between
+│ └── Boolean: is_true, is_false
+```
+
+Examples:
+```
+✓ plan is "pro"
+✓ wallet_age_days > 365
+✓ is_web3_user is_true
+✓ email is_set
+```
+
+#### Cohort-Based Criteria
+
+Nest cohorts for complex segments:
+
+```
+Users who:
+├── Are in cohort "Active Traders"
+├── AND are NOT in cohort "Churned Users"
+```
+
+### AND/OR Logic
+
+Combine criteria with logical operators:
+
+**AND** (all must be true):
+```
+Users who:
+├── Did swap_completed (5+ times)
+├── AND country = "US"
+├── AND plan = "pro"
+```
+
+**OR** (any can be true):
+```
+Users who:
+├── Did swap_completed (5+ times)
+├── OR did liquidity_added
+├── OR total_volume > 10000
+```
+
+**Nested logic**:
+```
+Users who:
+├── (Did swap_completed AND chain = "ethereum")
+├── OR
+├── (Did swap_completed AND chain = "polygon" AND count >= 10)
+```
+
+## Dynamic Cohorts
+
+Cohorts are **dynamic**—they auto-update as users match or unmatch criteria.
+
+```
+Day 1:
+"Active Traders" cohort: 500 users
+
+Day 7:
+- 50 new users matched (traded 5+ times)
+- 30 users unmatched (30-day window moved)
+"Active Traders" cohort: 520 users
+```
+
+**Recomputed**: On each query, ensuring up-to-date membership.
+
+## Using Cohorts
+
+### In Reports
+
+Filter any report by cohort:
+
+```
+Insights Report:
+├── Event: swap_completed
+├── Filter: Cohort = "Power Traders"
+└── See metrics for only power traders
+```
+
+### In Funnels
+
+Compare conversion across cohorts:
+
+```
+Funnel: Landing → Wallet → Transaction
+├── Cohort A: "Twitter Users" → 8% conversion
+├── Cohort B: "Discord Users" → 15% conversion
+└── Cohort C: "Organic" → 12% conversion
+```
+
+### In Retention
+
+Analyze retention by cohort:
+
+```
+Retention:
+├── Birth: First transaction
+├── Return: Any transaction
+├── Filter: Cohort = "High-Value Users"
+└── See retention for high-value segment
+```
+
+### In Breakdowns
+
+Break down metrics by cohort:
+
+```
+Breakdown by cohort:
+├── Power Traders: 45% of volume
+├── Casual Users: 35% of volume
+└── New Users: 20% of volume
+```
+
+## Example Cohorts
+
+### By Activity Level
+
+```
+"Power Users"
+├── Did any_event at least 50 times
+├── In the last 30 days
+
+"Casual Users"
+├── Did any_event at least 5 times
+├── AND at most 20 times
+├── In the last 30 days
+
+"At-Risk Users"
+├── Did any_event in the last 90 days
+├── AND did NOT do any_event in the last 14 days
+```
+
+### By Transaction Behavior
+
+```
+"Whales"
+├── User property: total_volume_usd > 100000
+├── OR did transaction where value > 10 ETH
+
+"Multi-Chain Users"
+├── Did transaction where chain = "ethereum"
+├── AND did transaction where chain = "polygon"
+├── AND did transaction where chain = "arbitrum"
+
+"New Transactors"
+├── Did transaction
+├── In the last 7 days
+├── AND did NOT do transaction before 7 days ago
+```
+
+### By Lifecycle
+
+```
+"New Users (This Week)"
+├── User property: first_seen in the last 7 days
+
+"Completed Onboarding"
+├── Did onboarding_completed
+
+"Churned"
+├── Did any_event in the last 90 days
+├── AND did NOT do any_event in the last 30 days
+```
+
+### By Source
+
+```
+"Twitter Acquisition"
+├── User property: utm_source = "twitter"
+├── OR initial_referrer contains "twitter.com"
+
+"Organic Search"
+├── User property: utm_medium = "organic"
+├── OR initial_referrer contains "google.com"
+├── OR initial_referrer contains "bing.com"
+```
+
+### Web3-Specific
+
+```
+"DeFi Power Users"
+├── Did swap_completed at least 10 times
+├── AND did liquidity_added at least once
+├── In the last 30 days
+
+"NFT Collectors"
+├── Did nft_purchased at least 3 times
+├── OR user property: nft_count > 10
+
+"Wallet Veterans"
+├── User property: wallet_age_days > 365
+├── AND user property: total_transaction_count > 100
+```
+
+## Managing Cohorts
+
+### Viewing Membership
+
+See current cohort members:
+
+```
+"Power Traders" - 523 users
+├── user_12345 (matched 3 days ago)
+├── user_67890 (matched 1 week ago)
+├── 0x1234...abcd (matched 2 weeks ago)
+└── ... (521 more)
+```
+
+### Editing Cohorts
+
+1. Open cohort
+2. Modify criteria
+3. Preview new membership count
+4. Save changes
+
+<Note>
+Editing a cohort affects all reports using it. Changes apply immediately.
+</Note>
+
+### Deleting Cohorts
+
+1. Open cohort
+2. Click **Delete**
+3. Confirm (cannot be undone)
+
+<Warning>
+Reports using a deleted cohort will show errors. Update or remove cohort filters before deleting.
+</Warning>
+
+## Best Practices
+
+### Name Descriptively
+
+```
+✅ Good names:
+"Active Traders (30d, 5+ swaps)"
+"High-Value Users (>$10k volume)"
+"Twitter Acquisition - Q1 2024"
+
+❌ Poor names:
+"Cohort 1"
+"Test"
+"Users"
+```
+
+### Keep Criteria Focused
+
+```
+✅ Focused:
+Users who swapped 10+ times in 30 days
+
+❌ Overly complex:
+Users who swapped 10+ times AND visited docs 
+AND have pro plan AND from US AND connected MetaMask 
+AND wallet age > 180 days AND...
+```
+
+### Document Logic
+
+Add descriptions to cohorts:
+
+```
+Name: "Churn Risk"
+Description: Users active 30-90 days ago but not in last 30 days.
+             Use for win-back campaigns.
+```
+
+### Review Periodically
+
+Cohort definitions may need updates:
+- Feature renames (event names change)
+- Business logic changes
+- Criteria become too broad/narrow
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Filters & Operators" icon="filter" href="/analysis/filters-and-operators">
+    All filter options
+  </Card>
+  <Card title="Insights" icon="chart-line" href="/analysis/reports/insights">
+    Use cohorts in reports
+  </Card>
+</CardGroup>

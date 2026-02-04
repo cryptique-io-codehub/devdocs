@@ -1,0 +1,434 @@
+---
+title: "Retention"
+description: "Measure how often users return and engage with your product"
+---
+
+## Overview
+
+Retention analysis measures how well you keep users engaged over time. Track whether users return after their first visit, first transaction, or any milestone event—and understand what drives long-term engagement.
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Product Health">
+    - What percentage of new users return after 7 days?
+    - Is our retention improving over time?
+    - How does retention compare across user segments?
+  </Accordion>
+  
+  <Accordion title="Web3 Engagement">
+    - Do users continue transacting after their first swap?
+    - What's the retention curve for NFT collectors?
+    - Are users on different chains retained differently?
+  </Accordion>
+  
+  <Accordion title="Feature Impact">
+    - Do users who use feature X have better retention?
+    - Does completing onboarding improve retention?
+    - How does wallet enrichment affect engagement?
+  </Accordion>
+</AccordionGroup>
+
+## Quick Start
+
+<Steps>
+  <Step title="Define Birth Event">
+    The event that "births" users into the cohort:
+    
+    ```
+    Birth Event: signup_completed
+    (or: wallet_connect, first_transaction, etc.)
+    ```
+  </Step>
+  
+  <Step title="Define Return Event">
+    The event that indicates a user "returned":
+    
+    ```
+    Return Event: any_active_event
+    (or: transaction, swap_completed, page_view, etc.)
+    ```
+  </Step>
+  
+  <Step title="Choose Time Frame">
+    Set the cohort interval and retention window:
+    
+    ```
+    Cohort Interval: Weekly (users grouped by week they were born)
+    Retention Window: 8 weeks
+    ```
+  </Step>
+  
+  <Step title="Select Criteria">
+    Choose when users count as retained:
+    - **On or After**: Any time from that day/week onward
+    - **On**: Only on exactly that day/week
+  </Step>
+</Steps>
+
+## Retention Criteria
+
+### On or After (Default)
+
+User counts as retained if they returned **on or after** the specified time period:
+
+```
+Day 7 retention (On or After):
+User returned on Day 7, 8, 9, 10... → Retained ✓
+User returned on Day 1-6 only → NOT Retained ✗
+```
+
+Best for: Understanding cumulative engagement over time.
+
+### On
+
+User counts as retained only if they returned **exactly on** that period:
+
+```
+Day 7 retention (On):
+User returned exactly on Day 7 → Retained ✓
+User returned on Day 6 or Day 8 → NOT Retained ✗
+```
+
+Best for: Understanding precise return patterns.
+
+## Cohort Intervals
+
+Group users by when they were "born":
+
+### Daily Cohorts
+
+```
+Daily cohorts over 14 days:
+├── Jan 1 cohort: Users born on Jan 1
+├── Jan 2 cohort: Users born on Jan 2
+├── ...
+└── Jan 14 cohort: Users born on Jan 14
+
+See: Day 1, Day 2, ... Day 14 retention for each
+```
+
+Best for: Short-term retention analysis, fast-moving products.
+
+### Weekly Cohorts
+
+```
+Weekly cohorts over 8 weeks:
+├── Week 1 cohort: Users born Jan 1-7
+├── Week 2 cohort: Users born Jan 8-14
+├── ...
+└── Week 8 cohort: Users born Feb 19-25
+
+See: Week 1, Week 2, ... Week 8 retention for each
+```
+
+Best for: Most retention analyses, standard timeframe.
+
+### Monthly Cohorts
+
+```
+Monthly cohorts over 6 months:
+├── January cohort: Users born in January
+├── February cohort: Users born in February
+├── ...
+└── June cohort: Users born in June
+
+See: Month 1, Month 2, ... Month 6 retention for each
+```
+
+Best for: Long-term retention, subscription products.
+
+## Custom Brackets
+
+Define custom retention windows:
+
+```
+Custom brackets: [1, 3, 7, 14, 30, 60, 90]
+
+View retention at:
+├── Day 1
+├── Day 3
+├── Day 7
+├── Day 14
+├── Day 30
+├── Day 60
+└── Day 90
+```
+
+## Reading the Retention Table
+
+```
+           │ Day 0 │ Day 1 │ Day 7 │ Day 14 │ Day 30
+───────────┼───────┼───────┼───────┼────────┼────────
+Jan 1-7    │ 1,000 │  42%  │  28%  │   22%  │   15%
+Jan 8-14   │   850 │  45%  │  30%  │   24%  │   18%
+Jan 15-21  │ 1,200 │  38%  │  25%  │   20%  │    -
+Jan 22-28  │   950 │  40%  │  27%  │    -   │    -
+───────────┼───────┼───────┼───────┼────────┼────────
+Average    │ 1,000 │  41%  │  28%  │   22%  │   17%
+```
+
+**Column meanings:**
+- **Day 0**: Number of users in cohort (birth event count)
+- **Day N**: Percentage who returned on/after day N
+
+**Row meanings:**
+- Each row is a cohort (users born in that period)
+- Newer cohorts have fewer data points (diagonal empty)
+
+## Retention Curves
+
+### Visualizing Retention
+
+```
+100% ─┬────────────────────────
+      │\
+      │ \
+  50% ─┤  \___
+      │      \_____
+      │            \________
+   0% ─┴─────────────────────────
+      Day 0  7  14  21  28  35
+```
+
+**Healthy retention**: Curve flattens (users who stay, stay)
+**Concerning retention**: Curve keeps declining (ongoing churn)
+
+### Comparing Curves
+
+```
+100% ─┬────────────────────────
+      │\
+      │ \__ Pro users
+      │    \_______________
+  50% ─┤
+      │  \
+      │   \___ Free users
+      │       \______
+   0% ─┴─────────────────────────
+```
+
+## Filters
+
+Focus on specific user segments:
+
+### Birth Event Filters
+
+Filter who enters the cohort:
+
+```
+Birth Event: signup_completed
+  └── where: signup_source = "twitter"
+
+Only users who signed up from Twitter
+```
+
+### Return Event Filters
+
+Filter what counts as "returning":
+
+```
+Return Event: transaction
+  └── where: chain = "ethereum"
+
+Users must transact on Ethereum to count as retained
+```
+
+### User Property Filters
+
+Filter by user attributes:
+
+```
+User Filter:
+├── plan = "pro"
+├── AND country = "US"
+
+Retention for US Pro users only
+```
+
+## Breakdowns
+
+Compare retention across segments:
+
+### By User Property
+
+```
+Retention by plan:
+├── Pro: 45% → 32% → 28%
+├── Free: 38% → 22% → 15%
+└── Trial: 25% → 12% → 8%
+```
+
+### By Birth Event Property
+
+```
+Retention by signup_source:
+├── Twitter: 40% → 28% → 22%
+├── Discord: 52% → 38% → 32%
+└── Google: 35% → 20% → 14%
+```
+
+### By Cohort Date
+
+Default view—compare how retention changes over time:
+
+```
+Are newer cohorts retaining better?
+├── Jan cohorts: 40% → 25% → 18%
+├── Feb cohorts: 42% → 28% → 22%
+└── Mar cohorts: 45% → 32% → 25%
+
+→ Yes! Retention is improving
+```
+
+## Web3 Retention Examples
+
+### Transaction Retention
+
+Track on-chain engagement:
+
+```
+Birth Event: First transaction
+Return Event: Any transaction
+
+Question: Do users keep transacting?
+```
+
+### Protocol Stickiness
+
+```
+Birth Event: First swap
+Return Event: swap_completed
+Filter by: chain = "arbitrum"
+
+Question: Do Arbitrum users keep swapping?
+```
+
+### NFT Collector Retention
+
+```
+Birth Event: First NFT mint
+Return Event: Any NFT activity (mint, transfer, sale)
+
+Question: Do minters become collectors?
+```
+
+### Feature-Driven Retention
+
+```
+Birth Event: used_advanced_feature
+Return Event: any_active_event
+
+Compare to:
+Birth Event: did_not_use_advanced_feature
+Return Event: any_active_event
+
+Question: Does the feature improve retention?
+```
+
+## Analyzing Retention
+
+### Key Metrics
+
+| Metric | Description | Good Benchmark |
+|--------|-------------|----------------|
+| **Day 1** | Next-day return | >40% |
+| **Day 7** | Week 1 return | >25% |
+| **Day 30** | Month 1 return | >15% |
+| **Plateau** | Stable long-term retention | >10% |
+
+### Signs of Healthy Retention
+
+```
+✅ Curve flattens (stabilizes)
+✅ Newer cohorts retain better
+✅ Power users have much higher retention
+✅ Key features correlate with retention
+```
+
+### Warning Signs
+
+```
+❌ Curve never flattens (constant churn)
+❌ Newer cohorts performing worse
+❌ No difference between segments
+❌ Day 1 retention below 30%
+```
+
+## Best Practices
+
+### Choose Meaningful Events
+
+```
+✅ Good birth events:
+- signup_completed (clear milestone)
+- wallet_connect (clear commitment)
+- first_transaction (value delivered)
+
+❌ Poor birth events:
+- page_view (too broad)
+- click (too minor)
+```
+
+### Match Return to Product
+
+```
+Social app: Return = any_active_event
+DeFi protocol: Return = transaction
+Marketplace: Return = purchase OR listing
+SaaS: Return = feature_used
+```
+
+### Segment Meaningfully
+
+Compare segments that inform action:
+
+```
+✅ Actionable:
+- By signup_source (optimize marketing)
+- By completed_onboarding (improve onboarding)
+- By user_tier (price/feature adjustments)
+
+❌ Not actionable:
+- By random_id
+- By timestamp
+```
+
+### Allow Enough Time
+
+Retention analysis needs mature data:
+
+```
+For Day 30 retention with weekly cohorts:
+Need 5-6 weeks of data minimum
+
+For quarterly analysis:
+Need 6+ months of data
+```
+
+## Saving & Sharing
+
+### Save Report
+
+1. Configure your retention analysis
+2. Click **Save**
+3. Name it: "Weekly Transaction Retention by Chain"
+
+### Add to Board
+
+1. Save the report
+2. Click **Add to Board**
+3. Select dashboard
+
+All reports are added to boards for organization and sharing.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Flows" icon="diagram-project" href="/analysis/reports/flows">
+    Understand user paths
+  </Card>
+  <Card title="Cohorts" icon="users" href="/analysis/cohorts">
+    Create user segments
+  </Card>
+</CardGroup>

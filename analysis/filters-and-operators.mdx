@@ -1,0 +1,408 @@
+---
+title: "Filters & Operators"
+description: "Complete reference for filter operators by data type"
+---
+
+## Overview
+
+Filters let you narrow down data to specific segments. Cryptique provides a visual query builder with AND/OR logic and type-specific operators for precise filtering.
+
+## Filter Types
+
+You can filter by five categories:
+
+| Filter Type | Description | Example |
+|-------------|-------------|---------|
+| **Event Filters** | Filter by event name and properties | Events where `event_name = "swap_completed"` |
+| **User Profile Filters** | Filter by user properties | Users where `plan = "pro"` |
+| **Transaction Filters** | Filter on-chain transactions | Transactions where `chain = "ethereum"` |
+| **Time Filters** | Filter by date/time ranges | Events in `last 30 days` |
+| **Cohort Filters** | Filter by cohort membership | Users in `"Power Users"` cohort |
+
+## Query Builder
+
+Cryptique uses a visual query builder with AND/OR logic:
+
+```
+Filter where:
+├── event_name = "swap_completed"
+├── AND chain = "ethereum"
+└── OR (
+    ├── amount_usd > 1000
+    └── AND user_tier = "whale"
+)
+```
+
+Combine conditions with:
+- **AND**: All conditions must be true
+- **OR**: At least one condition must be true
+- **Grouping**: Nest conditions for complex logic
+
+## String Operators
+
+For text properties like `country`, `browser_name`, `event_name`:
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `is` | Exact match | `country is "US"` |
+| `is_not` | Does not equal | `country is_not "US"` |
+| `contains` | Contains substring | `email contains "@gmail"` |
+| `does_not_contain` | Does not contain substring | `email does_not_contain "test"` |
+| `is_set` | Property has any value | `email is_set` |
+| `is_not_set` | Property has no value | `email is_not_set` |
+
+### String Examples
+
+```
+# Exact match
+country is "United States"
+
+# Exclude specific value
+browser_name is_not "Safari"
+
+# Partial match
+current_url contains "/swap"
+page_title contains "Dashboard"
+
+# Check existence
+wallet_address is_set      # Only Web3 users
+email is_not_set           # Anonymous users
+```
+
+## Number Operators
+
+For numeric properties like `amount_usd`, `transaction_count`, `session_duration`:
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `equal` | Equals | `amount equal 100` |
+| `not_equal` | Does not equal | `amount not_equal 0` |
+| `greater_than` | Greater than | `amount greater_than 100` |
+| `greater_than_equal` | Greater than or equal | `amount greater_than_equal 100` |
+| `less_than` | Less than | `amount less_than 1000` |
+| `less_than_equal` | Less than or equal | `amount less_than_equal 1000` |
+| `between` | In range (inclusive) | `amount between 100 and 1000` |
+| `not_between` | Outside range | `amount not_between 100 and 1000` |
+| `is_numeric` | Has a numeric value | `price is_numeric` |
+| `is_not_numeric` | Not a number (null/NaN) | `price is_not_numeric` |
+
+### Number Examples
+
+```
+# Exact value
+transaction_count equal 0          # Users with no transactions
+
+# Comparisons
+amount_usd greater_than 1000       # High-value transactions
+gas_used less_than 100000          # Low gas transactions
+
+# Range filtering
+amount_usd between 100 and 10000   # Mid-tier transactions
+session_duration not_between 0 and 10  # Exclude bounces
+
+# Existence checks
+token_balance is_numeric           # Has balance data
+```
+
+## Boolean Operators
+
+For true/false properties like `is_web3_user`, `has_completed_onboarding`:
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `is_true` | Property is true | `is_web3_user is_true` |
+| `is_false` | Property is false | `is_web3_user is_false` |
+
+### Boolean Examples
+
+```
+# Web3 users only
+is_web3_user is_true
+
+# Traditional Web2 users
+is_web3_user is_false
+
+# Custom boolean properties
+has_completed_onboarding is_true
+is_verified is_false
+```
+
+## Datetime Operators
+
+For date/time properties like `timestamp`, `created_at`, `last_seen`:
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `last` | Within the last N days/hours | `timestamp last 7 days` |
+| `not_in_the_last` | Not within the last N days | `timestamp not_in_the_last 7 days` |
+| `between` | Between two dates | `timestamp between Jan 1 and Jan 31` |
+| `not_between` | Outside date range | `timestamp not_between Jan 1 and Jan 31` |
+| `on` | On specific date | `timestamp on Jan 15` |
+| `not_on` | Not on specific date | `timestamp not_on Jan 1` |
+| `before_the_last` | Before the last N days | `timestamp before_the_last 30 days` |
+| `before` | Before specific date | `timestamp before Jan 1, 2024` |
+| `since` | Since specific date | `timestamp since Jan 1, 2024` |
+| `in_the_next` | Within the next N days | `expiry_date in_the_next 7 days` |
+
+### Datetime Examples
+
+```
+# Relative time filters
+timestamp last 30 days             # Last month's activity
+timestamp last 24 hours            # Today's events
+created_at not_in_the_last 90 days # Older users only
+
+# Date range
+timestamp between "2024-01-01" and "2024-01-31"
+timestamp not_between "2024-12-24" and "2024-12-26"  # Exclude holidays
+
+# Specific date
+timestamp on "2024-01-15"          # Single day
+timestamp not_on "2024-01-01"      # Exclude New Year
+
+# Before/after
+timestamp before "2024-06-01"      # Before June
+timestamp since "2024-01-01"       # This year only
+first_seen before_the_last 365 days  # Users over a year old
+
+# Future dates (for expiry, subscription end, etc.)
+subscription_end in_the_next 30 days  # Expiring soon
+```
+
+## List Operators
+
+For array properties like `chains_used`, `tokens_held`, `tags`:
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `any_in_list` | Any item matches | `chains_used any_in_list ["ethereum", "polygon"]` |
+| `all_in_list` | All items match | `required_tags all_in_list ["verified", "active"]` |
+
+List operators can be combined with **nested operators** based on item type:
+
+### List with String Items
+
+```
+# Any chain is ethereum OR polygon
+chains_used any_in_list where item is "ethereum" OR item is "polygon"
+
+# User has used any EVM chain
+chains_used any_in_list where item contains "evm"
+
+# All tags must be from approved list
+tags all_in_list where item is "verified" OR item is "premium"
+```
+
+### List with Number Items
+
+```
+# Any transaction over $1000
+transaction_amounts any_in_list where item greater_than 1000
+
+# All balances are positive
+token_balances all_in_list where item greater_than 0
+```
+
+## Filter Combinations
+
+### AND Logic
+
+All conditions must be true:
+
+```
+Events where:
+├── event_name is "swap_completed"
+├── AND chain is "ethereum"
+├── AND amount_usd greater_than 100
+└── AND timestamp last 7 days
+
+→ Only Ethereum swaps over $100 in the last week
+```
+
+### OR Logic
+
+At least one condition must be true:
+
+```
+Users where:
+├── plan is "pro"
+└── OR total_transactions greater_than 100
+
+→ Pro users OR users with 100+ transactions
+```
+
+### Nested Groups
+
+Combine AND/OR with grouping:
+
+```
+Events where:
+├── event_name is "swap_completed"
+└── AND (
+    ├── chain is "ethereum"
+    └── OR chain is "arbitrum"
+)
+└── AND (
+    ├── amount_usd greater_than 1000
+    └── OR user_tier is "whale"
+)
+
+→ Swaps on Ethereum or Arbitrum that are either 
+   high-value ($1000+) or from whale users
+```
+
+## Event Filters
+
+Filter events by name and properties:
+
+```
+Events:
+├── event_name is "swap_completed"
+├── Properties:
+│   ├── input_token is "ETH"
+│   ├── AND output_token is "USDC"
+│   └── AND slippage less_than 1
+```
+
+### Common Event Filters
+
+| Filter | Use Case |
+|--------|----------|
+| `event_name is "wallet_connect"` | Only wallet connections |
+| `event_category is "transaction"` | Only transaction events |
+| `custom_properties.campaign is "summer"` | Campaign-specific events |
+
+## User Profile Filters
+
+Filter by user attributes:
+
+```
+Users:
+├── plan is "pro"
+├── AND country is "US"
+├── AND is_web3_user is_true
+└── AND wallet_address is_set
+```
+
+### Common User Filters
+
+| Filter | Use Case |
+|--------|----------|
+| `is_web3_user is_true` | Web3 users only |
+| `first_seen last 30 days` | New users |
+| `session_count greater_than 10` | Engaged users |
+| `wallet_address is_set` | Users with connected wallets |
+
+## Transaction Filters
+
+Filter on-chain transactions:
+
+```
+Transactions:
+├── chain is "ethereum"
+├── AND contract_name is "Swap Router"
+├── AND method_name is "swapExactTokensForTokens"
+└── AND value greater_than 0
+```
+
+### Common Transaction Filters
+
+| Filter | Use Case |
+|--------|----------|
+| `chain is "ethereum"` | Ethereum transactions |
+| `status is "confirmed"` | Successful transactions |
+| `gas_price less_than 50` | Low gas transactions |
+| `method_name contains "swap"` | Swap transactions |
+
+## Cohort Filters
+
+Filter by cohort membership:
+
+```
+Users:
+├── IN cohort "Power Users"
+└── AND NOT IN cohort "Churned Users"
+```
+
+Cohort filters are particularly useful for:
+- Comparing behavior across segments
+- Excluding specific user groups
+- Analyzing high-value users
+
+## Time Filters
+
+Every report supports time range selection:
+
+```
+Time Range: Last 30 days
+Granularity: Daily
+
+OR
+
+Custom Range: Jan 1, 2024 - Jan 31, 2024
+Granularity: Weekly
+```
+
+See [Time Controls](/analysis/time-controls) for detailed time range options.
+
+## Saved Filters
+
+Save frequently used filters for reuse:
+
+1. Build your filter combination
+2. Click **Save Filter**
+3. Name it descriptively: "US Pro Web3 Users"
+4. Apply to any report with one click
+
+## Best Practices
+
+### Be Specific
+
+```
+✅ Good: event_name is "swap_completed" AND chain is "ethereum"
+❌ Vague: event_name contains "swap"
+```
+
+### Use Appropriate Operators
+
+```
+✅ For exact match: is / equal
+✅ For ranges: between / greater_than
+✅ For text search: contains
+
+❌ Using contains for exact values
+❌ Using is for partial matches
+```
+
+### Test Filter Results
+
+Before building complex reports, verify your filters:
+
+1. Apply filter to simple metric (total events)
+2. Check count makes sense
+3. Spot-check sample records if possible
+
+### Document Complex Filters
+
+For complex nested logic, add comments:
+
+```
+# High-value users: Pro plan OR whale behavior
+Users where:
+├── plan is "pro"                    # Paying customers
+└── OR (
+    ├── total_volume greater_than 100000  # High volume
+    └── AND transaction_count greater_than 50  # Active
+)
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Breakdowns" icon="chart-pie" href="/analysis/breakdowns">
+    Segment data by properties
+  </Card>
+  <Card title="Time Controls" icon="clock" href="/analysis/time-controls">
+    Configure time ranges
+  </Card>
+</CardGroup>

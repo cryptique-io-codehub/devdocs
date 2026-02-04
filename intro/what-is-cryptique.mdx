@@ -1,0 +1,146 @@
+---
+title: "What is Cryptique?"
+description: "Unified Web3 product analytics that bridges off-chain behavior with on-chain transactions"
+---
+
+## Overview
+
+Cryptique is a **unified analytics platform for Web3** that solves the fundamental attribution problem in blockchain applications: connecting anonymous wallet transactions with the user journeys that led to them.
+
+Traditional analytics tools track website behavior but stop at the wallet connection. Blockchain explorers show transaction data but have no context about user intent. Cryptique bridges this gap by creating **complete user profiles** that unify:
+
+- **Off-chain behavior**: Page views, clicks, form submissions, feature usage
+- **Wallet connections**: Which wallets users connect and when
+- **On-chain transactions**: Swaps, mints, staking, purchases, and any smart contract interaction
+
+<img
+  className="block dark:hidden"
+  src="/images/hero-light.svg"
+  alt="Cryptique Architecture"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/hero-dark.svg"
+  alt="Cryptique Architecture"
+/>
+
+## The Attribution Problem in Web3
+
+In Web2, attribution is straightforward: you track a user from ad click to signup to purchase using cookies and user IDs. In Web3, this breaks down because:
+
+1. **Wallet addresses are pseudonymous** — You can see that `0x1234...` bought your NFT, but not which marketing campaign brought them
+2. **Users have multiple wallets** — The same person might connect different wallets across sessions
+3. **On-chain and off-chain data live in silos** — Your web analytics and blockchain data never meet
+
+Cryptique solves this with a **CQ Intelligence** merge engine that automatically connects:
+
+```
+Website Visit → Wallet Connection → On-chain Transaction
+     ↓               ↓                    ↓
+  distinct_id ←→ wallet_address ←→ transaction_hash
+```
+
+## Key Capabilities
+
+<CardGroup cols={2}>
+  <Card title="Complete User Profiles" icon="user">
+    See every user's full journey: pages visited, buttons clicked, wallets connected, and transactions made—all in one timeline.
+  </Card>
+  <Card title="True Attribution" icon="chart-line">
+    Know which campaigns, content, and features actually drive on-chain conversions, not just wallet connections.
+  </Card>
+  <Card title="Cross-Chain Analytics" icon="link">
+    Track transactions across 35+ chains from a single dashboard. Support for EVM chains, Solana, and more.
+  </Card>
+  <Card title="Wallet Intelligence" icon="wallet">
+    Automatically enrich user profiles with wallet age, holdings, transaction history, and on-chain behavior patterns.
+  </Card>
+</CardGroup>
+
+## How It Works
+
+### 1. Install the SDK
+
+Add a single script to your website or dApp:
+
+```html
+<script>
+  var script = document.createElement('script');
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.setAttribute('site-id', 'your-site-id');
+  document.head.appendChild(script);
+</script>
+```
+
+### 2. Automatic Event Capture
+
+Cryptique automatically tracks page views, sessions, clicks, scroll depth, and wallet connections—no additional code required.
+
+### 3. Link Wallets to Users
+
+When a user connects their wallet, Cryptique automatically links that wallet address to their existing profile:
+
+```javascript
+// Automatic wallet detection works out of the box
+// Or explicitly track wallet connections:
+cryptique.wallet.connect('0x1234...abcd');
+```
+
+### 4. Index Your Smart Contracts
+
+Add your smart contracts in the dashboard to automatically capture all transactions:
+
+- Token transfers and swaps
+- NFT mints and sales  
+- Staking and liquidity provision
+- Any custom contract interaction
+
+### 5. Analyze Complete Journeys
+
+Use Insights, Funnels, Retention, and Flows reports to understand the complete path from first visit to on-chain conversion.
+
+## Use Cases
+
+### For DeFi Protocols
+- Track which features lead to first swap
+- Measure retention by transaction frequency
+- Identify power users vs. one-time traders
+- Attribute liquidity provision to marketing campaigns
+
+### For NFT Projects
+- Understand the mint funnel: landing page → connect wallet → mint
+- Segment collectors by on-chain history (whale vs. retail)
+- Track secondary market activity back to original acquisition source
+
+### For Web3 Games
+- Measure player progression from signup to first in-game purchase
+- Correlate gameplay behavior with token transactions
+- Identify churn predictors using combined off-chain and on-chain signals
+
+### For L2s and Infrastructure
+- Track developer onboarding funnels
+- Measure contract deployment conversions
+- Attribute mainnet transactions to documentation visits
+
+## Compared to Other Tools
+
+| Capability | Cryptique | Dune/Nansen | Mixpanel/Amplitude |
+|------------|-----------|-------------|-------------------|
+| Website analytics | ✅ | ❌ | ✅ |
+| Wallet connection tracking | ✅ | ❌ | ❌ |
+| On-chain transaction data | ✅ | ✅ | ❌ |
+| User profile unification | ✅ | ❌ | ✅ (off-chain only) |
+| Cross-chain support | ✅ 35+ chains | ✅ | ❌ |
+| Attribution modeling | ✅ | ❌ | ✅ (off-chain only) |
+| Bot detection | ✅ | ❌ | ❌ |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/intro/quickstart">
+    Get up and running in 5 minutes
+  </Card>
+  <Card title="What to Track" icon="list-check" href="/intro/what-to-track">
+    Plan your implementation strategy
+  </Card>
+</CardGroup>

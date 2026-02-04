@@ -1,0 +1,337 @@
+---
+title: "Events & Properties"
+description: "Understanding events and their properties in Cryptique"
+---
+
+## Overview
+
+Events are the foundation of analytics in Cryptique. Every user action—from page views to transactions—is captured as an event with associated properties.
+
+## Event Structure
+
+Every event has this structure:
+
+```javascript
+{
+  // Required
+  "event_name": "swap_completed",
+  "distinct_id": "user_12345",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  
+  // Auto-captured (default properties)
+  "session_id": "sess_abc123",
+  "current_url": "https://app.example.com/swap",
+  "browser_name": "Chrome",
+  "country": "US",
+  // ... more default properties
+  
+  // Custom (your properties)
+  "properties": {
+    "input_token": "ETH",
+    "output_token": "USDC", 
+    "amount": 1.5,
+    "slippage": 0.5
+  }
+}
+```
+
+## Event Types
+
+### Auto-Events
+
+Captured automatically when enabled:
+
+| Event | Trigger |
+|-------|---------|
+| `page_view` | Page load or SPA navigation |
+| `session_start` | New session begins |
+| `session_end` | 30-min inactivity |
+| `click` | User clicks interactive element |
+| `scroll` | Scroll depth milestones |
+| `form_submit` | Form submission |
+| `input_change` | Form field interaction |
+| `copy` | Text copy action |
+| `wallet_connect` | Wallet connected |
+| `wallet_disconnect` | Wallet disconnected |
+
+### Custom Events
+
+Tracked via SDK:
+
+```javascript
+cryptique.track('swap_completed', {
+  input_token: 'ETH',
+  output_token: 'USDC',
+  amount: 1.5
+});
+```
+
+### Transaction Events
+
+Generated from indexed smart contracts:
+
+```javascript
+// Auto-generated when transaction detected
+{
+  "event_name": "contract_interaction",
+  "event_category": "transaction",
+  "properties": {
+    "contract_name": "Swap Router",
+    "method_name": "swapExactTokensForTokens",
+    "transaction_hash": "0xabc...",
+    "chain": "ethereum"
+  }
+}
+```
+
+## Properties
+
+Properties provide context to events. They come in several categories:
+
+### Default Properties
+
+Auto-captured on every event:
+
+<Tabs>
+  <Tab title="Identifiers">
+    | Property | Description |
+    |----------|-------------|
+    | `team_id` | Your Cryptique team |
+    | `session_id` | Current session |
+    | `distinct_id` | User identifier |
+    | `website_id` | Site identifier |
+    | `event_type` | auto, custom, transaction |
+    | `event_name` | Name of the event |
+    | `event_category` | Category grouping |
+    | `timestamp` | Event time (ISO 8601) |
+  </Tab>
+  
+  <Tab title="Location">
+    | Property | Description |
+    |----------|-------------|
+    | `country` | Country code (US, GB, etc.) |
+    | `city` | City name |
+    | `region` | State/province |
+    | `latitude` | Approximate latitude |
+    | `longitude` | Approximate longitude |
+    | `timezone` | User timezone |
+  </Tab>
+  
+  <Tab title="Device & Browser">
+    | Property | Description |
+    |----------|-------------|
+    | `browser_name` | Chrome, Firefox, Safari, etc. |
+    | `browser_version` | Browser version |
+    | `os` | Operating system |
+    | `os_version` | OS version |
+    | `device_type` | desktop, mobile, tablet |
+    | `language` | Browser language |
+  </Tab>
+  
+  <Tab title="Screen & Page">
+    | Property | Description |
+    |----------|-------------|
+    | `screen_height` | Screen height (px) |
+    | `screen_width` | Screen width (px) |
+    | `viewport_height` | Viewport height (px) |
+    | `viewport_width` | Viewport width (px) |
+    | `dpi` | Device pixel ratio |
+    | `current_url` | Full page URL |
+    | `page_title` | Page title |
+    | `uri` | URL pathname |
+    | `referrer` | Previous page URL |
+    | `initial_referrer` | First referrer in session |
+  </Tab>
+  
+  <Tab title="UTM & Web3">
+    | Property | Description |
+    |----------|-------------|
+    | `utm_source` | Campaign source |
+    | `utm_medium` | Campaign medium |
+    | `utm_campaign` | Campaign name |
+    | `utm_term` | Campaign term |
+    | `utm_content` | Campaign content |
+    | `utm_id` | Campaign ID |
+    | `is_web3_user` | Has connected wallet |
+    | `wallet_address` | Connected wallet (if any) |
+  </Tab>
+</Tabs>
+
+### Custom Properties
+
+Add your own properties to events:
+
+```javascript
+cryptique.track('purchase_completed', {
+  // Strings
+  product_name: 'Premium NFT',
+  category: 'art',
+  
+  // Numbers
+  price_usd: 150.00,
+  quantity: 1,
+  
+  // Booleans
+  is_first_purchase: true,
+  used_discount: false,
+  
+  // Arrays
+  tags: ['rare', 'animated', '1of1'],
+  
+  // Nested objects
+  metadata: {
+    collection: 'CryptoPunks',
+    token_id: 1234
+  }
+});
+```
+
+### Event-Specific Properties
+
+Some auto-events capture additional properties:
+
+**click**:
+```javascript
+{
+  "element_name": "swap_button",
+  "element_id": "btn-swap",
+  "element_class": "btn btn-primary",
+  "element_tag": "BUTTON",
+  "element_text": "Swap Now",
+  "element_href": null
+}
+```
+
+**scroll**:
+```javascript
+{
+  "scroll_depth": 75,
+  "scroll_direction": "down",
+  "page_height": 3200,
+  "viewport_height": 800
+}
+```
+
+**wallet_connect**:
+```javascript
+{
+  "wallet_address": "0x1234...",
+  "wallet_type": "metamask",
+  "chain_id": 1,
+  "is_reconnect": false
+}
+```
+
+## Property Data Types
+
+| Type | Example | Notes |
+|------|---------|-------|
+| **String** | `"ethereum"` | Max 255 chars for indexed fields |
+| **Number** | `1500.50` | Integer or decimal |
+| **Boolean** | `true` / `false` | |
+| **Date** | `"2024-01-15"` | ISO 8601 date |
+| **Datetime** | `"2024-01-15T10:30:00Z"` | ISO 8601 with time |
+| **Array** | `["ETH", "USDC"]` | Homogeneous type recommended |
+| **Object** | `{name: "...", value: 100}` | Nested properties |
+
+## Best Practices
+
+### Event Naming
+
+Use `snake_case` with clear action verbs:
+
+```javascript
+// ✅ Good
+'swap_completed'
+'nft_minted'
+'liquidity_added'
+'onboarding_step_completed'
+
+// ❌ Avoid
+'SwapCompleted'      // PascalCase
+'swap-completed'     // kebab-case
+'swap'               // Too vague
+'user clicked swap'  // Spaces, unclear
+```
+
+### Property Naming
+
+```javascript
+// ✅ Good
+{
+  input_token: 'ETH',
+  output_token: 'USDC',
+  amount_usd: 1500.00,
+  slippage_percent: 0.5
+}
+
+// ❌ Avoid
+{
+  inputToken: 'ETH',      // camelCase
+  'Output Token': 'USDC', // Spaces
+  amt: 1500.00,           // Abbreviated
+  slippage: 0.5           // Missing unit
+}
+```
+
+### Property Values
+
+```javascript
+// ✅ Good - Consistent, specific
+{
+  status: 'completed',     // Lowercase enum
+  chain: 'ethereum',       // Lowercase
+  amount: 1500.50,         // Number for math
+  is_whale: true           // Boolean prefix
+}
+
+// ❌ Avoid
+{
+  status: 'COMPLETED',     // Inconsistent case
+  chain: 'Ethereum',       // Inconsistent case
+  amount: '1500.50',       // String for number
+  whale: 'yes'             // String for boolean
+}
+```
+
+### High-Cardinality Properties
+
+Avoid properties with unlimited unique values:
+
+```javascript
+// ❌ High cardinality - Don't do this
+{
+  transaction_hash: '0xabc...',  // Unique per event
+  user_input: 'arbitrary text',  // Unlimited values
+  timestamp_ms: 1705312200000    // Use timestamp field
+}
+
+// ✅ Better - Category or bucket
+{
+  transaction_status: 'confirmed',  // Limited values
+  input_length: 'medium',           // Bucketed
+  // Use built-in timestamp instead
+}
+```
+
+## Limits
+
+| Limit | Value |
+|-------|-------|
+| Event name length | 255 characters |
+| Property name length | 255 characters |
+| String property value | 8,192 characters |
+| Properties per event | 255 |
+| Array items | 255 |
+| Object nesting depth | 5 levels |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Track Events" icon="code" href="/data-in/sdk-reference/track">
+    Learn the track() method
+  </Card>
+  <Card title="Default Properties" icon="list" href="/data-in/default-properties">
+    Full property reference
+  </Card>
+</CardGroup>

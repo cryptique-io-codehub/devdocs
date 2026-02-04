@@ -1,0 +1,320 @@
+---
+title: "Boards"
+description: "Create dashboards to organize and share your analytics"
+---
+
+## Overview
+
+Boards are customizable dashboards that combine multiple visualizations, reports, and content into a single view. Use boards to monitor key metrics, share insights with your team, and tell data stories.
+
+## Components
+
+Boards can contain various types of components:
+
+### Visualizations
+
+Charts from your reports:
+
+| Type | Description |
+|------|-------------|
+| **Insights** | Line charts, bar charts, pie charts, tables, metric cards |
+| **Funnels** | Funnel visualizations showing conversion |
+| **Retention** | Retention tables and curves |
+| **Flows** | Sankey diagrams showing user paths |
+
+### Content Elements
+
+| Element | Description |
+|---------|-------------|
+| **Text** | Markdown-formatted text blocks |
+| **Headers** | Section headers to organize your board |
+| **Images** | Uploaded images or linked graphics |
+| **Videos** | Embedded video content |
+| **Dividers** | Visual separators between sections |
+
+## Creating a Board
+
+<Steps>
+  <Step title="Create New Board">
+    Navigate to **Boards** and click **New Board**
+  </Step>
+  
+  <Step title="Add Components">
+    Click **+ Add** to add visualizations or content:
+    - **Add Report**: Insert a saved report
+    - **Add Text**: Insert text/markdown
+    - **Add Image**: Upload or link an image
+    - **Add Video**: Embed a video
+    - **Add Divider**: Insert a visual break
+  </Step>
+  
+  <Step title="Arrange Layout">
+    Drag and drop components to arrange them. Resize by dragging edges.
+  </Step>
+  
+  <Step title="Save">
+    Click **Save** and give your board a name
+  </Step>
+</Steps>
+
+## Adding Reports to Boards
+
+### From a Report
+
+1. Build or open a saved report
+2. Click **Add to Board**
+3. Select existing board or create new
+4. Report appears on the board
+
+### From the Board
+
+1. Open your board
+2. Click **+ Add** → **Add Report**
+3. Browse or search saved reports
+4. Select and position the report
+
+## Layout & Styling
+
+### Grid System
+
+Boards use a flexible grid for layout:
+
+```
+┌─────────────────────────────────────────────────┐
+│ [Header: KPIs]                                   │
+├──────────────────┬──────────────────────────────┤
+│                  │                               │
+│   Metric Card    │        Line Chart             │
+│   (1x1)          │        (2x1)                  │
+│                  │                               │
+├──────────────────┼──────────────────────────────┤
+│                  │                               │
+│   Pie Chart      │        Funnel                 │
+│   (1x1)          │        (2x1)                  │
+│                  │                               │
+├──────────────────┴──────────────────────────────┤
+│ [Divider]                                        │
+├─────────────────────────────────────────────────┤
+│                                                  │
+│              Retention Table (3x1)               │
+│                                                  │
+└─────────────────────────────────────────────────┘
+```
+
+### Resizing Components
+
+- Drag corner/edges to resize
+- Snap to grid for alignment
+- Minimum sizes vary by component type
+
+### Reordering
+
+- Drag components to new positions
+- Components shift to accommodate
+- Use dividers to create sections
+
+## Sharing Boards
+
+### Team Sharing
+
+Share with specific team members:
+
+1. Click **Share** on your board
+2. Enter team member emails
+3. Set permissions:
+   - **View**: Can see but not edit
+   - **Edit**: Can modify the board
+
+### Public Links
+
+Create view-only public links:
+
+1. Click **Share** → **Create Public Link**
+2. Copy the generated URL
+3. Anyone with the link can view (not edit)
+
+<Note>
+Public links show a snapshot of the data. Consider data sensitivity before sharing externally.
+</Note>
+
+## Board Permissions
+
+| Role | View | Edit | Share | Delete |
+|------|------|------|-------|--------|
+| Owner | ✅ | ✅ | ✅ | ✅ |
+| Editor | ✅ | ✅ | ❌ | ❌ |
+| Viewer | ✅ | ❌ | ❌ | ❌ |
+| Public Link | ✅ | ❌ | ❌ | ❌ |
+
+## Example Boards
+
+### Executive Dashboard
+
+```
+┌─────────────────────────────────────────────────┐
+│ [Header] Key Metrics This Week                   │
+├────────┬────────┬────────┬─────────────────────┤
+│  WAU   │ Txns   │ Volume │   Conversion Rate   │
+│ 12.5K  │ 45.2K  │ $2.3M  │       8.5%          │
+├────────┴────────┴────────┴─────────────────────┤
+│                                                  │
+│         Weekly Active Users (Line Chart)         │
+│                                                  │
+├─────────────────────────────────────────────────┤
+│                                                  │
+│      Transaction Volume by Chain (Bar Chart)     │
+│                                                  │
+└─────────────────────────────────────────────────┘
+```
+
+### Acquisition Board
+
+```
+┌─────────────────────────────────────────────────┐
+│ [Header] Marketing Performance                   │
+├─────────────────────────────────────────────────┤
+│                                                  │
+│    Traffic Source → Wallet Connect Funnel        │
+│                                                  │
+├──────────────────┬──────────────────────────────┤
+│                  │                               │
+│ By Source (Pie)  │  Conversion by Source (Bar)   │
+│                  │                               │
+├──────────────────┴──────────────────────────────┤
+│                                                  │
+│       Post-Wallet Connect Flows (Sankey)         │
+│                                                  │
+└─────────────────────────────────────────────────┘
+```
+
+### Product Health Board
+
+```
+┌─────────────────────────────────────────────────┐
+│ [Header] User Engagement                         │
+├──────────────────┬──────────────────────────────┤
+│                  │                               │
+│  DAU/WAU Ratio   │     7-Day Retention Curve    │
+│                  │                               │
+├──────────────────┴──────────────────────────────┤
+│                                                  │
+│           Weekly Retention Table                 │
+│                                                  │
+├─────────────────────────────────────────────────┤
+│                                                  │
+│    Feature Usage by User Segment (Stacked Bar)   │
+│                                                  │
+└─────────────────────────────────────────────────┘
+```
+
+## Best Practices
+
+### Organize Logically
+
+Group related metrics together:
+
+```
+✅ Good organization:
+- KPIs at top
+- Detailed breakdowns below
+- Related metrics grouped
+- Clear section headers
+
+❌ Poor organization:
+- Random metric placement
+- No visual hierarchy
+- Missing context
+```
+
+### Design for Your Audience
+
+```
+Executive board:
+- High-level KPIs
+- Trend lines
+- Minimal detail
+
+Analyst board:
+- Detailed breakdowns
+- Multiple dimensions
+- Tables with raw data
+
+Team board:
+- Actionable metrics
+- Target comparisons
+- Recent changes
+```
+
+### Keep It Focused
+
+```
+✅ Good: 5-8 focused components per board
+   → Easy to scan, clear story
+
+❌ Avoid: 20+ components crammed together
+   → Information overload
+```
+
+### Use Text for Context
+
+Add explanatory text:
+
+```
+[Header] Conversion Funnel
+
+[Text] This week's funnel shows a 15% improvement in
+wallet-to-transaction conversion. The main driver is
+our new onboarding flow launched on Monday.
+
+[Funnel Chart]
+```
+
+### Refresh Considerations
+
+Board data refreshes when viewed. For large boards:
+- Consider splitting into multiple boards
+- Use summary views for dashboards
+- Link to detailed reports
+
+## Managing Boards
+
+### Duplicating
+
+1. Open board
+2. Click **...** → **Duplicate**
+3. Modify the copy as needed
+
+### Deleting
+
+1. Open board
+2. Click **...** → **Delete**
+3. Confirm deletion
+
+<Warning>
+Deleting a board is permanent. The saved reports within are not deleted—only removed from the board.
+</Warning>
+
+### Organizing
+
+Use folders or naming conventions:
+
+```
+Boards:
+├── [Exec] Weekly KPIs
+├── [Exec] Monthly Review
+├── [Product] Feature Adoption
+├── [Product] User Flows
+├── [Marketing] Campaign Performance
+└── [Marketing] Channel Analysis
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Insights" icon="chart-line" href="/analysis/reports/insights">
+    Create charts for your board
+  </Card>
+  <Card title="Cohorts" icon="users" href="/analysis/cohorts">
+    Segment data on boards
+  </Card>
+</CardGroup>
