@@ -13,79 +13,202 @@ Stay up to date with Cryptique releases, new features, and improvements.
 
 ---
 
-## September 2025
+## February 2026
 
-### Week of Sep 2–8
+### Week of Feb 1–7
 
-<Update label="Authentication & tenants" icon="key">
+<Update label="Configurable transaction columns" icon="table-columns">
 
-- Email/password signup and login with secure token refresh.
-- JWT-based sessions with configurable expiry; refresh flow without re-login.
-- Team-scoped multi-tenancy: all data isolated by team; team members and roles supported.
-- Website entity: multiple trackable properties per team with separate config and keys.
-
-</Update>
-
-<Update label="Session pipeline" icon="database">
-
-- First-party session creation and updates via tracking API.
-- Persisted fields: first/last visit, page view count, referrer, and geo (country/city).
-- Server-side idempotency for duplicate requests; session continuity across tabs.
+- Column set: Smart contract (chain), Function name, Transaction time, Tx hash, Block, From, To, Value.
+- Required columns (contract, function, time) always on; rest toggleable and reorderable.
+- Column config modal: checkboxes and drag-and-drop; selection persisted with table preferences.
+- Categories (e.g. core, blockchain, addresses) for easier grouping in the modal.
 
 </Update>
 
-### Week of Sep 9–15
+### Week of Feb 8–14
 
-<Update label="Campaign & UTM model" icon="chart-mixed">
+<Update label="Transaction row & detail" icon="file-lines">
 
-- Campaign definitions with UTM parameter sets (source, medium, campaign, term, content).
-- UTM event log: one row per UTM combination with aggregated counts and timestamps.
-- Cascade rules: campaign changes propagate to UTM aggregates; no orphaned UTM rows.
-- Indexes on (team_id, website_id, utm_) for fast campaign drill-downs.
-
-</Update>
-
-<Update label="Custom events (v1)" icon="bolt">
-
-- Event ingestion accepting event key, optional payload, and session/user references.
-- Event keys validated and normalized; invalid keys rejected with clear errors.
-- Batch endpoint for up to 500 events per request; non-blocking processing.
+- Dedicated transaction row component: consistent formatting, truncation for long hashes/addresses, copy-to-clipboard.
+- Transaction detail view: full hash, block, from/to, value, input data snippet, status, gas (when available).
+- Properties tab: all known fields (contract, function, args, chain, timestamp) in a structured layout.
+- Link to block explorer (chain-specific) when chain and hash are known.
 
 </Update>
 
-### Week of Sep 16–22
+### Week of Feb 15–21
 
-<Update label="Event storage & keys" icon="layer-group">
+<Update label="Transactions filter module" icon="filter">
 
-- Raw event log with JSONB payload; schema-on-read for arbitrary properties.
-- Event key uniqueness and case handling; migration to fix legacy missing keys.
-- Permissions aligned with team/website; RLS-style checks for event read/write.
-
-</Update>
-
-<Update label="UTM restructure" icon="arrows-rotate">
-
-- UTM event log restructured to one row per UTM identity for accurate attribution.
-- No more double-counting when the same UTM appears in multiple sessions.
-- Backfill script for existing data; zero-downtime migration window.
+- Filter bar for transactions: by contract (multi-select), time range, optional wallet or hash search.
+- Filter state synced with URL or local state so "filtered view" is shareable or restorable.
+- Combined with events and sessions filters so "events in range → sessions → transactions" flows feel consistent.
+- Clear filters and "no results" state with suggestion to widen criteria.
 
 </Update>
 
-### Week of Sep 23–30
+### Week of Feb 22–28
 
-<Update label="Campaign triggers" icon="wand-magic-sparkles">
+<Update label="Sessions page & tables" icon="table-cells">
 
-- Campaign definition updates trigger UTM log invalidation/rebuild where needed.
-- UTM removal from a campaign correctly prunes or marks affected UTM rows.
-- Documentation of campaign → UTM dependency graph for support and ops.
+- Sessions page: list of sessions with duration, page views, first/last event, device, country.
+- Session row: expand or click-through to session detail (timeline of pages and events).
+- Alignment with events and transactions: same table styling, loading states, and empty states.
+- Optional session-level filters (e.g. min duration, has event key) for funnel analysis.
 
 </Update>
 
-<Update label="Stability" icon="shield-check">
+<Update label="On-chain table integration" icon="link">
 
-- Connection pooling and query timeouts to avoid long-running requests.
-- Retry policy for transient DB errors on event and session writes.
-- Health check endpoint for load balancers and monitoring.
+- On-chain transactions table uses the same column config and filter module as the main Activity view.
+- Transaction detail modal available from both Activity and any embedded transaction list.
+- Team and contract scoping: only transactions for the team's registered contracts appear; no cross-team leakage.
+
+</Update>
+
+<Update label="Polish & performance" icon="sparkles">
+
+- Shared data table styles: borders, density, hover, and focus for accessibility.
+- Skeleton loaders and incremental load for large event/session/transaction lists.
+- Error boundaries and inline error messages so one failed section doesn't break the whole page.
+- Backend: transaction list API supports filter params and returns contract name and chain; response shape stable for the new UI.
+
+</Update>
+
+---
+
+## January 2026
+
+### Week of Jan 1–7
+
+<Update label="User journey filter semantics" icon="filter">
+
+- Filters (date, device, country, Web3 status, wallet net worth, etc.) apply only to the user list and to aggregate metrics.
+- User detail, timeline, dapps, and tokens APIs ignore filters and return full history for the selected user.
+- Documented contract: "filter to find users; then inspect anyone in full."
+- Metrics (unique users, geography, devices, activity charts) respect current filter set.
+
+</Update>
+
+### Week of Jan 8–14
+
+<Update label="Soneium wallet net worth" icon="coins">
+
+- Dedicated pipeline: Blockscout API for Soneium balance and token list; DexScreener for USD prices.
+- Native SONE + ERC-20 token balances; aggregated USD per wallet and stored in wallet_networth.soneium.
+- Rate limiting and retries (exponential backoff + jitter); timeouts to avoid hanging.
+- On failure: return 0 or last-known value; never fail the whole aggregation.
+
+</Update>
+
+<Update label="Chain config expansion" icon="link">
+
+- Central chain config: chain ID, name, API provider (Etherscan-compatible, Blockscout, etc.), transaction caps, block chunk size, and API offset limits.
+- Dozens of networks supported (Ethereum, Base, Arbitrum, Polygon, Optimism, BNB, Avalanche, Soneium, Berachain, etc.).
+- Per-chain transaction fetcher tuning so we stay within provider limits and avoid bans.
+
+</Update>
+
+### Week of Jan 15–21
+
+<Update label="Conversion events experience" icon="bolt">
+
+- Dedicated Events view: list of events with key, count, last seen; filters by key, time, property.
+- Sessions view: session list with duration, page views, device, location; link to event list for that session.
+- Activity view: on-chain transactions for the team's contracts; table with hash, block, from/to, value, time, function.
+- Shared filter bar and filter modules (dropdowns, date range, multi-select) across events/sessions/activity.
+- Event detail: payload, related sessions/users; session detail: pages, events, and linked identity.
+
+</Update>
+
+### Week of Jan 22–31
+
+<Update label="Preferences & persistence" icon="floppy-disk">
+
+- User preferences API and client state for table column visibility and order.
+- Preferences keyed by team and optional user; defaults for new users.
+- Conversion events tables (events, sessions, transactions) respect saved column sets.
+- Last-used time range and filters considered for "restore previous session" (where implemented).
+
+</Update>
+
+<Update label="Transaction table behavior" icon="table-list">
+
+- Transaction list: sort by time, filter by contract, time range, wallet (future).
+- Display of contract name + chain; function name from decoded input where ABI is present.
+- Value formatting (wei → human-readable; optional USD if price pipeline exists).
+- Pagination and "load more" with stable ordering (transaction_time, id).
+
+</Update>
+
+---
+
+## December 2025
+
+### Week of Dec 1–7
+
+<Update label="Identify & distinct ID" icon="fingerprint">
+
+- Identify API: attach email, name, phone, and custom traits to user_id; stored on user_identities.
+- distinct_id: optional stable cross-device ID; added to user_identities, sessions, events, and UTM event logs.
+- Merge logic: same user_id with different distinct_id can be linked for analytics.
+- Downstream: event ingestion can accept distinct_id; resolution to user_id where configured.
+
+</Update>
+
+### Week of Dec 8–14
+
+<Update label="Multi-website identity" icon="globe">
+
+- website_ids array on user_identities for users touching multiple properties.
+- Queries can scope by single website or "any of these websites".
+- Cross-website user view (optional) for teams that need cross-property journey.
+
+</Update>
+
+<Update label="Custom properties" icon="tags">
+
+- Custom key-value on user_identities with validation (key format, value type).
+- Property discovery: indexes and metadata for "which custom properties exist" per team/website.
+- Filters in user list and dashboards can use custom properties (e.g. plan_type, signup_source).
+
+</Update>
+
+### Week of Dec 15–21
+
+<Update label="UTM event log schema" icon="layer-group">
+
+- Datetime columns converted to arrays where one UTM row represents multiple hits over time.
+- Queries updated for array semantics; no loss of granularity.
+- Migration script with validation and rollback path.
+
+</Update>
+
+<Update label="Table preferences" icon="sliders">
+
+- Team-level table preferences: which columns to show, order, default sort for main tables.
+- Stored per team and optional per user; UI reads preference and applies on load.
+- Applied to user list, events list, sessions list (where applicable).
+
+</Update>
+
+### Week of Dec 22–31
+
+<Update label="Subscription enforcement" icon="lock">
+
+- Subscription-protected routes check team plan and status before serving.
+- Grace period for expired subscriptions (e.g. 7 days) with warning in UI.
+- Stripe Customer Portal link for self-service plan change and billing history.
+- Client-side subscription context so UI can show upgrade prompts or feature gates.
+
+</Update>
+
+<Update label="Stability & observability" icon="chart-line">
+
+- Structured logging with request ID and team_id for tracing.
+- Error classification (4xx vs 5xx) and safe error messages (no internal paths).
+- Health endpoint extended with DB and optional cache checks.
 
 </Update>
 
@@ -249,225 +372,81 @@ Stay up to date with Cryptique releases, new features, and improvements.
 
 ---
 
-## December 2025
+## September 2025
 
-### Week of Dec 1–7
+### Week of Sep 2–8
 
-<Update label="Identify & distinct ID" icon="fingerprint">
+<Update label="Authentication & tenants" icon="key">
 
-- Identify API: attach email, name, phone, and custom traits to user_id; stored on user_identities.
-- distinct_id: optional stable cross-device ID; added to user_identities, sessions, events, and UTM event logs.
-- Merge logic: same user_id with different distinct_id can be linked for analytics.
-- Downstream: event ingestion can accept distinct_id; resolution to user_id where configured.
-
-</Update>
-
-### Week of Dec 8–14
-
-<Update label="Multi-website identity" icon="globe">
-
-- website_ids array on user_identities for users touching multiple properties.
-- Queries can scope by single website or “any of these websites”.
-- Cross-website user view (optional) for teams that need cross-property journey.
+- Email/password signup and login with secure token refresh.
+- JWT-based sessions with configurable expiry; refresh flow without re-login.
+- Team-scoped multi-tenancy: all data isolated by team; team members and roles supported.
+- Website entity: multiple trackable properties per team with separate config and keys.
 
 </Update>
 
-<Update label="Custom properties" icon="tags">
+<Update label="Session pipeline" icon="database">
 
-- Custom key-value on user_identities with validation (key format, value type).
-- Property discovery: indexes and metadata for “which custom properties exist” per team/website.
-- Filters in user list and dashboards can use custom properties (e.g. plan_type, signup_source).
-
-</Update>
-
-### Week of Dec 15–21
-
-<Update label="UTM event log schema" icon="layer-group">
-
-- Datetime columns converted to arrays where one UTM row represents multiple hits over time.
-- Queries updated for array semantics; no loss of granularity.
-- Migration script with validation and rollback path.
+- First-party session creation and updates via tracking API.
+- Persisted fields: first/last visit, page view count, referrer, and geo (country/city).
+- Server-side idempotency for duplicate requests; session continuity across tabs.
 
 </Update>
 
-<Update label="Table preferences" icon="sliders">
+### Week of Sep 9–15
 
-- Team-level table preferences: which columns to show, order, default sort for main tables.
-- Stored per team and optional per user; UI reads preference and applies on load.
-- Applied to user list, events list, sessions list (where applicable).
+<Update label="Campaign & UTM model" icon="chart-mixed">
 
-</Update>
-
-### Week of Dec 22–31
-
-<Update label="Subscription enforcement" icon="lock">
-
-- Subscription-protected routes check team plan and status before serving.
-- Grace period for expired subscriptions (e.g. 7 days) with warning in UI.
-- Stripe Customer Portal link for self-service plan change and billing history.
-- Client-side subscription context so UI can show upgrade prompts or feature gates.
+- Campaign definitions with UTM parameter sets (source, medium, campaign, term, content).
+- UTM event log: one row per UTM combination with aggregated counts and timestamps.
+- Cascade rules: campaign changes propagate to UTM aggregates; no orphaned UTM rows.
+- Indexes on (team_id, website_id, utm_) for fast campaign drill-downs.
 
 </Update>
 
-<Update label="Stability & observability" icon="chart-line">
+<Update label="Custom events (v1)" icon="bolt">
 
-- Structured logging with request ID and team_id for tracing.
-- Error classification (4xx vs 5xx) and safe error messages (no internal paths).
-- Health endpoint extended with DB and optional cache checks.
-
-</Update>
-
----
-
-## January 2026
-
-### Week of Jan 1–7
-
-<Update label="User journey filter semantics" icon="filter">
-
-- Filters (date, device, country, Web3 status, wallet net worth, etc.) apply only to the user list and to aggregate metrics.
-- User detail, timeline, dapps, and tokens APIs ignore filters and return full history for the selected user.
-- Documented contract: “filter to find users; then inspect anyone in full.”
-- Metrics (unique users, geography, devices, activity charts) respect current filter set.
+- Event ingestion accepting event key, optional payload, and session/user references.
+- Event keys validated and normalized; invalid keys rejected with clear errors.
+- Batch endpoint for up to 500 events per request; non-blocking processing.
 
 </Update>
 
-### Week of Jan 8–14
+### Week of Sep 16–22
 
-<Update label="Soneium wallet net worth" icon="coins">
+<Update label="Event storage & keys" icon="layer-group">
 
-- Dedicated pipeline: Blockscout API for Soneium balance and token list; DexScreener for USD prices.
-- Native SONE + ERC-20 token balances; aggregated USD per wallet and stored in wallet_networth.soneium.
-- Rate limiting and retries (exponential backoff + jitter); timeouts to avoid hanging.
-- On failure: return 0 or last-known value; never fail the whole aggregation.
-
-</Update>
-
-<Update label="Chain config expansion" icon="link">
-
-- Central chain config: chain ID, name, API provider (Etherscan-compatible, Blockscout, etc.), transaction caps, block chunk size, and API offset limits.
-- Dozens of networks supported (Ethereum, Base, Arbitrum, Polygon, Optimism, BNB, Avalanche, Soneium, Berachain, etc.).
-- Per-chain transaction fetcher tuning so we stay within provider limits and avoid bans.
+- Raw event log with JSONB payload; schema-on-read for arbitrary properties.
+- Event key uniqueness and case handling; migration to fix legacy missing keys.
+- Permissions aligned with team/website; RLS-style checks for event read/write.
 
 </Update>
 
-### Week of Jan 15–21
+<Update label="UTM restructure" icon="arrows-rotate">
 
-<Update label="Conversion events experience" icon="bolt">
-
-- Dedicated Events view: list of events with key, count, last seen; filters by key, time, property.
-- Sessions view: session list with duration, page views, device, location; link to event list for that session.
-- Activity view: on-chain transactions for the team’s contracts; table with hash, block, from/to, value, time, function.
-- Shared filter bar and filter modules (dropdowns, date range, multi-select) across events/sessions/activity.
-- Event detail: payload, related sessions/users; session detail: pages, events, and linked identity.
+- UTM event log restructured to one row per UTM identity for accurate attribution.
+- No more double-counting when the same UTM appears in multiple sessions.
+- Backfill script for existing data; zero-downtime migration window.
 
 </Update>
 
-### Week of Jan 22–31
+### Week of Sep 23–30
 
-<Update label="Preferences & persistence" icon="floppy-disk">
+<Update label="Campaign triggers" icon="wand-magic-sparkles">
 
-- User preferences API and client state for table column visibility and order.
-- Preferences keyed by team and optional user; defaults for new users.
-- Conversion events tables (events, sessions, transactions) respect saved column sets.
-- Last-used time range and filters considered for “restore previous session” (where implemented).
-
-</Update>
-
-<Update label="Transaction table behavior" icon="table-list">
-
-- Transaction list: sort by time, filter by contract, time range, wallet (future).
-- Display of contract name + chain; function name from decoded input where ABI is present.
-- Value formatting (wei → human-readable; optional USD if price pipeline exists).
-- Pagination and “load more” with stable ordering (transaction_time, id).
+- Campaign definition updates trigger UTM log invalidation/rebuild where needed.
+- UTM removal from a campaign correctly prunes or marks affected UTM rows.
+- Documentation of campaign → UTM dependency graph for support and ops.
 
 </Update>
 
----
+<Update label="Stability" icon="shield-check">
 
-## February 2026
-
-### Week of Feb 1–7
-
-<Update label="Configurable transaction columns" icon="table-columns">
-
-- Column set: Smart contract (chain), Function name, Transaction time, Tx hash, Block, From, To, Value.
-- Required columns (contract, function, time) always on; rest toggleable and reorderable.
-- Column config modal: checkboxes and drag-and-drop; selection persisted with table preferences.
-- Categories (e.g. core, blockchain, addresses) for easier grouping in the modal.
+- Connection pooling and query timeouts to avoid long-running requests.
+- Retry policy for transient DB errors on event and session writes.
+- Health check endpoint for load balancers and monitoring.
 
 </Update>
-
-### Week of Feb 8–14
-
-<Update label="Transaction row & detail" icon="file-lines">
-
-- Dedicated transaction row component: consistent formatting, truncation for long hashes/addresses, copy-to-clipboard.
-- Transaction detail view: full hash, block, from/to, value, input data snippet, status, gas (when available).
-- Properties tab: all known fields (contract, function, args, chain, timestamp) in a structured layout.
-- Link to block explorer (chain-specific) when chain and hash are known.
-
-</Update>
-
-### Week of Feb 15–21
-
-<Update label="Transactions filter module" icon="filter">
-
-- Filter bar for transactions: by contract (multi-select), time range, optional wallet or hash search.
-- Filter state synced with URL or local state so “filtered view” is shareable or restorable.
-- Combined with events and sessions filters so “events in range → sessions → transactions” flows feel consistent.
-- Clear filters and “no results” state with suggestion to widen criteria.
-
-</Update>
-
-### Week of Feb 22–28
-
-<Update label="Sessions page & tables" icon="table-cells">
-
-- Sessions page: list of sessions with duration, page views, first/last event, device, country.
-- Session row: expand or click-through to session detail (timeline of pages and events).
-- Alignment with events and transactions: same table styling, loading states, and empty states.
-- Optional session-level filters (e.g. min duration, has event key) for funnel analysis.
-
-</Update>
-
-<Update label="On-chain table integration" icon="link">
-
-- On-chain transactions table uses the same column config and filter module as the main Activity view.
-- Transaction detail modal available from both Activity and any embedded transaction list.
-- Team and contract scoping: only transactions for the team’s registered contracts appear; no cross-team leakage.
-
-</Update>
-
-<Update label="Polish & performance" icon="sparkles">
-
-- Shared data table styles: borders, density, hover, and focus for accessibility.
-- Skeleton loaders and incremental load for large event/session/transaction lists.
-- Error boundaries and inline error messages so one failed section doesn’t break the whole page.
-- Backend: transaction list API supports filter params and returns contract name and chain; response shape stable for the new UI.
-
-</Update>
-
----
-
-## Coming Soon
-
-We're working on exciting new features:
-
-### Q2 2026
-
-- **AI-Powered Insights**: Automatic anomaly detection and predictive churn alerts
-- **Advanced Segmentation**: SQL-like query language for power users
-
-### Q3 2026
-
-- **Mobile SDKs**: React Native, iOS, and Android native support
-- **Collaboration**: Comments, Slack/Discord integration
-
-### Q4 2026
-
-- **New Chains**: Solana, Sui, Aptos
-- **Data Warehouse Integration**: Export to Snowflake, BigQuery, Redshift
 
 ---
 
