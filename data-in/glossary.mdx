@@ -1,0 +1,187 @@
+---
+title: "Glossary"
+description: "Definitions for Cryptique-specific terms and how they map to familiar analytics tools"
+---
+
+## Overview
+
+This page defines the core vocabulary used throughout Cryptique's documentation. Where relevant, each term is mapped to its equivalent in Mixpanel or Amplitude.
+
+---
+
+## distinct_id
+
+The primary identifier for a user in Cryptique. Every user — anonymous or identified — has one.
+
+- **Anonymous users**: Cryptique auto-generates a `distinct_id` (e.g. `anon_abc123xyz`) on first visit, stored in a first-party cookie (`cq_distinct_id`).
+- **Identified users**: When you call `Cryptique.identify('your_id')`, the anonymous `distinct_id` is replaced with the ID you supply (typically your database user ID or UUID).
+
+`distinct_id` is always developer-controlled after identification — Cryptique never reassigns it.
+
+| Tool | Equivalent term |
+|---|---|
+| Mixpanel | `distinct_id` |
+| Amplitude | `user_id` / `device_id` |
+
+---
+
+## user_identity_id
+
+An internal UUID assigned by Cryptique to each profile record. Unlike `distinct_id` (which you control), `user_identity_id` is system-generated and stable across merges. You will see it in raw data exports; you do not need to set or reference it in your SDK calls.
+
+---
+
+## identify()
+
+The SDK method that links an anonymous session to a known user. Call it once per session, at login or signup.
+
+```javascript
+Cryptique.identify('user_db_id_12345');
+```
+
+**Merge behavior:**
+- If the ID has never been seen: the current anonymous profile is converted to an identified profile.
+- If the ID has been seen on the same device: sessions merge seamlessly.
+- If the ID has been seen on a different device or session: the CQ Intelligence merge engine unifies the profiles automatically.
+
+| Tool | Equivalent |
+|---|---|
+| Mixpanel | `mixpanel.identify()` |
+| Amplitude | `amplitude.setUserId()` |
+
+---
+
+## CQ Intelligence merge engine
+
+Cryptique's internal system for unifying profiles that belong to the same real user across devices, sessions, and wallets.
+
+**Merge is triggered when:**
+- The same `identify()` ID is called across two different sessions or devices.
+- The same wallet address is connected on two different profiles.
+
+When a merge occurs, event history, profile properties, and wallet links from both profiles are combined into a single unified profile. The merge is automatic — no SDK calls required beyond standard `identify()` and `walletAddress()` usage.
+
+---
+
+## auto-events
+
+Behavioral events that Cryptique captures automatically without any `Cryptique.track()` calls. Auto-events are enabled by default when you set `auto-events="true"` on the script tag.
+
+**Automatically captured:**
+
+| Event | What triggers it |
+|---|---|
+| `page_view` | Every page load or SPA route change |
+| `session_start` | New session begins |
+| `click` | Any element click |
+| `scroll` | Scroll depth milestones |
+| `form_submit` | Form submission (metadata only, no field values) |
+| `wallet_connect` | Wallet connection detected |
+| `copy` | Text copied (truncated to 100 characters) |
+
+You can disable specific events or exclude paths via script attributes. See [Auto-Events](/data-in/auto-events) for configuration.
+
+| Tool | Equivalent |
+|---|---|
+| Mixpanel | Autocapture (select plans) |
+| Amplitude | Autocapture / Session Replay |
+
+---
+
+## wallet enrichment
+
+The automatic process by which Cryptique adds on-chain properties to a user profile once a wallet address is linked. No extra SDK calls are needed.
+
+**Properties added automatically:**
+
+| Property | Description |
+|---|---|
+| `wallet_age_days` | Days since the wallet's first on-chain transaction |
+| `total_transaction_count` | All transactions across supported chains |
+| `net_worth_usd` | Approximate portfolio value across chains |
+| `eth_balance` (and per-chain equivalents) | Native token balance per chain |
+| `dapps_used` | dApps the wallet has interacted with |
+| `is_whale` | Derived boolean based on net worth |
+
+Enrichment covers all 35+ chains supported by Cryptique. There is no equivalent concept in Mixpanel or Amplitude (off-chain-only tools).
+
+---
+
+## people methods
+
+The `Cryptique.people.*` namespace contains methods for setting and managing persistent user profile properties. Unlike event properties (which are attached to a single event), people properties are stored on the profile and persist across sessions.
+
+| Method | What it does |
+|---|---|
+| `people.set()` | Set properties (overwrites existing values) |
+| `people.set_once()` | Set only if the property doesn't already exist |
+| `people.increment()` | Add to a numeric property |
+| `people.append()` | Add to a list property (allows duplicates) |
+| `people.union()` | Add to a list property (no duplicates) |
+| `people.remove()` | Remove a value from a list property |
+| `people.unset()` | Delete a property from the profile |
+| `people.deleteUser()` | Permanently delete the entire profile |
+| `people.trackCharge()` | Record a revenue event on the profile |
+
+See the [People SDK Reference](/data-in/sdk-reference/people) for full usage.
+
+| Tool | Equivalent |
+|---|---|
+| Mixpanel | `mixpanel.people.set()` etc. |
+| Amplitude | `amplitude.identify()` with `Identify` object |
+
+---
+
+## trackCharge()
+
+Records a revenue or payment event against a user profile. Useful for tracking subscription payments, NFT purchases, or any monetization event.
+
+```javascript
+Cryptique.people.trackCharge(49.99, {
+  plan: 'pro',
+  currency: 'USD'
+});
+```
+
+| Tool | Equivalent |
+|---|---|
+| Mixpanel | `mixpanel.people.track_charge()` |
+| Amplitude | Revenue event via `Revenue` object |
+
+---
+
+## transactions
+
+On-chain events generated from your indexed smart contracts. Unlike behavioral events (which you track via the SDK), transactions are captured automatically once you add a contract in **Settings → Contracts**.
+
+Transactions are linked to user profiles via the wallet address — if the wallet that executed a transaction is connected to a Cryptique profile, the transaction appears in that profile's timeline.
+
+See [Transactions](/data-in/transactions) for details.
+
+---
+
+## session
+
+A period of continuous activity by a user. A new session begins when:
+- A user visits the site for the first time.
+- More than 30 minutes have elapsed since their last event.
+
+Sessions are tracked via the `cq_session_id` first-party cookie (30-minute expiry).
+
+| Tool | Equivalent |
+|---|---|
+| Mixpanel | Session (same concept) |
+| Amplitude | Session (same concept) |
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="User Profile Data Model" icon="user" href="/data-in/user-profiles">
+    How profiles are structured
+  </Card>
+  <Card title="Implementation Guide" icon="book" href="/data-in/implementation-guide">
+    End-to-end implementation patterns
+  </Card>
+</CardGroup>

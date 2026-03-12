@@ -78,6 +78,19 @@ Identified user: user_provided_id (your choice)
 
 You control what identifying information to associate with users.
 
+Wallet addresses follow the same principle: they are stored as pseudonymous identifiers and are only associated with a user profile when the End-User explicitly connects their wallet. See "Wallet Address Handling" below.
+
+### Wallet Address Handling
+
+Wallet addresses (e.g. `0x1234...abcd`) are stored as-is and are **pseudonymous by nature** — they identify a wallet, not a named individual, unless the user explicitly links additional identity information (such as an email address via `Cryptique.identify()`).
+
+Important considerations:
+
+- Blockchain transaction data is **publicly available**. Anyone can look up a wallet's history on a block explorer. Cryptique aggregates this public data; it does not expose anything that isn't already on-chain.
+- Cryptique does **not** use heuristics or clustering to deanonymize wallets. A wallet address is only linked to a user profile when the End-User explicitly connects their wallet.
+- Under GDPR, wallet addresses may be considered personal data if they can be linked to an identified individual. If your End-Users are in the EEA, ensure your privacy policy discloses wallet address collection and that you have a lawful basis for processing it.
+- Wallet addresses are subject to the same retention periods as other profile data (default 24 months, configurable).
+
 ## Consent Management
 
 ### Consent-Based Tracking
@@ -125,10 +138,10 @@ Configure how long data is retained:
 
 | Data Type | Default Retention | Configurable |
 |-----------|------------------|--------------|
-| Events | 12 months | Yes |
-| User profiles | 12 months | Yes |
-| Sessions | 12 months | Yes |
-| Transactions | 12 months | Yes |
+| Events | 24 months | Yes |
+| User profiles | 24 months | Yes |
+| Sessions | 24 months | Yes |
+| Transactions | 24 months | Yes |
 
 ### Configuring Retention
 
@@ -214,6 +227,31 @@ Audit Log:
 - Session timeouts
 - Secure authentication
 
+## Data Storage & Infrastructure
+
+### Where your data is stored
+
+All Cryptique data is stored and processed on **Google Cloud Platform (GCP)** in the **us-central1** region (Iowa, United States).
+
+| Layer | Provider | Region |
+|---|---|---|
+| Application hosting | Google Cloud Platform | us-central1 (US) |
+| Database & event storage | Google Cloud Platform | us-central1 (US) |
+| CDN & DDoS protection | Cloudflare | Global edge |
+
+Enterprise customers may request EU-only data residency as part of a custom agreement. Contact [privacy@cryptique.io](mailto:privacy@cryptique.io) to discuss data residency requirements.
+
+### Security certifications
+
+| Certification | Status |
+|---|---|
+| GDPR | ✅ Compliant |
+| CCPA / CPRA | ✅ Compliant |
+| SOC 2 Type II | 🔄 In progress |
+| ISO 27001 | 🔄 In progress |
+
+Cryptique's infrastructure runs on Google Cloud Platform, which holds SOC 2 Type II and ISO 27001 certifications at the infrastructure level. Cryptique's own SOC 2 Type II audit is currently in progress. When completed, the report will be available to enterprise customers under NDA.
+
 ## Compliance
 
 ### GDPR
@@ -292,13 +330,16 @@ script.setAttribute('auto-events-disabled-events', 'copy,input_change');
 
 ## Data Processing Agreement
 
-For enterprise customers, Cryptique provides:
+For customers who require a formal Data Processing Agreement (DPA) — including those operating under GDPR — Cryptique provides:
 
-- Data Processing Agreement (DPA)
-- Standard Contractual Clauses (SCCs)
-- HIPAA Business Associate Agreement (BAA) - upon request
+| Document | Available |
+|---|---|
+| Data Processing Agreement (DPA) | ✅ On request |
+| EU Standard Contractual Clauses (SCCs) | ✅ On request |
+| UK International Data Transfer Addendum | ✅ On request |
+| HIPAA Business Associate Agreement (BAA) | On request (enterprise) |
 
-Contact support for compliance documentation.
+To request any of these documents, email [privacy@cryptique.io](mailto:privacy@cryptique.io) with the subject line **"DPA Request"**. We aim to respond within 2 business days.
 
 ## Best Practices
 

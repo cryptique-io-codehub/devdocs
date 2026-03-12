@@ -78,7 +78,8 @@
               "data-in/events-and-properties",
               "data-in/user-profiles",
               "data-in/transactions",
-              "data-in/default-properties"
+              "data-in/default-properties",
+              "data-in/glossary"
             ]
           },
           {

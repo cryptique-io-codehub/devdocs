@@ -1,11 +1,15 @@
 ---
-title: "User Profiles"
-description: "Managing and understanding user profiles in Cryptique"
+title: "User Profile Data Model"
+description: "How Cryptique structures, builds, and enriches user profiles"
 ---
+
+<Info>
+  This page explains the User Profile data model — what a profile contains and how it's built. For the SDK methods used to set and update profile properties, see the [People SDK Reference](/data-in/sdk-reference/people).
+</Info>
 
 ## Overview
 
-User profiles in Cryptique aggregate all data about a single user: their events, properties, connected wallets, and on-chain transactions. This creates a complete picture of each user's journey.
+A user profile in Cryptique is the unified record for a single person. It aggregates three streams of data: off-chain behavioral events, connected wallet addresses, and on-chain transactions. Every profile is keyed on a `distinct_id`.
 
 ## Profile Structure
 
@@ -17,21 +21,20 @@ User profiles in Cryptique aggregate all data about a single user: their events,
   
   // Core properties
   "email": "user@example.com",
-  "username": "defi_whale",
   "name": "John Doe",
   
-  // Lifecycle
+  // Lifecycle (auto-computed)
   "first_seen": "2024-01-01T00:00:00Z",
   "last_seen": "2024-01-15T10:30:00Z",
   "session_count": 47,
   "event_count": 1250,
   
-  // Custom properties
+  // Custom properties (set via SDK)
   "plan": "pro",
   "referral_source": "twitter",
   "onboarding_completed": true,
   
-  // Web3 properties
+  // Web3 identity
   "is_web3_user": true,
   "wallets": [
     "0x1234567890abcdef1234567890abcdef12345678",
@@ -39,356 +42,96 @@ User profiles in Cryptique aggregate all data about a single user: their events,
   ],
   "primary_wallet": "0x1234567890abcdef1234567890abcdef12345678",
   
-  // Enriched properties (from wallet)
+  // Wallet enrichment (auto-added from on-chain data)
   "wallet_age_days": 847,
   "total_transaction_count": 523,
+  "net_worth_usd": 42500,
   "eth_balance": 15.5,
-  "is_whale": true
+  "is_whale": true,
+  "dapps_used": ["uniswap", "aave", "opensea"]
 }
 ```
 
-## Creating & Updating Profiles
+## How Profiles Are Created
 
-### identify()
+### Step 1 — Anonymous profile
 
-Link an anonymous user to a known identifier (a `distinct_id`):
+When a user first visits your site, Cryptique creates an anonymous profile with a generated `distinct_id` (e.g. `anon_abc123`). This profile immediately starts accumulating behavioral events.
 
-```javascript
-Cryptique.identify('user_12345');
-```
+### Step 2 — Identity resolution
 
-Set user profile properties separately:
+When you call `Cryptique.identify('your_user_id')`, the anonymous profile is merged into (or converted to) an identified profile keyed on your ID. See the [Identify SDK Reference](/data-in/sdk-reference/identify) for full merge behavior.
 
-```javascript
-Cryptique.people.set({
-  email: 'user@example.com',
-  name: 'John Doe',
-  plan: 'pro',
-  signup_date: '2024-01-01'
-});
-```
+### Step 3 — Property enrichment
 
-**When to call identify()**:
-- User logs in
-- User signs up
-- User updates their profile
-- You learn new information about the user
+Profile properties are added from four sources:
 
-### people.set()
-
-Set profile properties (overwrites existing):
-
-```javascript
-Cryptique.people.set({
-  plan: 'enterprise',
-  company: 'Acme Corp',
-  team_size: 50
-});
-```
-
-### people.set_once()
-
-Set properties only if not already set:
-
-```javascript
-Cryptique.people.set_once({
-  first_purchase_date: '2024-01-15',
-  referral_source: 'twitter',
-  original_plan: 'free'
-});
-```
-
-### people.increment()
-
-Increment numeric properties:
-
-```javascript
-Cryptique.people.increment({
-  login_count: 1,
-  total_swaps: 5,
-  lifetime_volume_usd: 1500.00
-});
-```
-
-### people.append()
-
-Add items to list properties:
-
-```javascript
-Cryptique.people.append({
-  favorite_tokens: 'ARB',
-  visited_pages: '/swap'
-});
-```
-
-### people.union()
-
-Add unique items to list properties:
-
-```javascript
-Cryptique.people.union({
-  connected_chains: ['ethereum', 'arbitrum'],
-  used_features: ['swap', 'bridge']
-});
-```
-
-### people.remove()
-
-Remove items from list properties:
-
-```javascript
-Cryptique.people.remove({
-  watchlist: 'DOGE'
-});
-```
-
-### people.unset()
-
-Delete properties from profile:
-
-```javascript
-Cryptique.people.unset(['temporary_flag', 'deprecated_field']);
-```
-
-### people.delete()
-
-Delete entire profile:
-
-```javascript
-Cryptique.people.delete();
-```
-
-<Warning>
-This permanently deletes the user profile and cannot be undone.
-</Warning>
-
-## Distinct ID
-
-The `distinct_id` uniquely identifies a user. Cryptique handles this automatically:
-
-### Anonymous Users
-
-Before identification, users get an anonymous ID:
-
-```javascript
-// Auto-generated format
-distinct_id: "anon_a1b2c3d4e5f6"
-```
-
-### Identified Users
-
-After calling `identify()`:
-
-```javascript
-Cryptique.identify('user_12345');
-// distinct_id becomes: "user_12345"
-```
-
-### ID Merge
-
-When an anonymous user identifies, their history is linked:
-
-```mermaid
-flowchart LR
-    subgraph Before["Before identify()"]
-        A[anon_xyz789 anonymous]
-        A --> A1[page_view]
-        A --> A2[click]
-        A --> A3[wallet_connect]
-    end
-    A -->|identify called| ID[identify user_12345]
-    ID --> B
-    subgraph After["After identify('user_12345')"]
-        B[user_12345 identified]
-        B --> B1[page_view merged]
-        B --> B2[click merged]
-        B --> B3[wallet_connect merged]
-        B --> B4[purchase new]
-    end
-```
-
-## Wallet Linking
-
-### Automatic Linking
-
-When using `wallet.connect()`, wallets are automatically linked to profiles:
-
-```javascript
-Cryptique.walletAddress('0x1234...');
-
-// Profile now includes:
-// {
-//   "wallets": ["0x1234..."],
-//   "is_web3_user": true
-// }
-```
-
-### Multiple Wallets
-
-Users can connect multiple wallets:
-
-```javascript
-Cryptique.walletAddress('0x1234...'); // First wallet
-Cryptique.walletAddress('0xabcd...'); // Second wallet
-
-// Profile:
-// {
-//   "wallets": ["0x1234...", "0xabcd..."],
-//   "primary_wallet": "0x1234..."  // First connected
-// }
-```
-
-### Transaction Attribution
-
-Once linked, all transactions from user's wallets are attributed to their profile:
-
-```mermaid
-flowchart TB
-    P[User Profile<br/>distinct_id: user_12345]
-    P --> Props[Properties: email, plan, etc.]
-    P --> W[Wallets: 0x1234..., 0xabcd...]
-    P --> T[Transactions]
-    T --> T1[0x1234... → Swap Jan 15]
-    T --> T2[0x1234... → Stake Jan 16]
-    T --> T3[0xabcd... → Mint Jan 17]
-```
+| Source | How |
+|---|---|
+| `identify()` | Sets the `distinct_id` |
+| `people.set/increment/append` | Sets custom properties via SDK |
+| `Cryptique.walletAddress()` | Links a wallet address to the profile |
+| Wallet enrichment (automatic) | Adds on-chain properties once a wallet is linked |
 
 ## Wallet Enrichment
 
-When enabled, wallet data enriches user profiles automatically:
+Once a wallet address is linked to a profile, Cryptique automatically queries the blockchain and adds the following properties:
 
 | Property | Description |
-|----------|-------------|
-| `wallet_age_days` | Days since first transaction |
-| `total_transaction_count` | Total transactions across chains |
-| `eth_balance` | Current ETH balance |
-| `token_holdings` | Major tokens held |
-| `nft_count` | Number of NFTs owned |
-| `defi_protocols_used` | Protocols interacted with |
-| `is_whale` | High-value wallet flag |
-| `activity_score` | Engagement scoring |
+|---|---|
+| `wallet_age_days` | Days since the wallet's first transaction |
+| `total_transaction_count` | Total transactions across all tracked chains |
+| `net_worth_usd` | Approximate portfolio value across supported chains |
+| `eth_balance` (and per-chain equivalents) | Native token balance per chain |
+| `dapps_used` | List of dApps the wallet has interacted with |
+| `is_whale` | Boolean, derived from net worth threshold |
 
-See [Wallet Enrichment](/integrations/wallet-enrichment) for configuration.
+Enrichment runs automatically — no additional SDK calls are required. Data covers all 35+ supported chains.
 
 ## Profile Timeline
 
-View complete user journey in the dashboard:
+In the dashboard, each profile displays a unified timeline of all off-chain events and on-chain transactions:
 
 ```
 user_12345 Timeline
 ───────────────────
-Jan 1, 10:00  │ page_view      │ Landing page
-Jan 1, 10:02  │ click          │ "Learn More" button
-Jan 2, 14:30  │ wallet_connect │ 0x1234... (MetaMask)
-Jan 2, 14:35  │ swap_initiated │ ETH → USDC
-Jan 2, 14:36  │ [Transaction]  │ Swap on Uniswap
-Jan 5, 09:00  │ identify       │ email: user@example.com
-Jan 5, 09:05  │ subscription   │ Plan: Pro
+Jan 1, 10:00  │ page_view         │ Landing page
+Jan 1, 10:02  │ click             │ "Learn More" button
+Jan 2, 14:30  │ wallet_connect    │ 0x1234... (MetaMask)
+Jan 2, 14:35  │ swap_initiated    │ ETH → USDC
+Jan 2, 14:36  │ [Transaction]     │ swapExactTokensForTokens
+Jan 5, 09:00  │ identify          │ email: user@example.com
+Jan 5, 09:05  │ people.set        │ plan: pro
 ```
 
-## Searching Users
+## Searching Profiles
 
-Find users by:
-
-- **distinct_id**: Direct lookup
-- **wallet_address**: Find by any connected wallet
-- **email**: If set via identify/people
-- **Custom properties**: Any property you've set
-
-```
-Search: 0x1234...
-→ Found: user_12345 (wallet linked Jan 2)
-
-Search: user@example.com  
-→ Found: user_12345 (email set Jan 5)
-```
+Find any profile by:
+- `distinct_id` — direct lookup
+- `wallet_address` — finds any profile with that wallet linked
+- `email` — if set via `identify()` or `people.set()`
+- Any custom property — e.g. `plan = 'enterprise'`
 
 ## Profile Properties vs Event Properties
 
-| Aspect | Profile Properties | Event Properties |
-|--------|-------------------|------------------|
-| Scope | User-level | Event-level |
-| Persistence | Stored on profile | Stored with event |
-| Updates | Mutable (set, increment) | Immutable |
-| Use case | User attributes | Event context |
+| | Profile Properties | Event Properties |
+|---|---|---|
+| Scope | User-level | Single event |
+| Persistence | Stored on profile, mutable | Immutable, stored with event |
+| How to set | `people.set()`, `people.increment()`, etc. | Second argument to `Cryptique.track()` |
+| Use case | Who the user is | What happened in this event |
 
-**Example**:
+## Privacy
 
-```javascript
-// Profile property - describes the user
-Cryptique.people.set({ plan: 'pro' });
-
-// Event property - describes this specific action
-Cryptique.track('feature_used', {
-  feature_name: 'advanced_charts',  // event context
-  // plan: 'pro' - available from profile in reports
-});
-```
-
-## Best Practices
-
-### Set meaningful properties
-
-```javascript
-// ✅ Good - Useful for segmentation
-Cryptique.identify('user_12345');
-Cryptique.people.set({
-  plan: 'pro',
-  company_size: 'enterprise',
-  industry: 'defi',
-  signup_source: 'product_hunt'
-});
-
-// ❌ Avoid - Not useful
-Cryptique.identify('user_12345');
-Cryptique.people.set({
-  random_id: 'abc123',
-  internal_flag: true
-});
-```
-
-### Use appropriate methods
-
-```javascript
-// ✅ set() for current state
-Cryptique.people.set({ plan: 'pro' });
-
-// ✅ set_once() for first occurrence
-Cryptique.people.set_once({ first_purchase_date: '2024-01-15' });
-
-// ✅ increment() for counters
-Cryptique.people.increment({ login_count: 1 });
-
-// ❌ Don't use set() for counters
-Cryptique.people.set({ login_count: 47 }); // Race condition!
-```
-
-### Handle privacy
-
-```javascript
-// ✅ Only collect necessary data
-Cryptique.identify('user_12345');
-Cryptique.people.set({
-  plan: 'pro',
-  country: 'US'
-});
-
-// ❌ Don't collect sensitive data unnecessarily
-Cryptique.identify('user_12345');
-Cryptique.people.set({
-  ssn: '123-45-6789',        // Never!
-  credit_card: '4111...',    // Never!
-  password: '...'            // Never!
-});
-```
+Wallet addresses are stored as-is and are pseudonymous — they are not inherently linked to a real-world identity unless the user explicitly provides identifying information (e.g. via `identify()` with an email). See [Privacy & Compliance](/admin/privacy-and-compliance) for full details on how wallet data is handled.
 
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="People Methods" icon="users" href="/data-in/sdk-reference/people">
-    Full people API reference
+  <Card title="People SDK Reference" icon="code" href="/data-in/sdk-reference/people">
+    Set and manage profile properties
   </Card>
   <Card title="Wallet Methods" icon="wallet" href="/data-in/sdk-reference/wallet">
-    Wallet connection methods
+    Link wallet addresses to profiles
   </Card>
 </CardGroup>
