@@ -205,15 +205,13 @@ updated_at: '2024-01-16T14:20:00Z'
 ### Identity Properties
 
 ```javascript
-Cryptique.identify('user_12345', {
+Cryptique.identify('user_12345');
+
+Cryptique.people.set({
   // Standard identity
   email: 'user@example.com',
   username: 'defi_whale',
   name: 'John Doe',
-  
-  // Avoid generic names
-  // ❌ id: '12345'        // Use distinct_id instead
-  // ❌ data: {...}        // Too vague
 });
 ```
 

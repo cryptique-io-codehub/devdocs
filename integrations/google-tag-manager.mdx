@@ -178,7 +178,8 @@ Create a tag to identify users when they log in:
 ```html
 <script>
   if (window.Cryptique && '{{User ID}}') {
-    window.Cryptique.identify('{{User ID}}', {
+    window.Cryptique.identify('{{User ID}}');
+    window.Cryptique.people.set({
       email: '{{User Email}}',
       name: '{{User Name}}',
       plan: '{{User Plan}}'

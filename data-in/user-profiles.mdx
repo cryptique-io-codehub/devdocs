@@ -51,10 +51,16 @@ User profiles in Cryptique aggregate all data about a single user: their events,
 
 ### identify()
 
-Link a distinct_id to user properties:
+Link an anonymous user to a known identifier (a `distinct_id`):
 
 ```javascript
-Cryptique.identify('user_12345', {
+Cryptique.identify('user_12345');
+```
+
+Set user profile properties separately:
+
+```javascript
+Cryptique.people.set({
   email: 'user@example.com',
   name: 'John Doe',
   plan: 'pro',
@@ -325,7 +331,8 @@ Cryptique.track('feature_used', {
 
 ```javascript
 // ✅ Good - Useful for segmentation
-Cryptique.identify('user_12345', {
+Cryptique.identify('user_12345');
+Cryptique.people.set({
   plan: 'pro',
   company_size: 'enterprise',
   industry: 'defi',
@@ -333,7 +340,8 @@ Cryptique.identify('user_12345', {
 });
 
 // ❌ Avoid - Not useful
-Cryptique.identify('user_12345', {
+Cryptique.identify('user_12345');
+Cryptique.people.set({
   random_id: 'abc123',
   internal_flag: true
 });
@@ -359,13 +367,15 @@ Cryptique.people.set({ login_count: 47 }); // Race condition!
 
 ```javascript
 // ✅ Only collect necessary data
-Cryptique.identify('user_12345', {
+Cryptique.identify('user_12345');
+Cryptique.people.set({
   plan: 'pro',
   country: 'US'
 });
 
 // ❌ Don't collect sensitive data unnecessarily
-Cryptique.identify('user_12345', {
+Cryptique.identify('user_12345');
+Cryptique.people.set({
   ssn: '123-45-6789',        // Never!
   credit_card: '4111...',    // Never!
   password: '...'            // Never!

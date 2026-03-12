@@ -53,7 +53,10 @@ Cryptique.track('signup_completed', {
 });
 
 // Identify the user
-Cryptique.identify(user.id, {
+Cryptique.identify(user.id);
+
+// Set user properties
+Cryptique.people.set({
   email: user.email,
   name: user.name,
   signup_date: new Date().toISOString(),
