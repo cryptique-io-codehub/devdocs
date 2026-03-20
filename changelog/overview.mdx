@@ -13,6 +13,30 @@ Stay up to date with Cryptique releases, new features, and improvements.
 
 ---
 
+## March 2026
+
+### Week of Mar 16–22
+
+<Update label="Auto Events — Major SDK Overhaul" icon="bolt">
+
+- **15 auto-captured events** (expanded from 8), organized into categories: navigation, interaction, visibility, form, media, error, and performance.
+- **New interaction events**: `rage_click` (3+ clicks on same element in 1s), `dead_click` (click on non-interactive element with no navigation), `text_selection` (≥3 chars selected), `element_view` (element ≥50% visible for ≥1s via IntersectionObserver).
+- **New form events**: `form_validation_error` (HTML5 `invalid` event on a field), `form_abandoned` (page unload with form touched but not submitted; sent via `sendBeacon`).
+- **New media events**: `media_play` and `media_pause` for `<video>` and `<audio>` elements (2s per-element throttle).
+- **New error events**: `js_error` (runtime errors and unhandled promise rejections), `network_error` (XHR status ≥400 or network failure).
+- **New performance event**: `page_performance` fires ~1500ms after `window load` with LCP, CLS, INP, FCP, and TTFB.
+- **Renamed events**: `click` → `element_click`, `scroll` → `page_scroll` with richer payloads.
+- **Removed events**: `input_change` and `copy` replaced by richer, lower-noise alternatives.
+- **Standard Element Data Object**: shared `element_data` sub-object across all interaction events with tag, id, class, type, text, category, and viewport position; extended with media/image fields for relevant click types.
+- **Per-event throttle/debounce**: `page_scroll` 250ms debounce, `text_selection` 300ms debounce + 1s cooldown, `media_play`/`media_pause` 2s per-element throttle, `element_view` fires once per element per load.
+- **JS Runtime API**: `Cryptique.disableAutoEvent()`, `Cryptique.enableAutoEvent()`, `Cryptique.setAutoEventsDisabledEvents()`, `Cryptique.getAutoEventsConfig()`.
+- **Storage**: event payloads written to `auto_event_data` JSONB column; element fields extracted to dedicated indexed columns; `event_category` derived server-side.
+- **Transport**: normal events use `fetch` with `keepalive: true`; unload events use `navigator.sendBeacon`.
+
+</Update>
+
+---
+
 ## February 2026
 
 ### Week of Feb 1–7
