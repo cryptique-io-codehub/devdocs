@@ -87,8 +87,8 @@ For each question, identify what events you need:
 **Question**: *"Which channels drive the most wallet connections?"*
 
 **Events needed**:
-- `page_view` with UTM properties (auto-captured)
-- `wallet_connected` (auto-captured when using wallet.connect())
+- `page_view` with UTM properties (auto-captured when auto-events are on)
+- `wallet_connected` (custom — call `Cryptique.track()` after connect, alongside `Cryptique.walletAddress()`)
 
 **Properties needed**:
 - `utm_source`, `utm_medium`, `utm_campaign` (auto-captured)
@@ -99,8 +99,8 @@ For each question, identify what events you need:
 **Question**: *"What's the conversion rate from landing page to first transaction?"*
 
 **Events needed**:
-- `page_view` on landing page (auto-captured)
-- `wallet_connected` (auto-captured)
+- `page_view` on landing page (auto-captured when auto-events are on)
+- `wallet_connected` (custom event you fire when the user connects)
 - On-chain transaction (captured via smart contract indexing)
 
 **Setup required**:
@@ -108,18 +108,14 @@ For each question, identify what events you need:
 
 ### Step 3: Choose Your Auto-Events
 
-Cryptique captures 10 event types automatically. Enable what's relevant:
+Auto-events are **off** until you set `auto-events="true"` (or call `Cryptique.enableAutoEvents()`). The SDK emits many named events (clicks, scroll, forms, errors, performance, `page_summary`, etc.). Enable the bundle, then **disable** what you do not want:
 
-| Auto-Event | Enable If... |
-|------------|-------------|
-| `page_view` | You have a multi-page site or dApp |
-| `session_start` / `session_end` | You want session-based analysis |
-| `click` | You want to track button/link clicks |
-| `scroll` | Content engagement matters (blogs, docs) |
-| `form_submit` | You have signup or contact forms |
-| `input_change` | You want granular form field tracking |
-| `copy` | Users copy addresses, codes, or content |
-| `wallet_connect` / `wallet_disconnect` | You have Web3 wallet integration |
+| Auto-Event | Disable If... |
+|------------|---------------|
+| `text_selection` / `copy_action` | Clipboard or selection is sensitive |
+| `rage_click` / `dead_click` | You only want raw `element_click` |
+| `page_performance` | You already capture Web Vitals elsewhere |
+| `js_error` / `network_error` | You use another error pipeline (rare) |
 
 Configure in your SDK initialization:
 
@@ -129,10 +125,12 @@ Configure in your SDK initialization:
   script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
   script.setAttribute('site-id', 'your-site-id');
   script.setAttribute('auto-events', 'true');
-  script.setAttribute('auto-events-disabled-events', 'copy,input_change');
+  script.setAttribute('auto-events-disabled-events', 'text_selection,copy_action');
   document.head.appendChild(script);
 </script>
 ```
+
+See [Auto-Events](/data-in/auto-events) for every event name and the JavaScript API. For wallets, use `Cryptique.walletAddress()` and custom `track()` events rather than expecting `wallet_connect` auto events.
 
 ### Step 4: Plan Custom Events
 

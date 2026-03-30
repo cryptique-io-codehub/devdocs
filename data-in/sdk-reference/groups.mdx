@@ -1,0 +1,261 @@
+---
+title: Groups
+description: "Associate users with organizations, teams, or any entity — and track events in context"
+---
+
+## Overview
+
+Groups let you model **B2B-style relationships**: companies, workspaces, teams, departments, or any entity your product has. You assign the **current user** to groups, track events in the context of a specific group, and optionally set **persistent properties on each group** (similar to [People](/data-in/sdk-reference/people), but scoped to that group entity).
+
+<Info>
+  Group APIs live on the root `Cryptique` object. Membership uses `set_group` / `add_group` / `remove_group`. Profile updates use `get_group(groupKey, groupId)` and call methods on the returned object.
+</Info>
+
+---
+
+## Core concepts
+
+| Term | Meaning |
+|------|---------|
+| **Group key** | A string you choose for the *type* of group (e.g. `company`, `team`, `active_team`). |
+| **Group ID** | The identifier for one specific instance of that type (e.g. `acme-inc`, `team-uuid-123`). |
+| **Membership** | Which group IDs the current user belongs to, per group key. Stored in `localStorage` and synced with the server. |
+| **Active context** | The group the user is *currently working in*, used for event attribution. |
+| **Group profile** | Properties attached to a specific `(groupKey, groupId)` pair, updated via `get_group(...).set()`. |
+
+---
+
+## How event attribution works
+
+Every event fired after group membership is set gets **stamped with the user's current group context**. This is how Cryptique knows which group's timeline an event belongs to.
+
+- `add_group` → adds a group to the user's membership list. All subsequent events are attributed to **all current memberships** for that key.
+- `set_group` → **replaces** the user's membership for a given key. Events fired after the switch are attributed to the new group only — not the old one.
+- Historical events (up to 90 days) are backfilled automatically when membership changes.
+
+This means the **group timeline** in Cryptique shows exactly the events that happened while a user was in that group — not all events by all current members.
+
+---
+
+## Group membership
+
+### `Cryptique.set_group(groupKey, groupId)`
+
+**Replaces** the user's membership for `groupKey` with one ID (or an array of IDs). Any previously set IDs for that key are removed.
+
+Use this when the user **switches** their active context (e.g. switching from one team to another).
+
+```javascript
+// User switches to a different team — old team is replaced
+await Cryptique.set_group('active_team', 'team-b-id');
+```
+
+```javascript
+// Also accepts an array to set multiple IDs at once
+await Cryptique.set_group('team', ['engineering', 'design']);
+```
+
+<ParamField path="groupKey" type="string" required>
+  Namespace for this group type (e.g. `active_team`, `company`).
+</ParamField>
+
+<ParamField path="groupId" type="string | string[]" required>
+  Single ID or array of IDs. Replaces the entire previous list for that key.
+</ParamField>
+
+**What happens internally:**
+- Updates `localStorage` immediately (optimistic).
+- Sends to the server, which removes the user from the old group's member list and adds them to the new group.
+- Backfills the last **24 hours** of the user's events: replaces the old group's ID with the new group's ID on those events.
+- Events older than 24 hours keep their original attribution (they were fired while the user was in the old group — correct behaviour).
+
+---
+
+### `Cryptique.add_group(groupKey, groupId)`
+
+**Adds** one group ID to the user's existing list for `groupKey` without removing others. Safe to call multiple times — calling with the same ID twice has no effect.
+
+Use this when a user **joins** a group permanently (e.g. joining a team or organisation they will always be a member of).
+
+```javascript
+// User is a permanent member of this company
+await Cryptique.add_group('company', 'acme-inc');
+
+// User is also a member of this team — both are kept
+await Cryptique.add_group('team', 'engineering');
+await Cryptique.add_group('team', 'design');
+```
+
+<ParamField path="groupKey" type="string" required>
+  Namespace for this group type.
+</ParamField>
+
+<ParamField path="groupId" type="string" required>
+  Must be a single string (not an array). Use `set_group` for arrays.
+</ParamField>
+
+**What happens internally:**
+- Updates `localStorage`, appending the new ID if not already present.
+- Sends to the server, which adds the user to the group's member list (deduplicated).
+- Backfills the last **90 days** of the user's events: appends the new group's ID to those events without removing any existing group attributions.
+
+---
+
+### `Cryptique.remove_group(groupKey, groupId)`
+
+Removes one specific group ID from the user's list for `groupKey`.
+
+```javascript
+await Cryptique.remove_group('team', 'design');
+```
+
+If no IDs remain for that key after removal, the key is deleted from `localStorage`.
+
+**What happens internally:**
+- Removes the user from the group's member list on the server.
+- Strips the group's ID from the last **24 hours** of the user's events so they no longer appear in that group's timeline.
+
+---
+
+## Recommended pattern for multi-team SaaS apps
+
+Most B2B apps have users who belong to multiple teams permanently but only work in one team at a time. Use **two separate group keys**:
+
+| Key | Method | Purpose |
+|-----|--------|---------|
+| `team` | `add_group` | Permanent membership — all teams the user belongs to |
+| `active_team` | `set_group` | Current active workspace — drives event attribution |
+
+```javascript
+// On login — user joins their teams permanently
+await Cryptique.add_group('team', 'team-a-id');
+await Cryptique.add_group('team', 'team-b-id');
+
+// Set the currently active team (for event attribution)
+await Cryptique.set_group('active_team', 'team-a-id');
+
+// User switches to Team B
+await Cryptique.set_group('active_team', 'team-b-id');
+// → events fired from here are attributed to team-b only
+// → events fired earlier stay attributed to team-a
+```
+
+**Result in Cryptique:**
+- The `team` group page for `team-a` shows the user as a **member** (permanent).
+- The `active_team` group page for `team-a` shows only **events fired while team-a was active**.
+- The `active_team` group page for `team-b` shows only **events fired while team-b was active**.
+
+---
+
+## Group profile (properties per group)
+
+### `Cryptique.get_group(groupKey, groupId)`
+
+Returns a **synchronous** handle with profile methods. Each method sends a network request when called. This is for setting **properties on the group entity itself** — not for event attribution.
+
+```javascript
+const team = Cryptique.get_group('team', 'team-a-id');
+
+await team.set({ name: 'Engineering', plan: 'enterprise', seat_count: 50 });
+await team.set_once({ created_at: '2024-01-01' });
+await team.union('tags', ['b2b', 'saas']);
+await team.remove('tags', 'b2b');
+await team.increment('seat_count', 5);
+await team.unset('plan');
+await team.delete();
+```
+
+| Method | Description |
+|--------|-------------|
+| `set(properties)` | Set or overwrite group properties. |
+| `set_once(properties)` | Set only if the property is not already set. |
+| `union(listName, values)` | Add unique values to a list property. |
+| `remove(listName, value)` | Remove one value from a list property. |
+| `append(property, value)` | Append a value to a list property (allows duplicates). |
+| `increment(property, value)` | Increment a numeric property by `value` (default: 1). |
+| `unset(property)` | Remove one property from the group profile. |
+| `delete()` | Delete the entire group profile. |
+
+Returns `null` if `groupKey` or `groupId` is missing.
+
+<Info>
+  `get_group` is **only** for profile operations — setting properties on the group entity. It has no effect on event attribution. To control which events are attributed to a group, use `set_group` or `add_group`.
+</Info>
+
+---
+
+## identify() and cross-device membership
+
+When `identify()` completes, the server returns `group_memberships` and the SDK **hydrates local membership** from that payload. This ensures the same user has consistent group assignments when logging in on a new device or browser.
+
+See [Identify](/data-in/sdk-reference/identify) for when to call `identify()`.
+
+---
+
+## Full example: SaaS app login flow
+
+```javascript
+// 1. Identify the user
+await Cryptique.identify(user.id);
+
+// 2. Set user profile properties
+Cryptique.people.set({
+  email: user.email,
+  name: user.name,
+  plan: user.plan
+});
+
+// 3. Add permanent team memberships (all teams this user belongs to)
+for (const team of user.teams) {
+  await Cryptique.add_group('team', team.id);
+}
+
+// 4. Set the active team context (drives event attribution)
+await Cryptique.set_group('active_team', user.currentTeamId);
+
+// 5. Set properties on the active team's profile
+const activeTeam = Cryptique.get_group('active_team', user.currentTeamId);
+await activeTeam.set({
+  name: user.currentTeam.name,
+  plan: user.currentTeam.plan,
+  member_count: user.currentTeam.memberCount
+});
+
+// 6. Track events — these are attributed to the active team
+Cryptique.track('dashboard_opened', { section: 'overview' });
+
+// 7. When user switches team
+await Cryptique.set_group('active_team', newTeamId);
+// → all subsequent events attributed to newTeamId
+```
+
+---
+
+## Comparison: People vs Groups
+
+| | People | Groups |
+|---|--------|--------|
+| **What it describes** | The end user | An organization, team, or entity the user belongs to |
+| **Namespace** | `Cryptique.people.*` | `Cryptique.set_group` / `add_group` / `get_group` on root |
+| **Typical first step** | `Cryptique.identify(id)` | `Cryptique.add_group('team', id)` or `Cryptique.set_group(...)` |
+| **Profile updates** | `Cryptique.people.set({...})` | `Cryptique.get_group(key, id).set({...})` |
+| **Membership** | Single user, always tied to `identify()` | One user can belong to many groups across many keys |
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="People" icon="user" href="/data-in/sdk-reference/people">
+    User profile properties
+  </Card>
+  <Card title="Identify" icon="id-card" href="/data-in/sdk-reference/identify">
+    User identity and cross-device merge
+  </Card>
+  <Card title="Track" icon="code" href="/data-in/sdk-reference/track">
+    Custom events
+  </Card>
+  <Card title="Auto-Events" icon="bolt" href="/data-in/auto-events">
+    Automatic event capture
+  </Card>
+</CardGroup>

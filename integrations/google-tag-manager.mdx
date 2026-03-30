@@ -66,7 +66,7 @@ Google Tag Manager (GTM) provides a flexible way to deploy Cryptique without mod
   script.setAttribute('site-id', 'YOUR_SITE_ID');
   script.setAttribute('auto-events', 'true');
   script.setAttribute('auto-events-disabled-paths', '/admin,/internal,/checkout');
-  script.setAttribute('auto-events-disabled-events', 'copy,input_change');
+  script.setAttribute('auto-events-disabled-events', 'text_selection,copy_action');
   document.head.appendChild(script);
 </script>
 ```

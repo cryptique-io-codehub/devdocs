@@ -28,9 +28,9 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     | Attribute | Type | Default | Description |
     |-----------|------|---------|-------------|
     | `site-id` | string | required | Your unique site identifier |
-    | `auto-events` | boolean | `true` | Enable automatic event tracking |
+    | `auto-events` | string | omitted (= off) | Set to **`true`** to enable automatic event tracking; any other value leaves auto-events **disabled** |
     | `auto-events-disabled-paths` | string | `''` | Comma-separated paths to exclude |
-    | `auto-events-disabled-events` | string | `''` | Comma-separated events to disable |
+    | `auto-events-disabled-events` | string | `''` | Comma-separated auto event names to disable (see [Auto-Events](/data-in/auto-events)) |
 
     ### Full Configuration Example
 
@@ -41,7 +41,7 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
       script.setAttribute('site-id', 'myapp-com-42');
       script.setAttribute('auto-events', 'true');
       script.setAttribute('auto-events-disabled-paths', '/admin,/internal');
-      script.setAttribute('auto-events-disabled-events', 'copy,input_change');
+      script.setAttribute('auto-events-disabled-events', 'text_selection,copy_action');
       document.head.appendChild(script);
     </script>
     ```
@@ -131,9 +131,9 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
         '/admin',
         '/checkout'
       ],
-      autoEventsDisabledEvents: [          // Events to disable
-        'copy',
-        'input_change'
+      autoEventsDisabledEvents: [          // Auto event names to disable
+        'text_selection',
+        'copy_action'
       ],
       debug: false                         // Enable console logging
     });
@@ -309,7 +309,7 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
       script.setAttribute('site-id', 'YOUR_SITE_ID');
       script.setAttribute('auto-events', 'true');
       script.setAttribute('auto-events-disabled-paths', '/admin,/internal');
-      script.setAttribute('auto-events-disabled-events', 'copy,input_change');
+      script.setAttribute('auto-events-disabled-events', 'text_selection,copy_action');
       document.head.appendChild(script);
     </script>
     ```

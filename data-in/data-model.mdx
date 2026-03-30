@@ -38,7 +38,7 @@ Events are discrete actions that users take. They form the foundation of behavio
 ```
 
 **Event Types**:
-- **Auto-events**: Automatically captured (page_view, click, scroll, etc.)
+- **Auto-events**: Captured when enabled (`page_view`, `element_click`, `page_scroll`, `page_summary`, etc.) — see [Auto-Events](/data-in/auto-events)
 - **Custom events**: Tracked via `Cryptique.track()`
 - **Transaction events**: Generated from indexed smart contracts
 
@@ -80,6 +80,10 @@ User profiles aggregate all activity for a single user, identified by `distinct_
 - **Computed**: Derived from event history
 
 See [User Profiles](/data-in/user-profiles) for details.
+
+### Groups
+
+Users can belong to **groups** (companies, workspaces, teams) under a string **group key** and one or more **group IDs**. Membership is updated with `Cryptique.set_group` / `add_group` / `remove_group`. Properties on the group itself (not the person) are updated via `Cryptique.get_group(key, id).set(...)`. Group fields are merged into event `custom_properties` when events are sent. See [Groups](/data-in/sdk-reference/groups).
 
 ### Transactions
 
@@ -133,7 +137,7 @@ Once a wallet is linked, all transactions from that wallet are attributed to the
 ```mermaid
 flowchart TB
     P[User Profile<br/>distinct_id: anon_xyz789]
-    P --> E[Events<br/>page_view, click, wallet_connect]
+    P --> E[Events<br/>page_view, element_click, custom…]
     P --> W[Wallet: 0x1234...]
     P --> T[Transactions]
     T --> T1[Swap Jan 15]

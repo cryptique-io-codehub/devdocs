@@ -68,6 +68,7 @@
               "data-in/sdk-reference/track",
               "data-in/sdk-reference/identify",
               "data-in/sdk-reference/people",
+              "data-in/sdk-reference/groups",
               "data-in/sdk-reference/wallet"
             ]
           },

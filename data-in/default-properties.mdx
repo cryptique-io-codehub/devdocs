@@ -117,61 +117,25 @@ Blockchain-related properties:
 
 ## Event-Specific Properties
 
-Some auto-events capture additional properties:
+Auto events attach a **payload** in addition to the default properties above. Names and shapes differ per `event_name`.
 
-### click Event
+<Info>
+  For the full list of auto events, when they fire, and privacy notes, see [Auto-Events](/data-in/auto-events).
+</Info>
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `element_name` | string | Element name attribute |
-| `element_id` | string | Element ID attribute |
-| `element_class` | string | Element CSS classes |
-| `element_tag` | string | HTML tag name |
-| `element_text` | string | Element text content (truncated) |
-| `element_href` | string | Link href (for `<a>` tags) |
+### Examples (current SDK)
 
-### scroll Event
+**`element_click`** — includes viewport and page coordinates, document dimensions, and element metadata such as `element_tag_name`, `element_id`, `element_class`, `element_name`, `element_text` (truncated), `element_category`, and `click_coordinates`.
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `scroll_depth` | number | Scroll percentage (25, 50, 75, 100) |
-| `scroll_direction` | string | `"down"` or `"up"` |
-| `page_height` | number | Total page height |
-| `viewport_height` | number | Visible area height |
+**`page_scroll`** — includes `scroll_depth`, `max_scroll_reached`, `scroll_position`, `scroll_x` / `scroll_y`, and document width/height.
 
-### form_submit Event
+**`form_submit`** — includes `form_id`, `form_action`, `form_method`, scroll/page context, and element metadata for the form (not field values).
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `form_id` | string | Form ID attribute |
-| `form_name` | string | Form name attribute |
-| `form_action` | string | Form action URL |
-| `form_method` | string | `"GET"` or `"POST"` |
+**`copy_action`** — includes `text_length` and coarse element info (not full clipboard contents).
 
-### input_change Event
+**`page_summary`** — large aggregate object: e.g. `move_grid`, `hover_grid`, `field_dwells`, `viewport_element_dwells`, `exit_type`, performance fields, and more.
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `input_name` | string | Input name attribute |
-| `input_type` | string | Input type (text, email, etc.) |
-| `input_id` | string | Input ID attribute |
-| `form_id` | string | Parent form ID |
-
-### wallet_connect Event
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `wallet_address` | string | Connected wallet address |
-| `wallet_type` | string | Wallet provider (metamask, etc.) |
-| `chain_id` | number | Connected chain ID |
-| `is_reconnect` | boolean | Was previously connected |
-
-### copy Event
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `copied_text` | string | Copied text (truncated to 100 chars) |
-| `source_element` | string | Element ID/class of source |
+Wallet connection is **not** an auto-event in the SDK; use **`Cryptique.walletAddress()`** and custom **`Cryptique.track()`** calls if you want explicit wallet lifecycle events in the event stream.
 
 ## Using Default Properties
 
@@ -239,14 +203,17 @@ Default properties are designed with privacy in mind:
 | Location | Approximate (city-level), not precise |
 | IP Address | Not stored or exposed |
 | Form values | Not captured (only form metadata) |
-| Copied text | Truncated to 100 characters |
+| Copy / selection | Auto events use length caps and truncated text where applicable; disable `text_selection` or `copy_action` if needed |
 
 See [Privacy & Compliance](/admin/privacy-and-compliance) for more details.
 
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Events & Properties" icon="bolt" href="/data-in/events-and-properties">
+  <Card title="Auto-Events" icon="bolt" href="/data-in/auto-events">
+    Full auto event catalog
+  </Card>
+  <Card title="Events & Properties" icon="layer-group" href="/data-in/events-and-properties">
     Custom properties guide
   </Card>
   <Card title="Filters & Operators" icon="filter" href="/analysis/filters-and-operators">

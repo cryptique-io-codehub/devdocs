@@ -64,7 +64,7 @@ When you call `Cryptique.identify('your_user_id')`, the anonymous profile is mer
 
 ### Step 3 — Property enrichment
 
-Profile properties are added from four sources:
+Profile properties are added from these sources:
 
 | Source | How |
 |---|---|
@@ -72,6 +72,9 @@ Profile properties are added from four sources:
 | `people.set/increment/append` | Sets custom properties via SDK |
 | `Cryptique.walletAddress()` | Links a wallet address to the profile |
 | Wallet enrichment (automatic) | Adds on-chain properties once a wallet is linked |
+| `identify()` response | Can restore **group memberships** server-side (see [Groups](/data-in/sdk-reference/groups)) |
+
+**Groups** (companies, workspaces, etc.) are modeled separately from the user profile: you assign the user with `set_group` and set entity-level properties with `get_group(key, id).set(...)`.
 
 ## Wallet Enrichment
 
@@ -96,8 +99,8 @@ In the dashboard, each profile displays a unified timeline of all off-chain even
 user_12345 Timeline
 ───────────────────
 Jan 1, 10:00  │ page_view         │ Landing page
-Jan 1, 10:02  │ click             │ "Learn More" button
-Jan 2, 14:30  │ wallet_connect    │ 0x1234... (MetaMask)
+Jan 1, 10:02  │ element_click     │ "Learn More" button
+Jan 2, 14:30  │ wallet_connected  │ custom event + walletAddress()
 Jan 2, 14:35  │ swap_initiated    │ ETH → USDC
 Jan 2, 14:36  │ [Transaction]     │ swapExactTokensForTokens
 Jan 5, 09:00  │ identify          │ email: user@example.com
@@ -130,6 +133,9 @@ Wallet addresses are stored as-is and are pseudonymous — they are not inherent
 <CardGroup cols={2}>
   <Card title="People SDK Reference" icon="code" href="/data-in/sdk-reference/people">
     Set and manage profile properties
+  </Card>
+  <Card title="Groups" icon="users" href="/data-in/sdk-reference/groups">
+    Companies, teams, and group profiles
   </Card>
   <Card title="Wallet Methods" icon="wallet" href="/data-in/sdk-reference/wallet">
     Link wallet addresses to profiles

@@ -39,20 +39,28 @@ Every event has this structure:
 
 ### Auto-Events
 
-Captured automatically when enabled:
+Captured automatically **only when** `auto-events="true"` (or `Cryptique.enableAutoEvents()`). Examples of implemented names:
 
-| Event | Trigger |
-|-------|---------|
-| `page_view` | Page load or SPA navigation |
-| `session_start` | New session begins |
-| `session_end` | 30-min inactivity |
-| `click` | User clicks interactive element |
-| `scroll` | Scroll depth milestones |
-| `form_submit` | Form submission |
-| `input_change` | Form field interaction |
-| `copy` | Text copy action |
-| `wallet_connect` | Wallet connected |
-| `wallet_disconnect` | Wallet disconnected |
+| Event | Trigger (summary) |
+|-------|-------------------|
+| `page_view` | Load / route |
+| `element_click` | Any click |
+| `rage_click` | Rapid repeated clicks on the same element |
+| `dead_click` | Click with no navigation or DOM change after a short window |
+| `page_scroll` | Increasing scroll depth |
+| `form_submit` | Form submit |
+| `form_validation_error` | Native invalid field |
+| `form_abandoned` | Started a form, left without submit |
+| `media_play` / `media_pause` | Video or audio |
+| `text_selection` | Text highlighted |
+| `copy_action` / `context_menu` | Copy / right-click |
+| `js_error` / `network_error` | Errors (when enabled) |
+| `page_performance` | Core vitals-style summary after load |
+| `exit_intent` / `page_summary` | Engagement / exit aggregates |
+
+See [Auto-Events](/data-in/auto-events) for the full catalog, script attributes, and JavaScript API.
+
+Custom properties on each event may also include [group](/data-in/sdk-reference/groups) membership fields merged from `set_group` / `add_group`.
 
 ### Custom Events
 
@@ -188,39 +196,37 @@ Cryptique.track('purchase_completed', {
 
 ### Event-Specific Properties
 
-Some auto-events capture additional properties:
+Auto event payloads vary by `event_name`. Examples:
 
-**click**:
+**`element_click`** (abbreviated):
 ```javascript
 {
-  "element_name": "swap_button",
+  "click_coordinates": { "x": 120, "y": 340 },
+  "page_x": 120,
+  "page_y": 540,
+  "scroll_x": 0,
+  "scroll_y": 200,
+  "document_height": 3200,
+  "document_width": 1280,
+  "double_click": false,
+  "element_category": "button",
+  "element_tag_name": "button",
   "element_id": "btn-swap",
-  "element_class": "btn btn-primary",
-  "element_tag": "BUTTON",
-  "element_text": "Swap Now",
-  "element_href": null
+  "element_text": "Swap now"
 }
 ```
 
-**scroll**:
+**`page_scroll`**:
 ```javascript
 {
-  "scroll_depth": 75,
-  "scroll_direction": "down",
-  "page_height": 3200,
-  "viewport_height": 800
+  "scroll_depth": 72,
+  "max_scroll_reached": 72,
+  "scroll_position": 2100,
+  "document_height": 3200
 }
 ```
 
-**wallet_connect**:
-```javascript
-{
-  "wallet_address": "0x1234...",
-  "wallet_type": "metamask",
-  "chain_id": 1,
-  "is_reconnect": false
-}
-```
+Wallet lifecycle is not emitted as a built-in auto-event; track it explicitly with `Cryptique.walletAddress()` and `Cryptique.track('wallet_connected', { ... })` if needed.
 
 ## Property Data Types
 
@@ -330,6 +336,12 @@ Avoid properties with unlimited unique values:
 <CardGroup cols={2}>
   <Card title="Track Events" icon="code" href="/data-in/sdk-reference/track">
     Learn the track() method
+  </Card>
+  <Card title="Auto-Events" icon="bolt" href="/data-in/auto-events">
+    Automatic event names and configuration
+  </Card>
+  <Card title="Groups" icon="users" href="/data-in/sdk-reference/groups">
+    Group keys, membership, and enrichment
   </Card>
   <Card title="Default Properties" icon="list" href="/data-in/default-properties">
     Full property reference

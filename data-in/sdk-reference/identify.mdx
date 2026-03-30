@@ -201,6 +201,8 @@ When you call `identify()`:
 
 3. **Existing User, New Device**: If the `identifyId` exists from another device, Cryptique's CQ Intelligence merges the profiles automatically.
 
+4. **Group memberships**: When the server returns `group_memberships` for this user, the SDK restores them locally so [group](/data-in/sdk-reference/groups) assignments stay in sync across devices.
+
 ```mermaid
 flowchart LR
     A[Anonymous User] --> B{identify called}
@@ -307,6 +309,9 @@ function logout() {
 <CardGroup cols={2}>
   <Card title="User Properties" icon="user-gear" href="/data-in/sdk-reference/people">
     Set persistent user attributes
+  </Card>
+  <Card title="Groups" icon="users" href="/data-in/sdk-reference/groups">
+    Company and team associations
   </Card>
   <Card title="Wallet Methods" icon="wallet" href="/data-in/sdk-reference/wallet">
     Track wallet connections

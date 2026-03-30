@@ -1,285 +1,196 @@
 ---
 title: "Auto-Events"
-description: "Events automatically captured by Cryptique without additional code"
+description: "Events captured automatically by the Cryptique SDK when enabled"
 ---
 
 ## Overview
 
-When `auto-events` is enabled, Cryptique automatically captures user interactions without requiring any additional code. This provides comprehensive behavioral data out of the box.
+**Auto-events are off by default.** They run only when you either:
 
-## Automatic Events
+- Set **`auto-events="true"`** on the analytics script tag, or  
+- Call **`Cryptique.enableAutoEvents()`** after load.
 
-| Event | Description | Key Properties |
-|-------|-------------|----------------|
-| `page_view` | Page load or navigation | `current_url`, `page_title`, `referrer` |
-| `click` | Element clicked | `element_name`, `element_id`, `element_class` |
-| `scroll` | Scroll depth milestones | `scroll_depth`, `scroll_direction` |
-| `form_submit` | Form submission | `form_id`, `form_name`, `form_action` |
-| `input_change` | Form field changed | `input_name`, `input_type` |
-| `copy` | Text copied | `copied_text` (truncated) |
-| `wallet_connect` | Wallet connected | `wallet_address`, `wallet_type` |
-| `wallet_disconnect` | Wallet disconnected | `wallet_address` |
-
-## Event Details
-
-### page_view
-
-Captured on every page load and client-side navigation (SPA).
-
-```json
-{
-  "event_name": "page_view",
-  "properties": {
-    "current_url": "https://app.example.com/swap",
-    "page_title": "Swap Tokens | Example DEX",
-    "referrer": "https://google.com/search?q=...",
-    "uri": "/swap"
-  }
-}
-```
-
-**SPA Support**: Automatically detects History API navigation (`pushState`, `replaceState`) and hash changes.
-
-### click
-
-Captures clicks on interactive elements.
-
-```json
-{
-  "event_name": "click",
-  "properties": {
-    "element_name": "swap_button",
-    "element_id": "btn-swap",
-    "element_class": "btn btn-primary",
-    "element_tag": "BUTTON",
-    "element_text": "Swap Now",
-    "element_href": null,
-    "current_url": "https://app.example.com/swap"
-  }
-}
-```
-
-**Captured Elements**:
-- Buttons (`<button>`)
-- Links (`<a>`)
-- Elements with `onclick` handlers
-- Elements with `role="button"`
-
-### scroll
-
-Tracks scroll depth at 25%, 50%, 75%, and 100% milestones.
-
-```json
-{
-  "event_name": "scroll",
-  "properties": {
-    "scroll_depth": 50,
-    "scroll_direction": "down",
-    "page_height": 3200,
-    "viewport_height": 800
-  }
-}
-```
-
-**Note**: Each milestone is tracked once per page view.
-
-### form_submit
-
-Captures form submissions.
-
-```json
-{
-  "event_name": "form_submit",
-  "properties": {
-    "form_id": "signup-form",
-    "form_name": "newsletter_signup",
-    "form_action": "/api/subscribe",
-    "form_method": "POST"
-  }
-}
-```
+When enabled, the SDK sends named **auto events** through the same pipeline as `Cryptique.track()`, including default properties and (when configured) [group](/data-in/sdk-reference/groups) enrichment.
 
 <Warning>
-Form field values are NOT captured automatically to protect sensitive data. Use custom events to track specific non-sensitive fields.
+  If auto-events are disabled, **`trackAutoEvent` does not send** any of the events below — including error, performance, and page summary events. They all share the same global switch and filters.
 </Warning>
 
-### input_change
+---
 
-Tracks form field interactions (focus/blur).
+## Gating and filters
 
-```json
-{
-  "event_name": "input_change",
-  "properties": {
-    "input_name": "email",
-    "input_type": "email",
-    "input_id": "email-field",
-    "form_id": "signup-form"
-  }
-}
-```
+Three layers apply before an auto event is sent:
 
-### copy
+1. **Global:** `CONFIG.AUTO_EVENTS.enabled` (script attribute or `enableAutoEvents` / `disableAutoEvents`).
+2. **Path:** `auto-events-disabled-paths` or `Cryptique.setAutoEventsDisabledPaths()` — prefix match on `pathname` (e.g. `/admin` matches `/admin` and `/admin/users`).
+3. **Per event:** `auto-events-disabled-events` or `Cryptique.disableAutoEvent('event_name')` — names are compared **case-insensitively**.
 
-Tracks text copy actions (Ctrl+C, right-click copy).
+**SPA navigation:** On `pushState`, `replaceState`, and `popstate`, the SDK re-evaluates path rules. If the new route allows auto-events and setup has not run, listeners are attached.
 
-```json
-{
-  "event_name": "copy",
-  "properties": {
-    "copied_text": "0x1234...abcd",
-    "source_element": "wallet-address"
-  }
-}
-```
+---
 
-**Privacy**: Long text is truncated to 100 characters.
+## JavaScript API
 
-### wallet_connect / wallet_disconnect
-
-Captures wallet connection state changes.
-
-```json
-{
-  "event_name": "wallet_connect",
-  "properties": {
-    "wallet_address": "0x1234567890abcdef1234567890abcdef12345678",
-    "wallet_type": "metamask",
-    "chain_id": 1,
-    "is_reconnect": false
-  }
-}
-```
+| Method | Purpose |
+|--------|---------|
+| `Cryptique.enableAutoEvents()` | Turn on auto-events and run setup if the current path allows it. |
+| `Cryptique.disableAutoEvents()` | Turn off all auto event sending. |
+| `Cryptique.setAutoEventsDisabledPaths(paths)` | Set path exclusions (string or array of strings). |
+| `Cryptique.disableAutoEvent(events)` | Add event name(s) to the disabled list. |
+| `Cryptique.enableAutoEvent(events)` | Remove event name(s) from the disabled list. |
+| `Cryptique.setAutoEventsDisabledEvents(events)` | Replace the entire disabled-event list. |
+| `Cryptique.getAvailableAutoEvents()` | Returns the **primary interaction** event names (subset; see note below). |
+| `Cryptique.getAutoEventsConfig()` | Returns `{ enabled, disabledPaths, disabledEvents, availableEvents, currentPath, shouldTrack }`. |
 
 <Note>
-For automatic wallet detection to work, ensure your wallet integration fires standard events. For custom implementations, use `Cryptique.walletAddress()`.
+  **`getAvailableAutoEvents()`** currently returns: `page_view`, `element_click`, `rage_click`, `dead_click`, `page_scroll`, `form_submit`, `form_focus`, `media_play`, `media_pause`, `text_selection`.  
+  Other auto events in the table below (e.g. `js_error`, `page_summary`) are still real events and can be **disabled by name** via `auto-events-disabled-events` or `disableAutoEvent`, even though they are not in that array.  
+  **`form_focus`** is listed for API symmetry; per-field focus is summarized in aggregates (e.g. `page_summary`) rather than emitted as its own high-volume auto event — see [Forms](#forms).
 </Note>
 
-## Configuration
+---
 
-### Disable Specific Events
+## Event catalog (implemented names)
 
-Disable events you don't need:
+Use these **exact** `event_name` values in dashboards, filters, and `auto-events-disabled-events`.
+
+### Navigation & page
+
+| Event | When it fires | Notes |
+|-------|----------------|-------|
+| `page_view` | After load (short delay) for the current route | Includes timing hints such as `page_load_time`, `scroll_position`. SPA route changes are covered by the tracker setup + navigation hooks. |
+
+### Clicks & scroll
+
+| Event | When it fires | Notes |
+|-------|----------------|-------|
+| `element_click` | Every click | Includes viewport and page coordinates, document dimensions, `double_click`, element metadata (`element_tag_name`, `element_id`, `element_text`, etc.). |
+| `rage_click` | ≥ 3 clicks on the **same** element within 1 s, debounced 800 ms after the last click | Sends final `click_count`, `time_span`, scroll/page context. |
+| `dead_click` | Click on a **non-interactive** element, and after 800 ms the URL and DOM mutation snapshot are unchanged | Reduces false positives when SPAs update the DOM without navigation. |
+| `page_scroll` | Scroll position updates (debounced); fires when **max** scroll depth increases | Properties include `scroll_depth`, `max_scroll_reached`, `scroll_position`, document size. |
+
+### Forms
+
+| Event | When it fires | Notes |
+|-------|----------------|-------|
+| `form_submit` | `submit` on a `<form>` | Captures form id, action, method, positions — **not** field values. |
+| `form_validation_error` | Browser `invalid` event on inputs / textareas | Field metadata and `validation_message` only. |
+| `form_abandoned` | User focused / filled fields then leaves without submit (`beforeunload`) | Counts filled fields, last field, time on form. |
+
+<Tip>
+  **Per-keystroke** focus/blur/change events are **not** emitted as separate auto-events (to avoid noise). Attention and field timing appear in **`page_summary`** (e.g. `field_dwells`).
+</Tip>
+
+### Media
+
+| Event | When it fires | Notes |
+|-------|----------------|-------|
+| `media_play` | `play` on `<video>` or `<audio>` | Throttled per element (~2 s) to reduce scrubbing noise. |
+| `media_pause` | `pause` on `<video>` or `<audio>` | Same throttling. |
+
+### Selection & clipboard
+
+| Event | When it fires | Notes |
+|-------|----------------|-------|
+| `text_selection` | User selects text (debounced); meaningful length ≥ 3 chars, 1 s cooldown | Selected text capped (e.g. 500 chars in payload); includes page and element context. |
+| `copy_action` | Native `copy` | Does not include full copied text by default; includes length and coarse element info. |
+| `context_menu` | Right-click (`contextmenu`) | Element tag/id/class and coordinates. |
+
+### Errors & network
+
+| Event | When it fires | Notes |
+|-------|----------------|-------|
+| `js_error` | `window.error` and unhandled promise rejections | Deduplicated (~10 s). Includes `error_class`, `last_event_name` (last non-error auto event). |
+| `network_error` | Fetch/XHR failures or HTTP ≥ 400 for **same-origin** `fetch` (and configured SDK XHR targets) | Cross-origin requests are intentionally not wrapped. |
+
+### Performance
+
+| Event | When it fires | Notes |
+|-------|----------------|-------|
+| `page_performance` | After `load` + delay | Core Web Vitals–style metrics where available: e.g. LCP, CLS, INP, FCP, TTFB, slowest resources. |
+
+### Engagement summary
+
+| Event | When it fires | Notes |
+|-------|----------------|-------|
+| `exit_intent` | Mouse leaves viewport **top edge** (debounced ~2 s) | Scroll depth and time on page. |
+| `page_summary` | `pagehide` or `visibilitychange` (tab hidden) | Single aggregate: movement/hover grids, tab switches, scroll reversals, field dwells, viewport element dwells, CLS/long tasks/INP, exit classification, etc. |
+
+### Not emitted in current builds
+
+| Name | Status |
+|------|--------|
+| `element_view` | **Disabled** — individual visibility events were replaced by **`viewport_element_dwells`** (and related fields) inside `page_summary`. |
+| `session_start` / `session_end` | **Not** sent as separate auto events in the SDK (session boundaries are handled via session cookies / backend). |
+| `media_ended` | **Not** emitted (play/pause only). |
+| `element_hover` | **Not** emitted as its own auto event; hover signal is aggregated in `page_summary`. |
+
+Wallet connect/disconnect are **not** auto-events in this SDK — use **`Cryptique.walletAddress()`** and/or **`Cryptique.track()`** for wallet lifecycle.
+
+---
+
+## Configuration examples
+
+### Script tag
 
 ```html
 <script>
   var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';
   script.setAttribute('site-id', 'YOUR_SITE_ID');
   script.setAttribute('auto-events', 'true');
-  script.setAttribute('auto-events-disabled-events', 'copy,input_change,scroll');
+  script.setAttribute('auto-events-disabled-paths', '/admin,/internal');
+  script.setAttribute('auto-events-disabled-events', 'text_selection,copy_action,page_performance');
   document.head.appendChild(script);
 </script>
 ```
 
-### Exclude Paths
-
-Prevent tracking on specific pages:
-
-```html
-<script>
-  var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
-  script.setAttribute('site-id', 'YOUR_SITE_ID');
-  script.setAttribute('auto-events', 'true');
-  script.setAttribute('auto-events-disabled-paths', '/admin,/internal,/debug');
-  document.head.appendChild(script);
-</script>
-```
-
-**Path Matching**:
-- `/admin` matches `/admin`, `/admin/users`, `/admin/settings`
-- Paths are matched from the start
-- Case-sensitive
-
-### Disable All Auto-Events
-
-For complete manual control:
-
-```html
-<script>
-  var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
-  script.setAttribute('site-id', 'YOUR_SITE_ID');
-  script.setAttribute('auto-events', 'false');
-  document.head.appendChild(script);
-</script>
-```
-
-## Best Practices
-
-### Recommended Configuration
-
-For most Web3 apps:
-
-```html
-<script>
-  var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
-  script.setAttribute('site-id', 'YOUR_SITE_ID');
-  script.setAttribute('auto-events', 'true');
-  // Disable noisy events that may not be useful
-  script.setAttribute('auto-events-disabled-events', 'input_change');
-  // Exclude admin/internal pages
-  script.setAttribute('auto-events-disabled-paths', '/admin');
-  document.head.appendChild(script);
-</script>
-```
-
-### When to Disable Auto-Events
-
-Consider disabling for:
-
-| Scenario | Recommendation |
-|----------|----------------|
-| High-traffic marketing pages | Keep `page_view`, disable `click`, `scroll` |
-| Data-entry heavy apps | Disable `input_change` |
-| Admin dashboards | Exclude path entirely |
-| Sensitive pages | Disable `copy`, exclude path |
-
-### Supplement with Custom Events
-
-Auto-events capture generic interactions. Add custom events for business-specific actions:
+### Runtime
 
 ```javascript
-// Auto-event captures: click on element with class "swap-btn"
-// Custom event adds context:
-Cryptique.track('swap_initiated', {
-  input_token: 'ETH',
-  output_token: 'USDC',
-  amount: 1.5,
-  slippage: 0.5
-});
+Cryptique.enableAutoEvents();
+Cryptique.setAutoEventsDisabledPaths(['/admin', '/debug']);
+Cryptique.disableAutoEvent(['rage_click', 'dead_click']);
+// Inspect state
+console.log(Cryptique.getAutoEventsConfig());
 ```
 
-## Data Captured
+### Path matching
 
-### Every Auto-Event Includes
+- `/admin` matches `/admin` and `/admin/users`.
+- Trailing slashes are normalized for comparison.
 
-These properties are attached to all auto-events:
+---
 
-| Property | Description |
-|----------|-------------|
-| `session_id` | Current session identifier |
-| `distinct_id` | User identifier |
-| `timestamp` | Event time (ISO 8601) |
-| `current_url` | Page URL |
-| `browser_name` | e.g., Chrome, Firefox |
-| `browser_version` | Browser version |
-| `os` | Operating system |
-| `device_type` | desktop, mobile, tablet |
-| `country`, `city` | Geographic location |
-| `utm_*` | UTM parameters if present |
+## Privacy and volume
 
-See [Default Properties](/data-in/default-properties) for the complete list.
+- **Forms:** Submits and validation capture **structure**, not user input values.  
+- **Text selection:** A **substring** of selected text may be included (length-capped). Disable `text_selection` if that is too sensitive for your policy.  
+- **Clicks:** `element_text` is truncated (e.g. 100 chars).  
+- **Volume:** `page_summary` consolidates high-frequency signals into **one** event per exit/hide instead of streaming every mouse move.
 
-## Next Steps
+---
+
+## Data on every auto event
+
+Auto events receive the same default context as custom events (session, device, URL, geo when available, UTM, etc.). See [Default Properties](/data-in/default-properties).
+
+---
+
+## Next steps
 
 <CardGroup cols={2}>
-  <Card title="Track Custom Events" icon="code" href="/data-in/sdk-reference/track">
-    Add business-specific events
+  <Card title="Groups" icon="users" href="/data-in/sdk-reference/groups">
+    Enrich events with company / team context
   </Card>
-  <Card title="Default Properties" icon="list" href="/data-in/default-properties">
-    See all auto-captured properties
+  <Card title="Track custom events" icon="code" href="/data-in/sdk-reference/track">
+    Business-specific actions
+  </Card>
+  <Card title="Installation" icon="download" href="/data-in/installation">
+    Script attributes and npm init
+  </Card>
+  <Card title="Events & properties" icon="layer-group" href="/data-in/events-and-properties">
+    Event model overview
   </Card>
 </CardGroup>

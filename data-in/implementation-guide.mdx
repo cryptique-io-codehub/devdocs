@@ -389,6 +389,26 @@ export function useTracking() {
 }
 ```
 
+## Groups (companies, teams, workspaces)
+
+Model B2B or multi-tenant context with [Groups](/data-in/sdk-reference/groups): assign the user, then set properties on the group profile.
+
+```javascript
+Cryptique.identify(user.id);
+
+await Cryptique.set_group('company', user.companyId);
+
+const company = Cryptique.get_group('company', user.companyId);
+await company.set({
+  name: user.companyName,
+  plan: user.companyPlan
+});
+
+Cryptique.track('report_exported', { format: 'csv' });
+```
+
+Use `add_group` / `remove_group` when a user can belong to **multiple** IDs under the same key. After `identify()`, the server may return `group_memberships` to hydrate assignments on a new device.
+
 ## Testing Your Implementation
 
 ### Debug Mode
@@ -443,9 +463,9 @@ await Cryptique.init({
   </Accordion>
   
   <Accordion title="Wallet not linking">
-    - Call wallet.connect() with valid address
-    - Ensure wallet events aren't disabled
-    - Verify address format (0x...)
+    - Call `Cryptique.walletAddress()` with a valid address
+    - Verify address format (0x…)
+    - Confirm the SDK session initialized (Site ID, domain allowlist)
   </Accordion>
   
   <Accordion title="Duplicate events">

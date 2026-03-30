@@ -65,26 +65,48 @@ When a merge occurs, event history, profile properties, and wallet links from bo
 
 ## auto-events
 
-Behavioral events that Cryptique captures automatically without any `Cryptique.track()` calls. Auto-events are enabled by default when you set `auto-events="true"` on the script tag.
+Behavioral events the SDK sends **without** `Cryptique.track()`, using the same pipeline as custom events. They are **off unless** you set `auto-events="true"` on the script tag or call `Cryptique.enableAutoEvents()`.
 
-**Automatically captured:**
+**Examples of event names** (not exhaustive):
 
 | Event | What triggers it |
 |---|---|
-| `page_view` | Every page load or SPA route change |
-| `session_start` | New session begins |
-| `click` | Any element click |
-| `scroll` | Scroll depth milestones |
-| `form_submit` | Form submission (metadata only, no field values) |
-| `wallet_connect` | Wallet connection detected |
-| `copy` | Text copied (truncated to 100 characters) |
+| `page_view` | Page load / route |
+| `element_click` | Clicks |
+| `rage_click` / `dead_click` | Frustration / non-interactive patterns |
+| `page_scroll` | Scroll depth increases |
+| `form_submit` | Form submit (metadata only) |
+| `form_validation_error` / `form_abandoned` | Validation and abandon signals |
+| `media_play` / `media_pause` | Video/audio |
+| `text_selection` / `copy_action` | Selection and copy |
+| `js_error` / `network_error` | Client errors |
+| `page_performance` | Performance summary after load |
+| `exit_intent` / `page_summary` | Exit and page-level aggregates |
 
-You can disable specific events or exclude paths via script attributes. See [Auto-Events](/data-in/auto-events) for configuration.
+Disable names or paths via script attributes or `Cryptique.disableAutoEvent()`. See [Auto-Events](/data-in/auto-events).
 
 | Tool | Equivalent |
 |---|---|
 | Mixpanel | Autocapture (select plans) |
 | Amplitude | Autocapture / Session Replay |
+
+---
+
+## groups
+
+**Group membership** ties the current user to entities you label with a **group key** (e.g. `company`) and **group ID** (e.g. `acme-inc`). **Group profiles** store properties for that pair.
+
+| SDK | Role |
+|---|---|
+| `Cryptique.set_group(key, id)` / `add_group` / `remove_group` | Membership |
+| `Cryptique.get_group(key, id).set({...})` | Group profile (like `people.set` for the group) |
+
+There is no `Cryptique.group` namespace — APIs are on the root object. See [Groups](/data-in/sdk-reference/groups).
+
+| Tool | Equivalent |
+|---|---|
+| Mixpanel | Group Analytics |
+| Amplitude | Groups |
 
 ---
 

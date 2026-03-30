@@ -7,9 +7,9 @@ description: "Get Cryptique running on your site in 5 minutes"
 
 This guide will get you tracking user behavior and wallet connections in about 5 minutes. By the end, you'll have:
 
-- ✅ Automatic page view and session tracking
-- ✅ Click, scroll, and form tracking
-- ✅ Wallet connection tracking
+- ✅ Automatic page, click, scroll, and form signals (when `auto-events="true"`)
+- ✅ Session tracking via the SDK session model
+- ✅ Wallet linking with `Cryptique.walletAddress()` (and optional custom events)
 - ✅ Data flowing to your dashboard
 
 ## Prerequisites
@@ -142,20 +142,19 @@ This links all their past anonymous activity to their identified profile.
 
 ## What's Being Tracked?
 
-With `auto-events` enabled, Cryptique automatically captures:
+With `auto-events` enabled, the SDK sends many named auto events. Common ones:
 
 | Event | Description |
 |-------|-------------|
-| `page_view` | Every page load with URL, title, referrer |
-| `session_start` | When a new session begins |
-| `session_end` | When a session ends (30-min inactivity timeout) |
-| `click` | Button and link clicks with element details |
-| `scroll` | Scroll depth milestones (25%, 50%, 75%, 100%) |
-| `form_submit` | Form submissions (without sensitive field data) |
-| `input_change` | Form field interactions |
-| `copy` | Text copy actions |
-| `wallet_connect` | Wallet connection events |
-| `wallet_disconnect` | Wallet disconnection events |
+| `page_view` | Page load / route with timing context |
+| `element_click` | Clicks with element and coordinate metadata |
+| `rage_click` / `dead_click` | Frustration and non-interactive click patterns |
+| `page_scroll` | Increasing scroll depth |
+| `form_submit` | Form submits (metadata only, no field values) |
+| `text_selection` / `copy_action` | Selection and copy signals |
+| `page_summary` | Aggregated engagement when the user leaves or hides the tab |
+
+See the full list in [Auto-Events](/data-in/auto-events). Wallet connect/disconnect are **not** built-in auto events — use `Cryptique.walletAddress()` and `Cryptique.track()` if you want them in the event stream.
 
 ## Example: Complete Setup
 
@@ -225,9 +224,9 @@ Here's a complete example for a DeFi app:
   </Accordion>
   
   <Accordion title="Wallet events not tracking">
-    1. Ensure Cryptique.walletAddress() is called after wallet connection
-    2. Pass a valid wallet address (0x...)
-    3. Check that wallet_connect isn't in disabled auto-events
+    1. Call `Cryptique.walletAddress(address)` after the wallet connects
+    2. Pass a valid address (0x…)
+    3. If you rely on a custom event (e.g. `wallet_connected`), call `Cryptique.track()` yourself — it is not emitted automatically
   </Accordion>
 </AccordionGroup>
 
