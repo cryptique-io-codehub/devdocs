@@ -1,196 +1,723 @@
 ---
 title: "Auto-Events"
-description: "Events captured automatically by the Cryptique SDK when enabled"
+description: "Events automatically captured by Cryptique without additional code"
 ---
 
 ## Overview
 
-**Auto-events are off by default.** They run only when you either:
+When `auto-events` is enabled, Cryptique automatically captures user interactions without requiring any additional code. This provides comprehensive behavioral data out of the box.
 
-- Set **`auto-events="true"`** on the analytics script tag, or  
-- Call **`Cryptique.enableAutoEvents()`** after load.
+## Automatic Events
 
-When enabled, the SDK sends named **auto events** through the same pipeline as `Cryptique.track()`, including default properties and (when configured) [group](/data-in/sdk-reference/groups) enrichment.
+| Event | Category | Fires When | Throttle |
+|-------|----------|------------|----------|
+| `page_view` | navigation | DOM ready | Once per load |
+| `element_click` | interaction | Any click | None |
+| `rage_click` | interaction | 3+ clicks on same element in 1s | 1s detection window |
+| `dead_click` | interaction | Click on non-interactive element, no navigation in 1s | 1s post-click delay |
+| `page_scroll` | interaction | New max scroll depth reached | 250ms debounce |
+| `text_selection` | interaction | ≥3 chars selected, different from last selection | 300ms debounce + 1s cooldown |
+| `element_view` | visibility | Element ≥50% visible for ≥1s | Once per element per load |
+| `form_submit` | form | HTML form submits | None |
+| `form_validation_error` | form | HTML5 `invalid` event on a field | None |
+| `form_abandoned` | form | Page unloads with form touched but not submitted | On `beforeunload` |
+| `media_play` | media | `<video>` or `<audio>` play | 2s per-element throttle |
+| `media_pause` | media | `<video>` or `<audio>` pause | 2s per-element throttle |
+| `js_error` | error | Runtime JS error or unhandled promise rejection | None |
+| `network_error` | error | XHR status ≥400 or network failure | None |
+| `page_performance` | performance | ~1500ms after `window load` | Once per load |
 
-<Warning>
-  If auto-events are disabled, **`trackAutoEvent` does not send** any of the events below — including error, performance, and page summary events. They all share the same global switch and filters.
-</Warning>
+<Info>
+**Declared but not yet firing**: `element_hover`, `media_ended`, `session_start`, `session_end` are in the config map but have no active tracking calls in the current SDK version.
+</Info>
 
 ---
 
-## Gating and filters
+## Event Details
 
-Three layers apply before an auto event is sent:
+### page_view
 
-1. **Global:** `CONFIG.AUTO_EVENTS.enabled` (script attribute or `enableAutoEvents` / `disableAutoEvents`).
-2. **Path:** `auto-events-disabled-paths` or `Cryptique.setAutoEventsDisabledPaths()` — prefix match on `pathname` (e.g. `/admin` matches `/admin` and `/admin/users`).
-3. **Per event:** `auto-events-disabled-events` or `Cryptique.disableAutoEvent('event_name')` — names are compared **case-insensitively**.
+Fires on every page load (DOM ready). In SPAs, also fires on History API navigation (`pushState`, `replaceState`) and hash changes.
 
-**SPA navigation:** On `pushState`, `replaceState`, and `popstate`, the SDK re-evaluates path rules. If the new route allows auto-events and setup has not run, listeners are attached.
+```json
+{
+  "event_name": "page_view",
+  "auto_event_data": {
+    "page_load_time": 432,
+    "scroll_position": 0
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `page_load_time` | number | ms since navigation start (`performance.now()`) |
+| `scroll_position` | number | Always `0` at load time |
 
 ---
 
-## JavaScript API
+### element_click
 
-| Method | Purpose |
-|--------|---------|
-| `Cryptique.enableAutoEvents()` | Turn on auto-events and run setup if the current path allows it. |
-| `Cryptique.disableAutoEvents()` | Turn off all auto event sending. |
-| `Cryptique.setAutoEventsDisabledPaths(paths)` | Set path exclusions (string or array of strings). |
-| `Cryptique.disableAutoEvent(events)` | Add event name(s) to the disabled list. |
-| `Cryptique.enableAutoEvent(events)` | Remove event name(s) from the disabled list. |
-| `Cryptique.setAutoEventsDisabledEvents(events)` | Replace the entire disabled-event list. |
-| `Cryptique.getAvailableAutoEvents()` | Returns the **primary interaction** event names (subset; see note below). |
-| `Cryptique.getAutoEventsConfig()` | Returns `{ enabled, disabledPaths, disabledEvents, availableEvents, currentPath, shouldTrack }`. |
+Fires on any click. Captures rich coordinates and element context.
+
+```json
+{
+  "event_name": "element_click",
+  "auto_event_data": {
+    "click_coordinates": { "x": 540, "y": 320 },
+    "page_x": 540,
+    "page_y": 1120,
+    "scroll_x": 0,
+    "scroll_y": 800,
+    "document_height": 4200,
+    "document_width": 1440,
+    "double_click": false,
+    "element_category": "button",
+    "element_data": { ... }
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `click_coordinates` | `{x,y}` | Viewport-relative click position |
+| `page_x` / `page_y` | number | Page-relative position (viewport + scroll) |
+| `scroll_x` / `scroll_y` | number | Window scroll at click time |
+| `document_height` | number | Capped at 25,000px |
+| `document_width` | number | Capped at 25,000px |
+| `double_click` | boolean | `true` if `event.detail === 2` |
+| `element_category` | string | `"button"` \| `"link"` \| `"form"` \| `"video"` \| `"audio"` \| `"image"` \| `"text"` \| `"other"` |
+| `element_data` | object | See [Standard Element Data Object](#standard-element-data-object) |
+
+---
+
+### rage_click
+
+Fires when 3 or more clicks occur on the same element within 1 second — a strong signal of user frustration.
+
+```json
+{
+  "event_name": "rage_click",
+  "auto_event_data": {
+    "click_coordinates": { "x": 540, "y": 320 },
+    "page_x": 540,
+    "page_y": 1120,
+    "scroll_x": 0,
+    "scroll_y": 800,
+    "document_height": 4200,
+    "document_width": 1440,
+    "click_count": 5,
+    "time_span": 820,
+    "element_area": 3600,
+    "element_category": "button",
+    "element_data": { ... }
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `click_count` | number | Total clicks in the sequence |
+| `time_span` | number | ms between first and last click |
+| `element_area` | number | `offsetWidth × offsetHeight` |
+| `element_category` | string | Same as `element_click` |
+| `element_data` | object | See [Standard Element Data Object](#standard-element-data-object) |
+
+---
+
+### dead_click
+
+Fires when a user clicks an element that is not interactive and no navigation occurs within 1 second. Useful for finding broken or confusing UI elements.
+
+```json
+{
+  "event_name": "dead_click",
+  "auto_event_data": {
+    "click_coordinates": { "x": 200, "y": 450 },
+    "page_x": 200,
+    "page_y": 1250,
+    "scroll_x": 0,
+    "scroll_y": 800,
+    "document_height": 4200,
+    "document_width": 1440,
+    "element_area": 1200,
+    "element_category": "other",
+    "element_has_onclick": false,
+    "element_has_href": false,
+    "element_role": null,
+    "element_data": { ... }
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `element_area` | number | `offsetWidth × offsetHeight` |
+| `element_has_onclick` | boolean | Whether the element had an `onclick` handler |
+| `element_has_href` | boolean | Whether the `<a>` element had an `href` |
+| `element_role` | string \| null | ARIA `role` attribute |
+| `element_data` | object | See [Standard Element Data Object](#standard-element-data-object) |
+
+---
+
+### page_scroll
+
+Fires whenever the user reaches a new maximum scroll depth on the page. Tracks the highest point scrolled — does not re-fire for upward scrolling.
+
+```json
+{
+  "event_name": "page_scroll",
+  "auto_event_data": {
+    "scroll_depth": 75,
+    "max_scroll_reached": 75,
+    "scroll_position": 2400,
+    "scroll_x": 0,
+    "scroll_y": 2400,
+    "document_height": 3200,
+    "document_width": 1440
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `scroll_depth` | number | Current % of page scrolled (0–100) |
+| `max_scroll_reached` | number | Highest % reached this page session |
+| `scroll_position` | number | `window.scrollY` in pixels |
+| `scroll_x` / `scroll_y` | number | Window scroll values |
+| `document_height` | number | Full page height in pixels |
+| `document_width` | number | Full page width in pixels |
 
 <Note>
-  **`getAvailableAutoEvents()`** currently returns: `page_view`, `element_click`, `rage_click`, `dead_click`, `page_scroll`, `form_submit`, `form_focus`, `media_play`, `media_pause`, `text_selection`.  
-  Other auto events in the table below (e.g. `js_error`, `page_summary`) are still real events and can be **disabled by name** via `auto-events-disabled-events` or `disableAutoEvent`, even though they are not in that array.  
-  **`form_focus`** is listed for API symmetry; per-field focus is summarized in aggregates (e.g. `page_summary`) rather than emitted as its own high-volume auto event — see [Forms](#forms).
+Fires with a 250ms debounce. Only fires when a new maximum depth is reached, so each percentage is recorded at most once per page load.
 </Note>
 
 ---
 
-## Event catalog (implemented names)
+### text_selection
 
-Use these **exact** `event_name` values in dashboards, filters, and `auto-events-disabled-events`.
+Fires when the user selects ≥3 characters of text, as long as the selection differs from the previous one. Useful for understanding what content users find important.
 
-### Navigation & page
+```json
+{
+  "event_name": "text_selection",
+  "auto_event_data": {
+    "selected_text": "Cryptique automatically captures...",
+    "selection_length": 35,
+    "selection_start": 12,
+    "selection_end": 47,
+    "anchor_offset": 12,
+    "focus_offset": 47,
+    "page_url": "https://app.example.com/docs",
+    "page_title": "Getting Started",
+    "page_path": "/docs",
+    "scroll_x": 0,
+    "scroll_y": 400,
+    "document_height": 3200,
+    "document_width": 1440,
+    "page_x": 320,
+    "page_y": 840,
+    "click_coordinates": { "x": 320, "y": 440 },
+    "element_data": { ... }
+  }
+}
+```
 
-| Event | When it fires | Notes |
-|-------|----------------|-------|
-| `page_view` | After load (short delay) for the current route | Includes timing hints such as `page_load_time`, `scroll_position`. SPA route changes are covered by the tracker setup + navigation hooks. |
-
-### Clicks & scroll
-
-| Event | When it fires | Notes |
-|-------|----------------|-------|
-| `element_click` | Every click | Includes viewport and page coordinates, document dimensions, `double_click`, element metadata (`element_tag_name`, `element_id`, `element_text`, etc.). |
-| `rage_click` | ≥ 3 clicks on the **same** element within 1 s, debounced 800 ms after the last click | Sends final `click_count`, `time_span`, scroll/page context. |
-| `dead_click` | Click on a **non-interactive** element, and after 800 ms the URL and DOM mutation snapshot are unchanged | Reduces false positives when SPAs update the DOM without navigation. |
-| `page_scroll` | Scroll position updates (debounced); fires when **max** scroll depth increases | Properties include `scroll_depth`, `max_scroll_reached`, `scroll_position`, document size. |
-
-### Forms
-
-| Event | When it fires | Notes |
-|-------|----------------|-------|
-| `form_submit` | `submit` on a `<form>` | Captures form id, action, method, positions — **not** field values. |
-| `form_validation_error` | Browser `invalid` event on inputs / textareas | Field metadata and `validation_message` only. |
-| `form_abandoned` | User focused / filled fields then leaves without submit (`beforeunload`) | Counts filled fields, last field, time on form. |
-
-<Tip>
-  **Per-keystroke** focus/blur/change events are **not** emitted as separate auto-events (to avoid noise). Attention and field timing appear in **`page_summary`** (e.g. `field_dwells`).
-</Tip>
-
-### Media
-
-| Event | When it fires | Notes |
-|-------|----------------|-------|
-| `media_play` | `play` on `<video>` or `<audio>` | Throttled per element (~2 s) to reduce scrubbing noise. |
-| `media_pause` | `pause` on `<video>` or `<audio>` | Same throttling. |
-
-### Selection & clipboard
-
-| Event | When it fires | Notes |
-|-------|----------------|-------|
-| `text_selection` | User selects text (debounced); meaningful length ≥ 3 chars, 1 s cooldown | Selected text capped (e.g. 500 chars in payload); includes page and element context. |
-| `copy_action` | Native `copy` | Does not include full copied text by default; includes length and coarse element info. |
-| `context_menu` | Right-click (`contextmenu`) | Element tag/id/class and coordinates. |
-
-### Errors & network
-
-| Event | When it fires | Notes |
-|-------|----------------|-------|
-| `js_error` | `window.error` and unhandled promise rejections | Deduplicated (~10 s). Includes `error_class`, `last_event_name` (last non-error auto event). |
-| `network_error` | Fetch/XHR failures or HTTP ≥ 400 for **same-origin** `fetch` (and configured SDK XHR targets) | Cross-origin requests are intentionally not wrapped. |
-
-### Performance
-
-| Event | When it fires | Notes |
-|-------|----------------|-------|
-| `page_performance` | After `load` + delay | Core Web Vitals–style metrics where available: e.g. LCP, CLS, INP, FCP, TTFB, slowest resources. |
-
-### Engagement summary
-
-| Event | When it fires | Notes |
-|-------|----------------|-------|
-| `exit_intent` | Mouse leaves viewport **top edge** (debounced ~2 s) | Scroll depth and time on page. |
-| `page_summary` | `pagehide` or `visibilitychange` (tab hidden) | Single aggregate: movement/hover grids, tab switches, scroll reversals, field dwells, viewport element dwells, CLS/long tasks/INP, exit classification, etc. |
-
-### Not emitted in current builds
-
-| Name | Status |
-|------|--------|
-| `element_view` | **Disabled** — individual visibility events were replaced by **`viewport_element_dwells`** (and related fields) inside `page_summary`. |
-| `session_start` / `session_end` | **Not** sent as separate auto events in the SDK (session boundaries are handled via session cookies / backend). |
-| `media_ended` | **Not** emitted (play/pause only). |
-| `element_hover` | **Not** emitted as its own auto event; hover signal is aggregated in `page_summary`. |
-
-Wallet connect/disconnect are **not** auto-events in this SDK — use **`Cryptique.walletAddress()`** and/or **`Cryptique.track()`** for wallet lifecycle.
+| Property | Type | Description |
+|----------|------|-------------|
+| `selected_text` | string | Truncated to 500 characters |
+| `selection_length` | number | Full character count of selection |
+| `selection_start` / `selection_end` | number \| null | Range start/end offsets |
+| `anchor_offset` / `focus_offset` | number \| null | Selection anchor and focus offsets |
+| `page_x` / `page_y` | number \| null | Position of selection on page |
+| `click_coordinates` | `{x,y}` \| null | Viewport position |
+| `element_data` | object | Containing element of the selection anchor |
 
 ---
 
-## Configuration examples
+### element_view
 
-### Script tag
+Fires when a tracked element becomes at least 50% visible in the viewport for at least 1 second. Requires the element to have an `id` attribute or `data-cq-track` attribute.
+
+```json
+{
+  "event_name": "element_view",
+  "auto_event_data": {
+    "time_in_viewport_ms": 1000,
+    "viewport_percent_visible": 80,
+    "element_data": { ... }
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `time_in_viewport_ms` | number | ms from first ≥50% visible to 1s threshold |
+| `viewport_percent_visible` | number | 0–100, rounded |
+| `element_data` | object | See [Standard Element Data Object](#standard-element-data-object) |
+
+<Note>
+To track an element, it must have an `id` attribute or a `data-cq-track` attribute. Elements without these are not observed.
+</Note>
+
+---
+
+### form_submit
+
+Fires when an HTML form is submitted.
+
+```json
+{
+  "event_name": "form_submit",
+  "auto_event_data": {
+    "form_id": "signup-form",
+    "form_action": "/api/subscribe",
+    "form_method": "post",
+    "scroll_x": 0,
+    "scroll_y": 600,
+    "document_height": 3200,
+    "document_width": 1440,
+    "page_x": 120,
+    "page_y": 740,
+    "click_coordinates": { "x": 200, "y": 140 },
+    "element_data": { ... }
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `form_id` | string \| null | `id` attribute of the form |
+| `form_action` | string \| null | `action` attribute |
+| `form_method` | string | `"get"` or `"post"` |
+| `click_coordinates` | `{x,y}` | Submit button position or form center |
+| `element_data` | object | The form element |
+
+<Warning>
+Form field values are **never** captured to protect sensitive data. Use custom events to track specific non-sensitive fields.
+</Warning>
+
+---
+
+### form_validation_error
+
+Fires on the HTML5 `invalid` event when a field fails browser-native validation (e.g., required field empty, email format invalid).
+
+```json
+{
+  "event_name": "form_validation_error",
+  "auto_event_data": {
+    "field_id": "email-field",
+    "field_name": "email",
+    "field_type": "email",
+    "form_id": "signup-form",
+    "validation_message": "Please include an '@' in the email address.",
+    "element_data": { ... }
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `field_id` | string | Input `id` attribute (empty string if none) |
+| `field_name` | string | Input `name` attribute |
+| `field_type` | string | Input `type` (e.g. `"email"`) or tag name |
+| `form_id` | string | Parent form `id` (empty string if none) |
+| `validation_message` | string | Browser constraint validation message |
+| `element_data` | object | The input element |
+
+---
+
+### form_abandoned
+
+Fires via `sendBeacon` on `beforeunload` when the user leaves a page with a form they interacted with but did not submit.
+
+```json
+{
+  "event_name": "form_abandoned",
+  "auto_event_data": {
+    "form_id": "checkout-form",
+    "last_active_field_id": "card-number",
+    "last_active_field_type": "text",
+    "fields_filled_count": 2,
+    "total_fields_count": 5,
+    "time_on_form_ms": 34200,
+    "element_data": { ... }
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `form_id` | string | Form `id` or `"unknown"` |
+| `last_active_field_id` | string | `id` of the last interacted field |
+| `last_active_field_type` | string | `type` of the last interacted field |
+| `fields_filled_count` | number | Distinct fields with entered values |
+| `total_fields_count` | number | Total form fields |
+| `time_on_form_ms` | number | ms from first focus to page unload |
+| `element_data` | object | The form element |
+
+<Note>
+`form_focus`, `form_blur`, and `form_change` events are intentionally suppressed — `form_abandoned` captures the meaningful signal without per-keystroke noise.
+</Note>
+
+---
+
+### media_play
+
+Fires when a `<video>` or `<audio>` element starts playing. Throttled to once per 2 seconds per element.
+
+```json
+{
+  "event_name": "media_play",
+  "auto_event_data": {
+    "media_type": "video",
+    "media_src": "https://cdn.example.com/demo.mp4",
+    "media_duration": 142.5,
+    "media_current_time": 0,
+    "scroll_x": 0,
+    "scroll_y": 1200,
+    "document_height": 4000,
+    "document_width": 1440,
+    "page_x": 100,
+    "page_y": 1380,
+    "click_coordinates": { "x": 720, "y": 180 }
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `media_type` | `"video"` \| `"audio"` | Media element type |
+| `media_src` | string \| null | `src` attribute |
+| `media_duration` | number \| null | Total duration in seconds |
+| `media_current_time` | number \| null | Playhead position at time of play |
+| `click_coordinates` | `{x,y}` | Center of the element in the viewport |
+
+---
+
+### media_pause
+
+Fires when a `<video>` or `<audio>` element is paused. Throttled to once per 2 seconds per element.
+
+```json
+{
+  "event_name": "media_pause",
+  "auto_event_data": {
+    "media_type": "video",
+    "media_src": "https://cdn.example.com/demo.mp4",
+    "media_current_time": 38.2,
+    "media_duration": 142.5,
+    "scroll_x": 0,
+    "scroll_y": 1200,
+    "document_height": 4000,
+    "document_width": 1440,
+    "page_x": 100,
+    "page_y": 1380,
+    "click_coordinates": { "x": 720, "y": 180 }
+  }
+}
+```
+
+Same properties as `media_play`. `media_current_time` reflects the playhead position at the moment of pause.
+
+---
+
+### js_error
+
+Fires on uncaught JavaScript errors and unhandled promise rejections.
+
+**Runtime error** (`window error` event):
+
+```json
+{
+  "event_name": "js_error",
+  "auto_event_data": {
+    "error_type": "javascript_error",
+    "message": "Cannot read properties of undefined (reading 'balance')",
+    "source": "https://app.example.com/static/js/main.chunk.js",
+    "line": 1042,
+    "column": 18,
+    "stack": "TypeError: Cannot read properties of undefined...\n    at getBalance (main.chunk.js:1042:18)"
+  }
+}
+```
+
+**Unhandled promise rejection**:
+
+```json
+{
+  "event_name": "js_error",
+  "auto_event_data": {
+    "error_type": "unhandled_promise_rejection",
+    "message": "Network request failed",
+    "stack": "Error: Network request failed\n    at fetch..."
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `error_type` | string | `"javascript_error"` or `"unhandled_promise_rejection"` |
+| `message` | string | Error message |
+| `source` | string | Source file URL (runtime errors only) |
+| `line` / `column` | number | Error location (runtime errors only) |
+| `stack` | string | Stack trace |
+
+---
+
+### network_error
+
+Fires when an XHR request returns HTTP status ≥400 or fails entirely. Only SDK-internal requests to `sdkapi.cryptique.io` are monitored — application XHR is not tracked.
+
+**HTTP error** (status ≥400):
+
+```json
+{
+  "event_name": "network_error",
+  "auto_event_data": {
+    "url": "https://sdkapi.cryptique.io/events",
+    "method": "POST",
+    "status": 429,
+    "status_text": "HTTP 429 Error",
+    "duration_ms": 210
+  }
+}
+```
+
+**Network failure** (no response):
+
+```json
+{
+  "event_name": "network_error",
+  "auto_event_data": {
+    "url": "https://sdkapi.cryptique.io/events",
+    "method": "POST",
+    "status": 0,
+    "status_text": "XHR Network Error",
+    "duration_ms": 5000
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `url` | string | Request URL |
+| `method` | string | HTTP method (`"GET"`, `"POST"`, etc.) |
+| `status` | number | HTTP status code, or `0` for network failures |
+| `status_text` | string | Human-readable status description |
+| `duration_ms` | number | Round-trip time in ms |
+
+---
+
+### page_performance
+
+Fires approximately 1500ms after `window load`, once per page load, with Core Web Vitals and key timing metrics.
+
+```json
+{
+  "event_name": "page_performance",
+  "auto_event_data": {
+    "lcp": 1820,
+    "cls": 0.04,
+    "inp": 140,
+    "fcp": 980,
+    "ttfb": 210
+  }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `lcp` | number \| null | Largest Contentful Paint (ms) |
+| `cls` | number \| null | Cumulative Layout Shift (0.0–1.0; lower is better) |
+| `inp` | number \| null | Interaction to Next Paint (ms) |
+| `fcp` | number \| null | First Contentful Paint (ms) |
+| `ttfb` | number \| null | Time to First Byte (ms) |
+
+---
+
+## Standard Element Data Object
+
+Most interaction events include an `element_data` sub-object describing the element that was interacted with:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `element_tag_name` | string \| null | Lowercase tag name, e.g. `"button"`, `"a"`, `"input"` |
+| `element_id` | string \| null | `id` attribute |
+| `element_name` | string \| null | `name` attribute or `data-cq-track` value |
+| `element_class` | string \| null | Full `className` string |
+| `element_type` | string \| null | `type` attribute or form method |
+| `element_text` | string \| null | Trimmed `textContent`, max 100 chars |
+| `element_category` | string | `"button"` \| `"link"` \| `"form"` \| `"video"` \| `"audio"` \| `"image"` \| `"text"` \| `"other"` |
+| `element_position` | `{x,y,width,height}` \| null | Viewport coordinates and dimensions |
+
+**For video element clicks, additional fields:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `video_src` | string \| null | Video `src` attribute |
+| `video_duration` | number \| null | Total duration in seconds |
+| `video_current_time` | number \| null | Playhead at time of click |
+
+**For image element clicks, additional fields:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `image_src` | string \| null | Image `src` attribute |
+| `image_alt` | string \| null | `alt` attribute |
+| `image_width` / `image_height` | number \| null | Rendered dimensions |
+
+---
+
+## Event Envelope
+
+Every auto-event automatically includes these context fields. No additional code is required.
+
+| Group | Properties |
+|-------|-----------|
+| **Session** | `session_id`, `user_id`, `distinct_id` |
+| **Page** | `page_url`, `page_title`, `page_path`, `referrer` |
+| **Viewport / Screen** | `viewport_width`, `viewport_height`, `screen_width`, `screen_height`, `dpi` |
+| **Device / Browser** | `browser_name`, `browser_version`, `os`, `os_version`, `device_type`, `language` |
+| **Geo** | `country`, `city`, `region`, `timezone` |
+| **UTM** | `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `utm_id` |
+| **Web3** | `wallet_address`, `is_web3_user` |
+
+See [Default Properties](/data-in/default-properties) for the complete list with descriptions.
+
+---
+
+## Configuration
+
+### HTML Attribute
+
+Enable auto-events and optionally suppress specific events directly on the script tag:
 
 ```html
-<script>
-  var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';
-  script.setAttribute('site-id', 'YOUR_SITE_ID');
-  script.setAttribute('auto-events', 'true');
-  script.setAttribute('auto-events-disabled-paths', '/admin,/internal');
-  script.setAttribute('auto-events-disabled-events', 'text_selection,copy_action,page_performance');
-  document.head.appendChild(script);
+<script
+  src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js"
+  site-id="YOUR_SITE_ID"
+  auto-events="true"
+  auto-events-disabled-events="js_error,network_error,page_performance">
 </script>
 ```
 
-### Runtime
+Pass a comma-separated list of event names to `auto-events-disabled-events`.
+
+### JS Runtime API
+
+You can also configure auto-events at runtime after the SDK has loaded:
 
 ```javascript
-Cryptique.enableAutoEvents();
-Cryptique.setAutoEventsDisabledPaths(['/admin', '/debug']);
-Cryptique.disableAutoEvent(['rage_click', 'dead_click']);
-// Inspect state
-console.log(Cryptique.getAutoEventsConfig());
+// Disable one or more events
+Cryptique.disableAutoEvent(['js_error', 'network_error'])
+
+// Re-enable a previously disabled event
+Cryptique.enableAutoEvent('rage_click')
+
+// Replace the entire disabled list
+Cryptique.setAutoEventsDisabledEvents(['page_scroll'])
+
+// Inspect the current configuration
+Cryptique.getAutoEventsConfig()
 ```
 
-### Path matching
+### Exclude Paths
 
-- `/admin` matches `/admin` and `/admin/users`.
-- Trailing slashes are normalized for comparison.
+Prevent tracking on specific pages:
+
+```html
+<script
+  src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js"
+  site-id="YOUR_SITE_ID"
+  auto-events="true"
+  auto-events-disabled-paths="/admin,/internal,/debug">
+</script>
+```
+
+**Path matching rules:**
+- `/admin` matches `/admin`, `/admin/users`, `/admin/settings` (prefix match)
+- Case-sensitive
+- Multiple paths separated by commas
+
+### Disable All Auto-Events
+
+For complete manual control:
+
+```html
+<script
+  src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js"
+  site-id="YOUR_SITE_ID"
+  auto-events="false">
+</script>
+```
 
 ---
 
-## Privacy and volume
+## Storage
 
-- **Forms:** Submits and validation capture **structure**, not user input values.  
-- **Text selection:** A **substring** of selected text may be included (length-capped). Disable `text_selection` if that is too sensitive for your policy.  
-- **Clicks:** `element_text` is truncated (e.g. 100 chars).  
-- **Volume:** `page_summary` consolidates high-frequency signals into **one** event per exit/hide instead of streaming every mouse move.
-
----
-
-## Data on every auto event
-
-Auto events receive the same default context as custom events (session, device, URL, geo when available, UTM, etc.). See [Default Properties](/data-in/default-properties).
+| Detail | Value |
+|--------|-------|
+| Table | `events`, with `event_type = 'auto'` |
+| Event payload | `auto_event_data` JSONB column |
+| Indexed element fields | `element_name`, `element_id`, `element_class`, `element_tag_name`, `element_type`, `element_text`, `element_position` |
+| `event_category` | Derived server-side from `event_name` — not sent by the SDK |
+| Normal events | Sent via `fetch` with `keepalive: true` |
+| Unload events (`form_abandoned`) | Sent via `navigator.sendBeacon` |
 
 ---
 
-## Next steps
+## Best Practices
+
+### Recommended Starting Configuration
+
+For most Web3 apps, disable the noisiest low-signal events:
+
+```html
+<script
+  src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js"
+  site-id="YOUR_SITE_ID"
+  auto-events="true"
+  auto-events-disabled-events="js_error,network_error,page_performance"
+  auto-events-disabled-paths="/admin">
+</script>
+```
+
+### When to Disable Specific Events
+
+| Scenario | Recommendation |
+|----------|----------------|
+| High-traffic marketing pages | Keep `page_view`, `page_scroll`; disable `element_click` |
+| Forms / data-entry apps | Disable `form_validation_error` if noise is high |
+| Admin dashboards | Exclude path entirely with `auto-events-disabled-paths` |
+| Debugging / internal tools | Disable `dead_click`, `rage_click` |
+| Error monitoring handled elsewhere | Disable `js_error`, `network_error` |
+
+### Supplement with Custom Events
+
+Auto-events capture generic interactions. Add custom events for business-specific actions:
+
+```javascript
+// Auto-event captures: element_click on the swap button
+// Custom event adds business context:
+Cryptique.track('swap_initiated', {
+  input_token: 'ETH',
+  output_token: 'USDC',
+  amount: 1.5,
+  slippage: 0.5
+});
+```
+
+---
+
+## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Groups" icon="users" href="/data-in/sdk-reference/groups">
-    Enrich events with company / team context
+  <Card title="Track Custom Events" icon="code" href="/data-in/sdk-reference/track">
+    Add business-specific events
   </Card>
-  <Card title="Track custom events" icon="code" href="/data-in/sdk-reference/track">
-    Business-specific actions
-  </Card>
-  <Card title="Installation" icon="download" href="/data-in/installation">
-    Script attributes and npm init
-  </Card>
-  <Card title="Events & properties" icon="layer-group" href="/data-in/events-and-properties">
-    Event model overview
+  <Card title="Default Properties" icon="list" href="/data-in/default-properties">
+    See all auto-captured properties
   </Card>
 </CardGroup>
