@@ -1,11 +1,11 @@
 ---
 title: "Installation"
-description: "Multiple ways to install Cryptique on your website or dApp"
+description: "Multiple ways to install Trodo on your website or dApp"
 ---
 
 ## Overview
 
-Cryptique can be installed via CDN script, npm package, or through tag managers. Choose the method that best fits your tech stack.
+Trodo can be installed via CDN script, npm package, or through tag managers. Choose the method that best fits your tech stack.
 
 <Tabs>
   <Tab title="CDN (Recommended)">
@@ -16,7 +16,7 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     ```html
     <script>
       var script = document.createElement('script');
-      script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+      script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
       script.setAttribute('site-id', 'YOUR_SITE_ID');
       script.setAttribute('auto-events', 'true');
       document.head.appendChild(script);
@@ -37,7 +37,7 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     ```html
     <script>
       var script = document.createElement('script');
-      script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+      script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
       script.setAttribute('site-id', 'myapp-com-42');
       script.setAttribute('auto-events', 'true');
       script.setAttribute('auto-events-disabled-paths', '/admin,/internal');
@@ -55,10 +55,10 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
       <meta charset="utf-8">
       <title>My App</title>
       
-      <!-- Cryptique - load early for complete tracking -->
+      <!-- Trodo - load early for complete tracking -->
       <script>
         var script = document.createElement('script');
-        script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+        script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
         script.setAttribute('site-id', 'YOUR_SITE_ID');
         script.setAttribute('auto-events', 'true');
         document.head.appendChild(script);
@@ -70,17 +70,17 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     </html>
     ```
 
-    After loading via CDN, the global `Cryptique` object is available:
+    After loading via CDN, the global `Trodo` object is available:
 
     ```javascript
     // Track events
-    Cryptique.track('button_clicked', { button_name: 'signup' });
+    Trodo.track('button_clicked', { button_name: 'signup' });
 
     // Identify users
-    Cryptique.identify('user_123');
+    Trodo.identify('user_123');
 
     // Set user properties
-    Cryptique.people.set({ plan: 'pro' });
+    Trodo.people.set({ plan: 'pro' });
     ```
   </Tab>
 
@@ -90,38 +90,38 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     For JavaScript/TypeScript projects with a build system:
 
     ```bash
-    npm install cryptique-sdk
+    npm install trodo
     ```
 
     Or with yarn:
 
     ```bash
-    yarn add cryptique-sdk
+    yarn add trodo
     ```
 
     ### Basic Usage
 
     ```javascript
-    import Cryptique from 'cryptique-sdk';
+    import Trodo from 'trodo';
 
-    // Initialize (async – returns the same Cryptique instance)
-    await Cryptique.init({
+    // Initialize (async – returns the same Trodo instance)
+    await Trodo.init({
       siteId: 'YOUR_SITE_ID',
       autoEvents: true
     });
 
-    // Use the global Cryptique object
-    Cryptique.track('button_clicked', { button_name: 'signup' });
-    Cryptique.identify('user_123');
-    Cryptique.people.set({ plan: 'pro' });
+    // Use the global Trodo object
+    Trodo.track('button_clicked', { button_name: 'signup' });
+    Trodo.identify('user_123');
+    Trodo.people.set({ plan: 'pro' });
     ```
 
     ### Configuration Options
 
     ```javascript
-    import Cryptique from 'cryptique-sdk';
+    import Trodo from 'trodo';
 
-    await Cryptique.init({
+    await Trodo.init({
       // Required
       siteId: 'YOUR_SITE_ID',
       
@@ -142,16 +142,16 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     ### React Integration
 
     ```jsx
-    // lib/cryptique.js
-    import Cryptique from 'cryptique-sdk';
+    // lib/trodo.js
+    import Trodo from 'trodo';
 
     let initialized = false;
 
-    export async function initCryptique() {
+    export async function initTrodo() {
       if (initialized) return;
       
-      await Cryptique.init({
-        siteId: process.env.REACT_APP_CRYPTIQUE_SITE_ID,
+      await Trodo.init({
+        siteId: process.env.REACT_APP_TRODO_SITE_ID,
         autoEvents: true
       });
       
@@ -160,18 +160,18 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
 
     // App.jsx
     import { useEffect } from 'react';
-    import Cryptique from 'cryptique-sdk';
-    import { initCryptique } from './lib/cryptique';
+    import Trodo from 'trodo';
+    import { initTrodo } from './lib/trodo';
 
     function App() {
       useEffect(() => {
-        initCryptique();
+        initTrodo();
       }, []);
 
       useEffect(() => {
         if (user) {
-          Cryptique.identify(user.id);
-          Cryptique.people.set({
+          Trodo.identify(user.id);
+          Trodo.people.set({
             email: user.email,
             plan: user.plan
           });
@@ -185,17 +185,17 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     ### Next.js Integration
 
     ```jsx
-    // lib/cryptique.js
-    import Cryptique from 'cryptique-sdk';
+    // lib/trodo.js
+    import Trodo from 'trodo';
 
     let initialized = false;
 
-    export async function initCryptique() {
+    export async function initTrodo() {
       if (typeof window === 'undefined') return;
       if (initialized) return;
       
-      await Cryptique.init({
-        siteId: process.env.NEXT_PUBLIC_CRYPTIQUE_SITE_ID,
+      await Trodo.init({
+        siteId: process.env.NEXT_PUBLIC_TRODO_SITE_ID,
         autoEvents: true
       });
       
@@ -205,11 +205,11 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     // app/layout.jsx (App Router)
     'use client';
     import { useEffect } from 'react';
-    import { initCryptique } from '@/lib/cryptique';
+    import { initTrodo } from '@/lib/trodo';
 
     export default function RootLayout({ children }) {
       useEffect(() => {
-        initCryptique();
+        initTrodo();
       }, []);
 
       return (
@@ -220,11 +220,11 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     }
 
     // Any component
-    import Cryptique from 'cryptique-sdk';
+    import Trodo from 'trodo';
 
     function MyComponent() {
       const handleClick = () => {
-        Cryptique.track('feature_used', { feature: 'swap' });
+        Trodo.track('feature_used', { feature: 'swap' });
       };
 
       return <button onClick={handleClick}>Swap</button>;
@@ -234,41 +234,41 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     ### Vue Integration
 
     ```javascript
-    // plugins/cryptique.js
-    import Cryptique from 'cryptique-sdk';
+    // plugins/trodo.js
+    import Trodo from 'trodo';
 
     export default {
       async install(app) {
-        await Cryptique.init({
-          siteId: import.meta.env.VITE_CRYPTIQUE_SITE_ID,
+        await Trodo.init({
+          siteId: import.meta.env.VITE_TRODO_SITE_ID,
           autoEvents: true
         });
         
-        app.config.globalProperties.$cryptique = Cryptique;
-        app.provide('cryptique', Cryptique);
+        app.config.globalProperties.$trodo = Trodo;
+        app.provide('trodo', Trodo);
       }
     };
 
     // main.js
     import { createApp } from 'vue';
     import App from './App.vue';
-    import cryptiquePlugin from './plugins/cryptique';
+    import trodoPlugin from './plugins/trodo';
 
     const app = createApp(App);
-    app.use(cryptiquePlugin);
+    app.use(trodoPlugin);
     app.mount('#app');
 
     // Component usage
-    import Cryptique from 'cryptique-sdk';
+    import Trodo from 'trodo';
 
-    Cryptique.track('feature_used', { feature: 'swap' });
+    Trodo.track('feature_used', { feature: 'swap' });
     ```
   </Tab>
 
   <Tab title="Google Tag Manager">
     ## Google Tag Manager
 
-    Deploy Cryptique via GTM without modifying your codebase.
+    Deploy Trodo via GTM without modifying your codebase.
 
     ### Setup Steps
 
@@ -283,7 +283,7 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
         ```html
         <script>
           var script = document.createElement('script');
-          script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+          script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
           script.setAttribute('site-id', 'YOUR_SITE_ID');
           script.setAttribute('auto-events', 'true');
           document.head.appendChild(script);
@@ -305,7 +305,7 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     ```html
     <script>
       var script = document.createElement('script');
-      script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+      script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
       script.setAttribute('site-id', 'YOUR_SITE_ID');
       script.setAttribute('auto-events', 'true');
       script.setAttribute('auto-events-disabled-paths', '/admin,/internal');
@@ -316,12 +316,12 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
 
     ### Custom Events via Data Layer
 
-    Push events from your site to GTM, then forward to Cryptique:
+    Push events from your site to GTM, then forward to Trodo:
 
     **On your website:**
     ```javascript
     dataLayer.push({
-      event: 'cryptique_track',
+      event: 'trodo_track',
       eventName: 'button_clicked',
       eventProperties: { button_name: 'signup' }
     });
@@ -330,8 +330,8 @@ Cryptique can be installed via CDN script, npm package, or through tag managers.
     **GTM Custom HTML Tag:**
     ```html
     <script>
-      if (window.Cryptique) {
-        Cryptique.track('{{DL - eventName}}', {{DL - eventProperties}});
+      if (window.Trodo) {
+        Trodo.track('{{DL - eventName}}', {{DL - eventProperties}});
       }
     </script>
     ```
@@ -349,14 +349,14 @@ After installation, verify it's working:
 Open developer tools (F12) and look for:
 
 ```
-[Cryptique] Initialized successfully
-[Cryptique] Session started: abc123
-[Cryptique] Event tracked: page_view
+[Trodo] Initialized successfully
+[Trodo] Session started: abc123
+[Trodo] Event tracked: page_view
 ```
 
 ### 2. Check Live Events
 
-1. Go to your Cryptique dashboard
+1. Go to your Trodo dashboard
 2. Navigate to **Live Events** or **Debugger**
 3. Perform actions on your site
 4. Events should appear within 60 seconds
@@ -364,8 +364,8 @@ Open developer tools (F12) and look for:
 ### 3. Network Tab
 
 In browser dev tools → Network tab, look for requests to:
-- `api.cryptique.io/events`
-- `api.cryptique.io/sessions`
+- `api.trodo.ai/events`
+- `api.trodo.ai/sessions`
 
 ## Troubleshooting
 
@@ -373,8 +373,8 @@ In browser dev tools → Network tab, look for requests to:
   <Accordion title="Script blocked by Content Security Policy">
     Add these domains to your CSP:
     ```
-    script-src 'self' https://cdn.cryptique.io;
-    connect-src 'self' https://api.cryptique.io;
+    script-src 'self' https://cdn.trodo.ai;
+    connect-src 'self' https://api.trodo.ai;
     ```
   </Accordion>
   

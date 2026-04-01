@@ -5,20 +5,20 @@ description: "Link anonymous sessions to known user identities"
 
 ## Overview
 
-Cryptique automatically assigns anonymous IDs to track users. When you know who a user is (e.g., after login or wallet connection), use `identify()` to link their anonymous activity to their known identity.
+Trodo automatically assigns anonymous IDs to track users. When you know who a user is (e.g., after login or wallet connection), use `identify()` to link their anonymous activity to their known identity.
 
 <Info>
-  Cryptique's **CQ Intelligence merge engine** automatically consolidates user profiles across sessions, devices, and wallets when you call `identify()`.
+  Trodo's **CQ Intelligence merge engine** automatically consolidates user profiles across sessions, devices, and wallets when you call `identify()`.
 </Info>
 
 ---
 
-## Cryptique.identify()
+## Trodo.identify()
 
 Associate the current user with a unique identifier.
 
 ```javascript
-Cryptique.identify(identifyId)
+Trodo.identify(identifyId)
 ```
 
 ### Parameters
@@ -44,13 +44,13 @@ Cryptique.identify(identifyId)
 
 ```javascript
 // After user logs in
-Cryptique.identify('user_12345');
+Trodo.identify('user_12345');
 
 // Using email
-Cryptique.identify('user@example.com');
+Trodo.identify('user@example.com');
 
 // Using wallet address
-Cryptique.identify('0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21');
+Trodo.identify('0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21');
 ```
 
 ---
@@ -66,10 +66,10 @@ Cryptique.identify('0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21');
       const user = await login(email, password);
       
       // Identify after successful login
-      Cryptique.identify(user.id);
+      Trodo.identify(user.id);
       
       // Optionally set user properties
-      Cryptique.people.set({
+      Trodo.people.set({
         email: user.email,
         plan: user.subscription,
         signupDate: user.createdAt
@@ -86,15 +86,15 @@ Cryptique.identify('0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21');
       const newUser = await createUser(userData);
       
       // Identify the new user
-      Cryptique.identify(newUser.id);
+      Trodo.identify(newUser.id);
       
       // Track signup event
-      Cryptique.track('Signup Completed', {
+      Trodo.track('Signup Completed', {
         source: userData.referralSource
       });
       
       // Set initial user properties
-      Cryptique.people.set({
+      Trodo.people.set({
         email: newUser.email,
         signupDate: new Date().toISOString()
       });
@@ -108,12 +108,12 @@ Cryptique.identify('0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21');
     ```javascript
     // On app initialization
     async function initApp() {
-      await Cryptique.init({ siteId: 'your-site-id' });
+      await Trodo.init({ siteId: 'your-site-id' });
       
       // If user is already logged in
       const currentUser = getCurrentUser();
       if (currentUser) {
-        Cryptique.identify(currentUser.id);
+        Trodo.identify(currentUser.id);
       }
     }
     ```
@@ -124,26 +124,26 @@ Cryptique.identify('0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21');
 
 ## Cross-Domain Identification
 
-Cryptique can merge user profiles across domains when you use the same `identifyId`:
+Trodo can merge user profiles across domains when you use the same `identifyId`:
 
 ```javascript
 // On app.example.com
-Cryptique.identify('user_12345');
+Trodo.identify('user_12345');
 
 // On dashboard.example.com (same user)
-Cryptique.identify('user_12345');
+Trodo.identify('user_12345');
 
-// Cryptique merges all sessions for user_12345 automatically
+// Trodo merges all sessions for user_12345 automatically
 ```
 
 ---
 
-## Cryptique.reset()
+## Trodo.reset()
 
 Clear the current user identity and start a new anonymous session. Use this when a user logs out.
 
 ```javascript
-Cryptique.reset()
+Trodo.reset()
 ```
 
 ### Returns
@@ -157,8 +157,8 @@ function handleLogout() {
   // Clear user session in your app
   logout();
   
-  // Reset Cryptique identity
-  Cryptique.reset();
+  // Reset Trodo identity
+  Trodo.reset();
   
   // Future events will use a new anonymous ID
 }
@@ -178,10 +178,10 @@ You can use wallet addresses as the primary identifier:
 // When wallet connects
 function handleWalletConnect(address) {
   // Use wallet address as identity
-  Cryptique.identify(address);
+  Trodo.identify(address);
   
   // Also register with walletAddress for enrichment
-  Cryptique.walletAddress(address);
+  Trodo.walletAddress(address);
 }
 ```
 
@@ -199,7 +199,7 @@ When you call `identify()`:
 
 2. **Existing User, Same Device**: If the `identifyId` matches a profile already on this device, sessions merge seamlessly.
 
-3. **Existing User, New Device**: If the `identifyId` exists from another device, Cryptique's CQ Intelligence merges the profiles automatically.
+3. **Existing User, New Device**: If the `identifyId` exists from another device, Trodo's CQ Intelligence merges the profiles automatically.
 
 4. **Group memberships**: When the server returns `group_memberships` for this user, the SDK restores them locally so [group](/data-in/sdk-reference/groups) assignments stay in sync across devices.
 
@@ -219,13 +219,13 @@ flowchart LR
 
 ```javascript
 // Good - Stable, unique identifiers
-Cryptique.identify(user.databaseId);    // '12345'
-Cryptique.identify(user.uuid);          // 'a1b2c3d4-e5f6-...'
-Cryptique.identify(user.walletAddress); // '0x742d...'
+Trodo.identify(user.databaseId);    // '12345'
+Trodo.identify(user.uuid);          // 'a1b2c3d4-e5f6-...'
+Trodo.identify(user.walletAddress); // '0x742d...'
 
 // Avoid - IDs that might change
-Cryptique.identify(user.username);      // User might change this
-Cryptique.identify(user.displayName);   // Not unique
+Trodo.identify(user.username);      // User might change this
+Trodo.identify(user.displayName);   // Not unique
 ```
 
 ### Don't Over-Identify
@@ -233,16 +233,16 @@ Cryptique.identify(user.displayName);   // Not unique
 ```javascript
 // Bad - Calling identify too frequently
 function onClick() {
-  Cryptique.identify(userId);  // Don't identify on every action
-  Cryptique.track('Button Clicked');
+  Trodo.identify(userId);  // Don't identify on every action
+  Trodo.track('Button Clicked');
 }
 
 // Good - Identify once per session
 async function initApp() {
-  await Cryptique.init({ siteId: 'your-site-id' });
+  await Trodo.init({ siteId: 'your-site-id' });
   
   if (currentUser) {
-    Cryptique.identify(currentUser.id);
+    Trodo.identify(currentUser.id);
   }
 }
 ```
@@ -254,9 +254,9 @@ async function initApp() {
 useEffect(() => {
   const unsubscribe = auth.onAuthStateChanged((user) => {
     if (user) {
-      Cryptique.identify(user.uid);
+      Trodo.identify(user.uid);
     } else {
-      Cryptique.reset();
+      Trodo.reset();
     }
   });
   
@@ -270,13 +270,13 @@ useEffect(() => {
 
 ```javascript
 // Initialize
-await Cryptique.init({ siteId: 'your-site-id' });
+await Trodo.init({ siteId: 'your-site-id' });
 
 // Check for existing session
 const user = getCurrentUser();
 if (user) {
-  Cryptique.identify(user.id);
-  Cryptique.people.set({
+  Trodo.identify(user.id);
+  Trodo.people.set({
     email: user.email,
     lastSeen: new Date().toISOString()
   });
@@ -286,18 +286,18 @@ if (user) {
 async function login(credentials) {
   const user = await authService.login(credentials);
   
-  Cryptique.identify(user.id);
-  Cryptique.people.set({
+  Trodo.identify(user.id);
+  Trodo.people.set({
     email: user.email,
     lastLogin: new Date().toISOString()
   });
-  Cryptique.track('Login Completed');
+  Trodo.track('Login Completed');
 }
 
 // Logout handler
 function logout() {
-  Cryptique.track('Logout Completed');
-  Cryptique.reset();
+  Trodo.track('Logout Completed');
+  Trodo.reset();
   authService.logout();
 }
 ```

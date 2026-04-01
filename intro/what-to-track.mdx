@@ -1,6 +1,6 @@
 ---
 title: "What to Track"
-description: "A guide to planning your Cryptique implementation for maximum insight"
+description: "A guide to planning your Trodo implementation for maximum insight"
 ---
 
 ## Overview
@@ -9,7 +9,7 @@ A successful analytics implementation starts with understanding **what questions
 
 ## The Three Data Types
 
-Cryptique unifies three types of data into complete user profiles:
+Trodo unifies three types of data into complete user profiles:
 
 ### 1. Events (Off-Chain Behavior)
 
@@ -88,7 +88,7 @@ For each question, identify what events you need:
 
 **Events needed**:
 - `page_view` with UTM properties (auto-captured when auto-events are on)
-- `wallet_connected` (custom — call `Cryptique.track()` after connect, alongside `Cryptique.walletAddress()`)
+- `wallet_connected` (custom — call `Trodo.track()` after connect, alongside `Trodo.walletAddress()`)
 
 **Properties needed**:
 - `utm_source`, `utm_medium`, `utm_campaign` (auto-captured)
@@ -108,7 +108,7 @@ For each question, identify what events you need:
 
 ### Step 3: Choose Your Auto-Events
 
-Auto-events are **off** until you set `auto-events="true"` (or call `Cryptique.enableAutoEvents()`). The SDK emits many named events (clicks, scroll, forms, errors, performance, `page_summary`, etc.). Enable the bundle, then **disable** what you do not want:
+Auto-events are **off** until you set `auto-events="true"` (or call `Trodo.enableAutoEvents()`). The SDK emits many named events (clicks, scroll, forms, errors, performance, `page_summary`, etc.). Enable the bundle, then **disable** what you do not want:
 
 | Auto-Event | Disable If... |
 |------------|---------------|
@@ -122,7 +122,7 @@ Configure in your SDK initialization:
 ```html
 <script>
   var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
   script.setAttribute('site-id', 'your-site-id');
   script.setAttribute('auto-events', 'true');
   script.setAttribute('auto-events-disabled-events', 'text_selection,copy_action');
@@ -130,7 +130,7 @@ Configure in your SDK initialization:
 </script>
 ```
 
-See [Auto-Events](/data-in/auto-events) for every event name and the JavaScript API. For wallets, use `Cryptique.walletAddress()` and custom `track()` events rather than expecting `wallet_connect` auto events.
+See [Auto-Events](/data-in/auto-events) for every event name and the JavaScript API. For wallets, use `Trodo.walletAddress()` and custom `track()` events rather than expecting `wallet_connect` auto events.
 
 ### Step 4: Plan Custom Events
 
@@ -138,20 +138,20 @@ Beyond auto-events, track custom events for key actions:
 
 ```javascript
 // Feature usage
-Cryptique.track('feature_used', {
+Trodo.track('feature_used', {
   feature_name: 'swap_calculator',
   input_token: 'ETH',
   output_token: 'USDC'
 });
 
 // Conversion milestones
-Cryptique.track('onboarding_completed', {
+Trodo.track('onboarding_completed', {
   steps_completed: 5,
   time_to_complete: 180
 });
 
 // Errors and friction
-Cryptique.track('transaction_failed', {
+Trodo.track('transaction_failed', {
   error_type: 'insufficient_funds',
   attempted_amount: 1000
 });
@@ -167,7 +167,7 @@ Add your contracts to capture on-chain transactions:
    - Contract address
    - Chain (Ethereum, Polygon, Base, etc.)
    - A friendly name (e.g., "Token Swap Contract")
-4. Cryptique automatically indexes all transactions
+4. Trodo automatically indexes all transactions
 
 Supported chains for smart contracts:
 - **EVM**: Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BSC, Fantom, and 20+ more
@@ -191,18 +191,18 @@ Use consistent `snake_case` naming:
 <Tabs>
   <Tab title="✅ Good">
     ```javascript
-    Cryptique.track('swap_completed', { ... });
-    Cryptique.track('nft_minted', { ... });
-    Cryptique.track('liquidity_added', { ... });
-    Cryptique.track('onboarding_step_completed', { ... });
+    Trodo.track('swap_completed', { ... });
+    Trodo.track('nft_minted', { ... });
+    Trodo.track('liquidity_added', { ... });
+    Trodo.track('onboarding_step_completed', { ... });
     ```
   </Tab>
   <Tab title="❌ Avoid">
     ```javascript
-    Cryptique.track('SwapCompleted', { ... });     // PascalCase
-    Cryptique.track('swap-completed', { ... });    // kebab-case
-    Cryptique.track('Swap Completed', { ... });    // Spaces
-    Cryptique.track('swap', { ... });              // Too vague
+    Trodo.track('SwapCompleted', { ... });     // PascalCase
+    Trodo.track('swap-completed', { ... });    // kebab-case
+    Trodo.track('Swap Completed', { ... });    // Spaces
+    Trodo.track('swap', { ... });              // Too vague
     ```
   </Tab>
 </Tabs>

@@ -1,11 +1,11 @@
 ---
 title: "Auto-Events"
-description: "Events automatically captured by Cryptique without additional code"
+description: "Events automatically captured by Trodo without additional code"
 ---
 
 ## Overview
 
-When `auto-events` is enabled, Cryptique automatically captures user interactions without requiring any additional code. This provides comprehensive behavioral data out of the box.
+When `auto-events` is enabled, Trodo automatically captures user interactions without requiring any additional code. This provides comprehensive behavioral data out of the box.
 
 ## Automatic Events
 
@@ -202,7 +202,7 @@ Fires when the user selects ≥3 characters of text, as long as the selection di
 {
   "event_name": "text_selection",
   "auto_event_data": {
-    "selected_text": "Cryptique automatically captures...",
+    "selected_text": "Trodo automatically captures...",
     "selection_length": 35,
     "selection_start": 12,
     "selection_end": 47,
@@ -468,7 +468,7 @@ Fires on uncaught JavaScript errors and unhandled promise rejections.
 
 ### network_error
 
-Fires when an XHR request returns HTTP status ≥400 or fails entirely. Only SDK-internal requests to `sdkapi.cryptique.io` are monitored — application XHR is not tracked.
+Fires when an XHR request returns HTTP status ≥400 or fails entirely. Only SDK-internal requests to `sdkapi.trodo.ai` are monitored — application XHR is not tracked.
 
 **HTTP error** (status ≥400):
 
@@ -476,7 +476,7 @@ Fires when an XHR request returns HTTP status ≥400 or fails entirely. Only SDK
 {
   "event_name": "network_error",
   "auto_event_data": {
-    "url": "https://sdkapi.cryptique.io/events",
+    "url": "https://sdkapi.trodo.ai/events",
     "method": "POST",
     "status": 429,
     "status_text": "HTTP 429 Error",
@@ -491,7 +491,7 @@ Fires when an XHR request returns HTTP status ≥400 or fails entirely. Only SDK
 {
   "event_name": "network_error",
   "auto_event_data": {
-    "url": "https://sdkapi.cryptique.io/events",
+    "url": "https://sdkapi.trodo.ai/events",
     "method": "POST",
     "status": 0,
     "status_text": "XHR Network Error",
@@ -596,7 +596,7 @@ Enable auto-events and optionally suppress specific events directly on the scrip
 
 ```html
 <script
-  src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js"
+  src="https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js"
   site-id="YOUR_SITE_ID"
   auto-events="true"
   auto-events-disabled-events="js_error,network_error,page_performance">
@@ -611,16 +611,16 @@ You can also configure auto-events at runtime after the SDK has loaded:
 
 ```javascript
 // Disable one or more events
-Cryptique.disableAutoEvent(['js_error', 'network_error'])
+Trodo.disableAutoEvent(['js_error', 'network_error'])
 
 // Re-enable a previously disabled event
-Cryptique.enableAutoEvent('rage_click')
+Trodo.enableAutoEvent('rage_click')
 
 // Replace the entire disabled list
-Cryptique.setAutoEventsDisabledEvents(['page_scroll'])
+Trodo.setAutoEventsDisabledEvents(['page_scroll'])
 
 // Inspect the current configuration
-Cryptique.getAutoEventsConfig()
+Trodo.getAutoEventsConfig()
 ```
 
 ### Exclude Paths
@@ -629,7 +629,7 @@ Prevent tracking on specific pages:
 
 ```html
 <script
-  src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js"
+  src="https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js"
   site-id="YOUR_SITE_ID"
   auto-events="true"
   auto-events-disabled-paths="/admin,/internal,/debug">
@@ -647,7 +647,7 @@ For complete manual control:
 
 ```html
 <script
-  src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js"
+  src="https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js"
   site-id="YOUR_SITE_ID"
   auto-events="false">
 </script>
@@ -676,7 +676,7 @@ For most Web3 apps, disable the noisiest low-signal events:
 
 ```html
 <script
-  src="https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js"
+  src="https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js"
   site-id="YOUR_SITE_ID"
   auto-events="true"
   auto-events-disabled-events="js_error,network_error,page_performance"
@@ -701,7 +701,7 @@ Auto-events capture generic interactions. Add custom events for business-specifi
 ```javascript
 // Auto-event captures: element_click on the swap button
 // Custom event adds business context:
-Cryptique.track('swap_initiated', {
+Trodo.track('swap_initiated', {
   input_token: 'ETH',
   output_token: 'USDC',
   amount: 1.5,

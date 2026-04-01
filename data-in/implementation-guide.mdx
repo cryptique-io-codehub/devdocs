@@ -1,6 +1,6 @@
 ---
 title: "Implementation Guide"
-description: "Patterns and best practices for implementing Cryptique analytics"
+description: "Patterns and best practices for implementing Trodo analytics"
 ---
 
 ## Overview
@@ -14,7 +14,7 @@ This guide covers implementation patterns for common Web3 analytics scenarios. U
     Define what you want to measure before writing code
   </Step>
   <Step title="Install SDK">
-    Add Cryptique to your application
+    Add Trodo to your application
   </Step>
   <Step title="Configure Auto-Events">
     Enable/disable automatic tracking
@@ -41,22 +41,22 @@ Track the complete auth journey:
 
 ```javascript
 // Signup started
-Cryptique.track('signup_started', {
+Trodo.track('signup_started', {
   signup_method: 'email',  // or 'google', 'wallet'
   referral_source: getReferralSource()
 });
 
 // Signup completed
-Cryptique.track('signup_completed', {
+Trodo.track('signup_completed', {
   signup_method: 'email',
   time_to_complete_seconds: 45
 });
 
 // Identify the user
-Cryptique.identify(user.id);
+Trodo.identify(user.id);
 
 // Set user properties
-Cryptique.people.set({
+Trodo.people.set({
   email: user.email,
   name: user.name,
   signup_date: new Date().toISOString(),
@@ -64,7 +64,7 @@ Cryptique.people.set({
 });
 
 // Set persistent properties
-Cryptique.people.set_once({
+Trodo.people.set_once({
   first_seen: new Date().toISOString(),
   original_referrer: document.referrer
 });
@@ -76,7 +76,7 @@ Track wallet interactions:
 
 ```javascript
 // Wallet connection initiated
-Cryptique.track('wallet_connect_initiated', {
+Trodo.track('wallet_connect_initiated', {
   wallet_type: 'metamask',
   trigger_location: 'navbar'  // or 'modal', 'onboarding'
 });
@@ -84,26 +84,26 @@ Cryptique.track('wallet_connect_initiated', {
 // Wallet connected successfully
 async function onWalletConnected(address, provider) {
   // Track with SDK
-  Cryptique.walletAddress(address);
-  Cryptique.track('wallet_connected', {
+  Trodo.walletAddress(address);
+  Trodo.track('wallet_connected', {
     wallet_type: getWalletType(provider),
     chain_id: await provider.getChainId()
   });
   
   // Optional: set user properties
-  Cryptique.people.set({
+  Trodo.people.set({
     primary_wallet: address,
     last_wallet_connect: new Date().toISOString()
   });
   
-  Cryptique.people.increment({
+  Trodo.people.increment({
     wallet_connect_count: 1
   });
 }
 
 // Wallet connection failed
 function onWalletError(error) {
-  Cryptique.track('wallet_connect_failed', {
+  Trodo.track('wallet_connect_failed', {
     error_type: error.code,
     error_message: error.message,
     wallet_type: 'metamask'
@@ -112,12 +112,12 @@ function onWalletError(error) {
 
 // Wallet disconnected
 function onWalletDisconnected(address) {
-  Cryptique.track('wallet_disconnected', { address });
+  Trodo.track('wallet_disconnected', { address });
 }
 
 // Chain changed
 function onChainChanged(chainId, address) {
-  Cryptique.track('chain_changed', {
+  Trodo.track('chain_changed', {
     new_chain_id: chainId,
     wallet_address: address
   });
@@ -130,7 +130,7 @@ Track the complete swap journey:
 
 ```javascript
 // Token selected
-Cryptique.track('token_selected', {
+Trodo.track('token_selected', {
   token_symbol: 'ETH',
   token_address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
   selection_type: 'input',  // or 'output'
@@ -138,7 +138,7 @@ Cryptique.track('token_selected', {
 });
 
 // Swap quoted
-Cryptique.track('swap_quoted', {
+Trodo.track('swap_quoted', {
   input_token: 'ETH',
   output_token: 'USDC',
   input_amount: 1.5,
@@ -149,7 +149,7 @@ Cryptique.track('swap_quoted', {
 });
 
 // Swap initiated (user clicked swap)
-Cryptique.track('swap_initiated', {
+Trodo.track('swap_initiated', {
   input_token: 'ETH',
   output_token: 'USDC',
   input_amount: 1.5,
@@ -158,14 +158,14 @@ Cryptique.track('swap_initiated', {
 });
 
 // Transaction approval requested
-Cryptique.track('transaction_approval_requested', {
+Trodo.track('transaction_approval_requested', {
   token: 'USDC',
   spender: '0x...router',
   amount: 'unlimited'  // or specific amount
 });
 
 // Swap completed (after on-chain confirmation)
-Cryptique.track('swap_completed', {
+Trodo.track('swap_completed', {
   input_token: 'ETH',
   output_token: 'USDC',
   input_amount: 1.5,
@@ -177,7 +177,7 @@ Cryptique.track('swap_completed', {
 });
 
 // Swap failed
-Cryptique.track('swap_failed', {
+Trodo.track('swap_failed', {
   input_token: 'ETH',
   output_token: 'USDC',
   input_amount: 1.5,
@@ -190,7 +190,7 @@ Cryptique.track('swap_failed', {
 
 ```javascript
 // Collection viewed
-Cryptique.track('collection_viewed', {
+Trodo.track('collection_viewed', {
   collection_name: 'Cool Cats',
   collection_address: '0x...',
   items_available: 500,
@@ -198,7 +198,7 @@ Cryptique.track('collection_viewed', {
 });
 
 // Mint initiated
-Cryptique.track('mint_initiated', {
+Trodo.track('mint_initiated', {
   collection_name: 'Cool Cats',
   quantity: 2,
   total_price_eth: 0.10,
@@ -206,7 +206,7 @@ Cryptique.track('mint_initiated', {
 });
 
 // Mint completed
-Cryptique.track('mint_completed', {
+Trodo.track('mint_completed', {
   collection_name: 'Cool Cats',
   quantity: 2,
   token_ids: [1234, 1235],
@@ -231,7 +231,7 @@ const ONBOARDING_STEPS = [
 function trackOnboardingStep(step, additionalProps = {}) {
   const stepIndex = ONBOARDING_STEPS.indexOf(step);
   
-  Cryptique.track('onboarding_step_completed', {
+  Trodo.track('onboarding_step_completed', {
     step_name: step,
     step_number: stepIndex + 1,
     total_steps: ONBOARDING_STEPS.length,
@@ -239,7 +239,7 @@ function trackOnboardingStep(step, additionalProps = {}) {
   });
   
   // Update user property
-  Cryptique.people.set({
+  Trodo.people.set({
     onboarding_step: step,
     onboarding_progress: Math.round((stepIndex + 1) / ONBOARDING_STEPS.length * 100)
   });
@@ -247,13 +247,13 @@ function trackOnboardingStep(step, additionalProps = {}) {
 
 // On completion
 function completeOnboarding() {
-  Cryptique.track('onboarding_completed', {
+  Trodo.track('onboarding_completed', {
     total_time_seconds: timeSinceStart,
     steps_completed: completedSteps.length,
     skipped_steps: skippedSteps
   });
   
-  Cryptique.people.set({
+  Trodo.people.set({
     onboarding_completed: true,
     onboarding_completed_date: new Date().toISOString()
   });
@@ -267,7 +267,7 @@ Track errors for debugging:
 ```javascript
 // Generic error tracking
 function trackError(error, context) {
-  Cryptique.track('error_occurred', {
+  Trodo.track('error_occurred', {
     error_type: error.name,
     error_message: error.message,
     error_code: error.code,
@@ -278,7 +278,7 @@ function trackError(error, context) {
 
 // Transaction error
 function trackTransactionError(error, txDetails) {
-  Cryptique.track('transaction_error', {
+  Trodo.track('transaction_error', {
     error_type: classifyError(error),
     error_message: error.message,
     transaction_type: txDetails.type,
@@ -313,8 +313,8 @@ function WalletTracker() {
   // Track connection state changes
   useEffect(() => {
     if (isConnected && address) {
-      Cryptique.walletAddress(address);
-      Cryptique.track('wallet_connected', {
+      Trodo.walletAddress(address);
+      Trodo.track('wallet_connected', {
         chain_id: chain?.id,
         wallet_type: connectors[0]?.name || 'unknown'
       });
@@ -324,7 +324,7 @@ function WalletTracker() {
   // Track disconnection
   const handleDisconnect = () => {
     if (address) {
-      Cryptique.track('wallet_disconnected', { address });
+      Trodo.track('wallet_disconnected', { address });
     }
     disconnect();
   };
@@ -341,7 +341,7 @@ function WalletTracker() {
 
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import Cryptique from 'cryptique-sdk';
+import Trodo from 'trodo';
 
 export function AnalyticsProvider({ children }) {
   const pathname = usePathname();
@@ -350,7 +350,7 @@ export function AnalyticsProvider({ children }) {
   // Track page views on route change
   useEffect(() => {
     // Auto page_view should handle this, but for SPAs:
-    Cryptique.track('page_view', {
+    Trodo.track('page_view', {
       page_path: pathname,
       query_string: searchParams.toString()
     });
@@ -366,7 +366,7 @@ export function AnalyticsProvider({ children }) {
 // composables/useTracking.js
 import { watch } from 'vue';
 import { useRoute } from 'vue-router';
-import Cryptique from 'cryptique-sdk';
+import Trodo from 'trodo';
 
 export function useTracking() {
   const route = useRoute();
@@ -375,14 +375,14 @@ export function useTracking() {
   watch(
     () => route.fullPath,
     (newPath) => {
-      Cryptique.track('page_view', {
+      Trodo.track('page_view', {
         page_path: newPath
       });
     }
   );
   
   const trackEvent = (name, properties) => {
-    Cryptique.track(name, properties);
+    Trodo.track(name, properties);
   };
   
   return { trackEvent };
@@ -394,17 +394,17 @@ export function useTracking() {
 Model B2B or multi-tenant context with [Groups](/data-in/sdk-reference/groups): assign the user, then set properties on the group profile.
 
 ```javascript
-Cryptique.identify(user.id);
+Trodo.identify(user.id);
 
-await Cryptique.set_group('company', user.companyId);
+await Trodo.set_group('company', user.companyId);
 
-const company = Cryptique.get_group('company', user.companyId);
+const company = Trodo.get_group('company', user.companyId);
 await company.set({
   name: user.companyName,
   plan: user.companyPlan
 });
 
-Cryptique.track('report_exported', { format: 'csv' });
+Trodo.track('report_exported', { format: 'csv' });
 ```
 
 Use `add_group` / `remove_group` when a user can belong to **multiple** IDs under the same key. After `identify()`, the server may return `group_memberships` to hydrate assignments on a new device.
@@ -420,7 +420,7 @@ Enable debug logging:
 script.setAttribute('debug', 'true');
 
 // npm
-await Cryptique.init({
+await Trodo.init({
   siteId: 'YOUR_SITE_ID',
   debug: true  // Logs all events to console
 });
@@ -463,7 +463,7 @@ await Cryptique.init({
   </Accordion>
   
   <Accordion title="Wallet not linking">
-    - Call `Cryptique.walletAddress()` with a valid address
+    - Call `Trodo.walletAddress()` with a valid address
     - Verify address format (0x…)
     - Confirm the SDK session initialized (Site ID, domain allowlist)
   </Accordion>

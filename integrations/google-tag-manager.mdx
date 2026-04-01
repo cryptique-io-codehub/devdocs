@@ -1,11 +1,11 @@
 ---
 title: "Google Tag Manager"
-description: "Deploy Cryptique via Google Tag Manager"
+description: "Deploy Trodo via Google Tag Manager"
 ---
 
 ## Overview
 
-Google Tag Manager (GTM) provides a flexible way to deploy Cryptique without modifying your website's source code. This guide covers setup, configuration, and best practices.
+Google Tag Manager (GTM) provides a flexible way to deploy Trodo without modifying your website's source code. This guide covers setup, configuration, and best practices.
 
 ## Quick Setup
 
@@ -18,20 +18,20 @@ Google Tag Manager (GTM) provides a flexible way to deploy Cryptique without mod
     Click **Tags** → **New** → **Tag Configuration** → **Custom HTML**
   </Step>
   
-  <Step title="Add Cryptique Script">
+  <Step title="Add Trodo Script">
     Paste the following code:
     
     ```html
     <script>
       var script = document.createElement('script');
-      script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+      script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
       script.setAttribute('site-id', 'YOUR_SITE_ID');
       script.setAttribute('auto-events', 'true');
       document.head.appendChild(script);
     </script>
     ```
     
-    Replace `YOUR_SITE_ID` with your actual Site ID from Cryptique dashboard.
+    Replace `YOUR_SITE_ID` with your actual Site ID from Trodo dashboard.
   </Step>
   
   <Step title="Set Trigger">
@@ -50,7 +50,7 @@ Google Tag Manager (GTM) provides a flexible way to deploy Cryptique without mod
 ```html
 <script>
   var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
   script.setAttribute('site-id', 'YOUR_SITE_ID');
   script.setAttribute('auto-events', 'true');
   document.head.appendChild(script);
@@ -62,7 +62,7 @@ Google Tag Manager (GTM) provides a flexible way to deploy Cryptique without mod
 ```html
 <script>
   var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
   script.setAttribute('site-id', 'YOUR_SITE_ID');
   script.setAttribute('auto-events', 'true');
   script.setAttribute('auto-events-disabled-paths', '/admin,/internal,/checkout');
@@ -75,7 +75,7 @@ Google Tag Manager (GTM) provides a flexible way to deploy Cryptique without mod
 
 | Attribute | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `site-id` | string | required | Your Cryptique site identifier |
+| `site-id` | string | required | Your Trodo site identifier |
 | `auto-events` | boolean | `true` | Enable automatic event tracking |
 | `auto-events-disabled-paths` | string | `''` | Comma-separated URL paths to exclude |
 | `auto-events-disabled-events` | string | `''` | Comma-separated auto-events to disable |
@@ -92,8 +92,8 @@ You can use GTM variables in your configuration:
 ```html
 <script>
   var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
-  script.setAttribute('site-id', '{{Cryptique Site ID}}');
+  script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
+  script.setAttribute('site-id', '{{Trodo Site ID}}');
   script.setAttribute('auto-events', 'true');
   document.head.appendChild(script);
 </script>
@@ -105,9 +105,9 @@ Use GTM's environment feature for staging vs production:
 
 ```html
 <script>
-  var siteId = '{{Cryptique Site ID}}'; // Different per environment
+  var siteId = '{{Trodo Site ID}}'; // Different per environment
   var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
   script.setAttribute('site-id', siteId);
   script.setAttribute('auto-events', 'true');
   document.head.appendChild(script);
@@ -118,12 +118,12 @@ Use GTM's environment feature for staging vs production:
 
 ### Via Data Layer
 
-Push events to GTM's data layer, then forward to Cryptique:
+Push events to GTM's data layer, then forward to Trodo:
 
 **On your website:**
 ```javascript
 dataLayer.push({
-  event: 'cryptique_event',
+  event: 'trodo_event',
   eventName: 'button_clicked',
   eventProperties: {
     button_name: 'signup',
@@ -135,34 +135,34 @@ dataLayer.push({
 **GTM Tag (Custom HTML):**
 ```html
 <script>
-  if (window.Cryptique) {
+  if (window.Trodo) {
     var eventName = '{{DL - eventName}}';
     var eventProps = '{{DL - eventProperties}}';
-    window.Cryptique.track(eventName, eventProps);
+    window.Trodo.track(eventName, eventProps);
   }
 </script>
 ```
 
-**Trigger:** Custom Event = `cryptique_event`
+**Trigger:** Custom Event = `trodo_event`
 
 ### Direct Tracking
 
-After Cryptique loads, you can track directly:
+After Trodo loads, you can track directly:
 
 ```html
 <script>
-  // Wait for Cryptique to be available
-  function trackWithCryptique(eventName, properties) {
-    if (window.Cryptique) {
-      window.Cryptique.track(eventName, properties);
+  // Wait for Trodo to be available
+  function trackWithTrodo(eventName, properties) {
+    if (window.Trodo) {
+      window.Trodo.track(eventName, properties);
     } else {
       setTimeout(function() {
-        trackWithCryptique(eventName, properties);
+        trackWithTrodo(eventName, properties);
       }, 100);
     }
   }
   
-  trackWithCryptique('gtm_custom_event', {
+  trackWithTrodo('gtm_custom_event', {
     source: 'gtm',
     trigger: '{{Trigger Name}}'
   });
@@ -177,9 +177,9 @@ Create a tag to identify users when they log in:
 
 ```html
 <script>
-  if (window.Cryptique && '{{User ID}}') {
-    window.Cryptique.identify('{{User ID}}');
-    window.Cryptique.people.set({
+  if (window.Trodo && '{{User ID}}') {
+    window.Trodo.identify('{{User ID}}');
+    window.Trodo.people.set({
       email: '{{User Email}}',
       name: '{{User Name}}',
       plan: '{{User Plan}}'
@@ -196,8 +196,8 @@ Track wallet connections:
 
 ```html
 <script>
-  if (window.Cryptique && '{{Wallet Address}}') {
-    window.Cryptique.walletAddress('{{Wallet Address}}');
+  if (window.Trodo && '{{Wallet Address}}') {
+    window.Trodo.walletAddress('{{Wallet Address}}');
   }
 </script>
 ```
@@ -208,7 +208,7 @@ Track wallet connections:
 
 ### All Pages (Recommended)
 
-Load Cryptique on every page:
+Load Trodo on every page:
 
 1. Trigger Type: **Page View**
 2. Trigger fires on: **All Page Views**
@@ -245,32 +245,32 @@ dataLayer.push({ event: 'consent_granted' });
 
 ### Load Order
 
-Ensure Cryptique loads before dependent tags:
+Ensure Trodo loads before dependent tags:
 
-1. Open your Cryptique tag
+1. Open your Trodo tag
 2. Go to **Advanced Settings** → **Tag Sequencing**
-3. Check "Fire a tag before [Cryptique] fires" if needed
-4. Check "Fire a tag after [Cryptique] fires" for dependent tags
+3. Check "Fire a tag before [Trodo] fires" if needed
+4. Check "Fire a tag after [Trodo] fires" for dependent tags
 
-### Wait for Cryptique
+### Wait for Trodo
 
-For tags that depend on Cryptique:
+For tags that depend on Trodo:
 
 ```html
 <script>
-  function waitForCryptique(callback) {
-    if (window.Cryptique) {
+  function waitForTrodo(callback) {
+    if (window.Trodo) {
       callback();
     } else {
       setTimeout(function() {
-        waitForCryptique(callback);
+        waitForTrodo(callback);
       }, 50);
     }
   }
   
-  waitForCryptique(function() {
-    // Your code that needs Cryptique
-    window.Cryptique.track('dependent_event');
+  waitForTrodo(function() {
+    // Your code that needs Trodo
+    window.Trodo.track('dependent_event');
   });
 </script>
 ```
@@ -286,23 +286,23 @@ For tags that depend on Cryptique:
    - Variable values
    - Data layer events
 
-### Verify Cryptique Loading
+### Verify Trodo Loading
 
 In browser console:
 
 ```javascript
-// Check if Cryptique loaded
-console.log(window.Cryptique); // Should show Cryptique object
+// Check if Trodo loaded
+console.log(window.Trodo); // Should show Trodo object
 
 // Check initialization
-console.log(window.Cryptique.getSiteId()); // Should show your Site ID
+console.log(window.Trodo.getSiteId()); // Should show your Site ID
 ```
 
 ### Network Tab
 
 Check for requests to:
-- `cdn.cryptique.io` (script load)
-- `api.cryptique.io` (event tracking)
+- `cdn.trodo.ai` (script load)
+- `api.trodo.ai` (event tracking)
 
 ## Common Issues
 
@@ -313,15 +313,15 @@ Check for requests to:
     3. Check for JavaScript errors in console
   </Accordion>
   
-  <Accordion title="Events not appearing in Cryptique">
+  <Accordion title="Events not appearing in Trodo">
     1. Verify Site ID is correct
-    2. Check domain is whitelisted in Cryptique
+    2. Check domain is whitelisted in Trodo
     3. Look for blocked requests (ad blockers)
     4. Verify in Network tab that API calls succeed
   </Accordion>
   
   <Accordion title="Double tracking">
-    1. Ensure Cryptique is only loaded once
+    1. Ensure Trodo is only loaded once
     2. Check for duplicate tags in GTM
     3. Don't load via both GTM and direct script
   </Accordion>
@@ -329,8 +329,8 @@ Check for requests to:
   <Accordion title="Script blocked by CSP">
     Add to your Content Security Policy:
     ```
-    script-src 'self' https://cdn.cryptique.io;
-    connect-src 'self' https://api.cryptique.io;
+    script-src 'self' https://cdn.trodo.ai;
+    connect-src 'self' https://api.trodo.ai;
     ```
   </Accordion>
 </AccordionGroup>
@@ -339,15 +339,15 @@ Check for requests to:
 
 ### Use Folders
 
-Organize your Cryptique tags:
+Organize your Trodo tags:
 
 ```
 Tags/
-├── Cryptique/
-│   ├── Cryptique - Base Script
-│   ├── Cryptique - Identify User
-│   ├── Cryptique - Track Signup
-│   └── Cryptique - Track Purchase
+├── Trodo/
+│   ├── Trodo - Base Script
+│   ├── Trodo - Identify User
+│   ├── Trodo - Track Signup
+│   └── Trodo - Track Purchase
 ```
 
 ### Naming Convention
@@ -356,9 +356,9 @@ Use clear, consistent names:
 
 ```
 ✅ Good:
-"Cryptique - Base Script (All Pages)"
-"Cryptique - Track Button Click"
-"Cryptique - Identify Logged In User"
+"Trodo - Base Script (All Pages)"
+"Trodo - Track Button Click"
+"Trodo - Identify Logged In User"
 
 ❌ Poor:
 "Tag 1"
@@ -371,7 +371,7 @@ Use clear, consistent names:
 Use GTM's built-in versioning:
 
 1. Add descriptions to each version
-2. Name versions meaningfully: "Added Cryptique tracking"
+2. Name versions meaningfully: "Added Trodo tracking"
 3. Use workspaces for team collaboration
 
 ### Testing
@@ -380,7 +380,7 @@ Always test before publishing:
 
 1. Use GTM Preview mode
 2. Test on staging environment first
-3. Verify events appear in Cryptique
+3. Verify events appear in Trodo
 4. Check for console errors
 
 ## Next Steps

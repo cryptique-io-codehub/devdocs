@@ -5,7 +5,7 @@ description: "Properties automatically captured on every event"
 
 ## Overview
 
-Cryptique automatically captures a rich set of properties on every event. These properties require no additional code and are available for filtering, breakdowns, and analysis.
+Trodo automatically captures a rich set of properties on every event. These properties require no additional code and are available for filtering, breakdowns, and analysis.
 
 ## Property Categories
 
@@ -15,7 +15,7 @@ Core identifiers attached to every event:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `team_id` | string | Your Cryptique team identifier |
+| `team_id` | string | Your Trodo team identifier |
 | `session_id` | string | Current session identifier |
 | `session_db_id` | string | Internal session database ID |
 | `user_id` | string | User identifier (if identified) |
@@ -135,7 +135,7 @@ Auto events attach a **payload** in addition to the default properties above. Na
 
 **`page_summary`** — large aggregate object: e.g. `move_grid`, `hover_grid`, `field_dwells`, `viewport_element_dwells`, `exit_type`, performance fields, and more.
 
-Wallet connection is **not** an auto-event in the SDK; use **`Cryptique.walletAddress()`** and custom **`Cryptique.track()`** calls if you want explicit wallet lifecycle events in the event stream.
+Wallet connection is **not** an auto-event in the SDK; use **`Trodo.walletAddress()`** and custom **`Trodo.track()`** calls if you want explicit wallet lifecycle events in the event stream.
 
 ## Using Default Properties
 
@@ -178,13 +178,13 @@ Some properties can be overridden when tracking events:
 
 ```javascript
 // Override location for server-side events
-Cryptique.track('server_event', {
+Trodo.track('server_event', {
   country: 'GB',
   city: 'London'
 });
 
 // Override page info for SPA
-Cryptique.track('virtual_page_view', {
+Trodo.track('virtual_page_view', {
   current_url: '/app/dashboard',
   page_title: 'Dashboard'
 });

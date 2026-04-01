@@ -5,14 +5,14 @@ description: "Set and manage persistent user properties"
 
 ## Overview
 
-The `Cryptique.people` object provides methods to set and manage persistent user properties. Unlike event properties (which describe a single action), user properties describe the user themselves and persist across sessions.
+The `Trodo.people` object provides methods to set and manage persistent user properties. Unlike event properties (which describe a single action), user properties describe the user themselves and persist across sessions.
 
 <Info>
   User properties are ideal for storing user attributes like plan type, signup date, preferences, and cumulative metrics.
 </Info>
 
 <Info>
-  This page is the API reference for `Cryptique.people.*` methods. If you want to understand how user profiles are structured — what fields they contain, how they're created, and how wallet enrichment adds properties automatically — see the [User Profile Data Model](/data-in/user-profiles).
+  This page is the API reference for `Trodo.people.*` methods. If you want to understand how user profiles are structured — what fields they contain, how they're created, and how wallet enrichment adds properties automatically — see the [User Profile Data Model](/data-in/user-profiles).
 </Info>
 
 ---
@@ -39,7 +39,7 @@ The `Cryptique.people` object provides methods to set and manage persistent user
 Set user properties. Overwrites any existing values.
 
 ```javascript
-Cryptique.people.set(properties)
+Trodo.people.set(properties)
 ```
 
 <ParamField path="properties" type="object" required>
@@ -50,7 +50,7 @@ Cryptique.people.set(properties)
 
 ```javascript
 // Set multiple properties
-Cryptique.people.set({
+Trodo.people.set({
   email: 'user@example.com',
   plan: 'pro',
   company: 'Acme Inc',
@@ -58,12 +58,12 @@ Cryptique.people.set({
 });
 
 // Update a single property
-Cryptique.people.set({
+Trodo.people.set({
   plan: 'enterprise'
 });
 
 // Set Web3-specific properties
-Cryptique.people.set({
+Trodo.people.set({
   primaryWallet: '0x742d35Cc6634C0532925a3b844Bc9e7595f5bB21',
   preferredChain: 'ethereum',
   totalSwaps: 47,
@@ -78,7 +78,7 @@ Cryptique.people.set({
 Set properties only if they haven't been set before. Useful for immutable properties like signup date or referral source.
 
 ```javascript
-Cryptique.people.set_once(properties)
+Trodo.people.set_once(properties)
 ```
 
 <ParamField path="properties" type="object" required>
@@ -89,14 +89,14 @@ Cryptique.people.set_once(properties)
 
 ```javascript
 // Only sets if not already present
-Cryptique.people.set_once({
+Trodo.people.set_once({
   signupDate: new Date().toISOString(),
   referralSource: 'twitter',
   initialPlan: 'free'
 });
 
 // These won't overwrite existing values
-Cryptique.people.set_once({
+Trodo.people.set_once({
   signupDate: '2025-02-01'  // Ignored if signupDate exists
 });
 ```
@@ -108,7 +108,7 @@ Cryptique.people.set_once({
 Increment (or decrement) numeric properties.
 
 ```javascript
-Cryptique.people.increment(properties)
+Trodo.people.increment(properties)
 ```
 
 <ParamField path="properties" type="object" required>
@@ -119,19 +119,19 @@ Cryptique.people.increment(properties)
 
 ```javascript
 // Increment by 1
-Cryptique.people.increment({
+Trodo.people.increment({
   totalSwaps: 1,
   loginCount: 1
 });
 
 // Increment by specific amounts
-Cryptique.people.increment({
+Trodo.people.increment({
   totalVolumeUSD: 2500,
   tokensTraded: 5
 });
 
 // Decrement (use negative numbers)
-Cryptique.people.increment({
+Trodo.people.increment({
   creditsRemaining: -10
 });
 ```
@@ -143,7 +143,7 @@ Cryptique.people.increment({
 Append values to list properties.
 
 ```javascript
-Cryptique.people.append(properties)
+Trodo.people.append(properties)
 ```
 
 <ParamField path="properties" type="object" required>
@@ -154,14 +154,14 @@ Cryptique.people.append(properties)
 
 ```javascript
 // Append to a list
-Cryptique.people.append({
+Trodo.people.append({
   connectedWallets: '0x789...',
   tradedTokens: 'USDC',
   visitedPages: '/swap'
 });
 
 // Can create duplicates
-Cryptique.people.append({
+Trodo.people.append({
   tradedTokens: 'ETH'  // Added even if 'ETH' exists
 });
 ```
@@ -173,7 +173,7 @@ Cryptique.people.append({
 Add unique values to list properties (no duplicates).
 
 ```javascript
-Cryptique.people.union(properties)
+Trodo.people.union(properties)
 ```
 
 <ParamField path="properties" type="object" required>
@@ -184,13 +184,13 @@ Cryptique.people.union(properties)
 
 ```javascript
 // Add unique values only
-Cryptique.people.union({
+Trodo.people.union({
   tradedTokens: ['ETH', 'USDC', 'DAI'],
   usedFeatures: ['swap', 'stake', 'bridge']
 });
 
 // Won't add duplicates
-Cryptique.people.union({
+Trodo.people.union({
   tradedTokens: ['ETH']  // Ignored if 'ETH' already exists
 });
 ```
@@ -202,7 +202,7 @@ Cryptique.people.union({
 Remove specific values from list properties.
 
 ```javascript
-Cryptique.people.remove(properties)
+Trodo.people.remove(properties)
 ```
 
 <ParamField path="properties" type="object" required>
@@ -213,7 +213,7 @@ Cryptique.people.remove(properties)
 
 ```javascript
 // Remove specific values from lists
-Cryptique.people.remove({
+Trodo.people.remove({
   connectedWallets: '0x789...',
   watchlist: 'DOGE'
 });
@@ -226,7 +226,7 @@ Cryptique.people.remove({
 Remove properties entirely from the user profile.
 
 ```javascript
-Cryptique.people.unset(propertyNames)
+Trodo.people.unset(propertyNames)
 ```
 
 <ParamField path="propertyNames" type="string | string[]" required>
@@ -237,10 +237,10 @@ Cryptique.people.unset(propertyNames)
 
 ```javascript
 // Remove a single property
-Cryptique.people.unset('temporaryFlag');
+Trodo.people.unset('temporaryFlag');
 
 // Remove multiple properties
-Cryptique.people.unset(['oldProperty', 'deprecatedField']);
+Trodo.people.unset(['oldProperty', 'deprecatedField']);
 ```
 
 ---
@@ -250,7 +250,7 @@ Cryptique.people.unset(['oldProperty', 'deprecatedField']);
 Permanently delete the user profile and all associated data.
 
 ```javascript
-Cryptique.people.deleteUser()
+Trodo.people.deleteUser()
 ```
 
 <Warning>
@@ -263,8 +263,8 @@ Cryptique.people.deleteUser()
 // Delete user profile (e.g., for GDPR requests)
 async function handleAccountDeletion() {
   await deleteUserFromDatabase(userId);
-  Cryptique.people.deleteUser();
-  Cryptique.reset();
+  Trodo.people.deleteUser();
+  Trodo.reset();
 }
 ```
 
@@ -275,7 +275,7 @@ async function handleAccountDeletion() {
 Track a payment or revenue event associated with the user.
 
 ```javascript
-Cryptique.people.trackCharge(amount, properties?)
+Trodo.people.trackCharge(amount, properties?)
 ```
 
 <ParamField path="amount" type="number" required>
@@ -290,17 +290,17 @@ Cryptique.people.trackCharge(amount, properties?)
 
 ```javascript
 // Track a simple charge
-Cryptique.people.trackCharge(99.99);
+Trodo.people.trackCharge(99.99);
 
 // Track with properties
-Cryptique.people.trackCharge(49.99, {
+Trodo.people.trackCharge(49.99, {
   plan: 'pro',
   billingCycle: 'monthly',
   currency: 'USD'
 });
 
 // Track crypto payments
-Cryptique.people.trackCharge(0.5, {
+Trodo.people.trackCharge(0.5, {
   currency: 'ETH',
   valueUSD: 950,
   txHash: '0x123...',
@@ -315,14 +315,14 @@ Cryptique.people.trackCharge(0.5, {
 Clear all tracked charges for the user.
 
 ```javascript
-Cryptique.people.clearCharges()
+Trodo.people.clearCharges()
 ```
 
 ### Example
 
 ```javascript
 // Clear charges (e.g., after refund)
-Cryptique.people.clearCharges();
+Trodo.people.clearCharges();
 ```
 
 ---
@@ -361,36 +361,36 @@ See [Implementation Guide](/data-in/implementation-guide) for complete details.
 
 ```javascript
 // On signup
-Cryptique.identify(user.id);
+Trodo.identify(user.id);
 
-Cryptique.people.set({
+Trodo.people.set({
   email: user.email,
   plan: 'free'
 });
 
-Cryptique.people.set_once({
+Trodo.people.set_once({
   signupDate: new Date().toISOString(),
   referralSource: utmSource
 });
 
 // On first trade
-Cryptique.people.increment({ totalTrades: 1 });
-Cryptique.people.union({ tradedTokens: ['ETH', 'USDC'] });
+Trodo.people.increment({ totalTrades: 1 });
+Trodo.people.union({ tradedTokens: ['ETH', 'USDC'] });
 
 // On upgrade
-Cryptique.people.set({ plan: 'pro' });
-Cryptique.people.trackCharge(99, {
+Trodo.people.set({ plan: 'pro' });
+Trodo.people.trackCharge(99, {
   plan: 'pro',
   billingCycle: 'annual'
 });
 
 // On connecting new wallet
-Cryptique.people.append({
+Trodo.people.append({
   connectedWallets: newWalletAddress
 });
 
 // On disconnecting wallet
-Cryptique.people.remove({
+Trodo.people.remove({
   connectedWallets: removedWalletAddress
 });
 ```

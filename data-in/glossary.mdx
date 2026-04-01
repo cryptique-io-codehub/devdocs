@@ -1,22 +1,22 @@
 ---
 title: "Glossary"
-description: "Definitions for Cryptique-specific terms and how they map to familiar analytics tools"
+description: "Definitions for Trodo-specific terms and how they map to familiar analytics tools"
 ---
 
 ## Overview
 
-This page defines the core vocabulary used throughout Cryptique's documentation. Where relevant, each term is mapped to its equivalent in Mixpanel or Amplitude.
+This page defines the core vocabulary used throughout Trodo's documentation. Where relevant, each term is mapped to its equivalent in Mixpanel or Amplitude.
 
 ---
 
 ## distinct_id
 
-The primary identifier for a user in Cryptique. Every user — anonymous or identified — has one.
+The primary identifier for a user in Trodo. Every user — anonymous or identified — has one.
 
-- **Anonymous users**: Cryptique auto-generates a `distinct_id` (e.g. `anon_abc123xyz`) on first visit, stored in a first-party cookie (`cq_distinct_id`).
-- **Identified users**: When you call `Cryptique.identify('your_id')`, the anonymous `distinct_id` is replaced with the ID you supply (typically your database user ID or UUID).
+- **Anonymous users**: Trodo auto-generates a `distinct_id` (e.g. `anon_abc123xyz`) on first visit, stored in a first-party cookie (`cq_distinct_id`).
+- **Identified users**: When you call `Trodo.identify('your_id')`, the anonymous `distinct_id` is replaced with the ID you supply (typically your database user ID or UUID).
 
-`distinct_id` is always developer-controlled after identification — Cryptique never reassigns it.
+`distinct_id` is always developer-controlled after identification — Trodo never reassigns it.
 
 | Tool | Equivalent term |
 |---|---|
@@ -27,7 +27,7 @@ The primary identifier for a user in Cryptique. Every user — anonymous or iden
 
 ## user_identity_id
 
-An internal UUID assigned by Cryptique to each profile record. Unlike `distinct_id` (which you control), `user_identity_id` is system-generated and stable across merges. You will see it in raw data exports; you do not need to set or reference it in your SDK calls.
+An internal UUID assigned by Trodo to each profile record. Unlike `distinct_id` (which you control), `user_identity_id` is system-generated and stable across merges. You will see it in raw data exports; you do not need to set or reference it in your SDK calls.
 
 ---
 
@@ -36,7 +36,7 @@ An internal UUID assigned by Cryptique to each profile record. Unlike `distinct_
 The SDK method that links an anonymous session to a known user. Call it once per session, at login or signup.
 
 ```javascript
-Cryptique.identify('user_db_id_12345');
+Trodo.identify('user_db_id_12345');
 ```
 
 **Merge behavior:**
@@ -53,7 +53,7 @@ Cryptique.identify('user_db_id_12345');
 
 ## CQ Intelligence merge engine
 
-Cryptique's internal system for unifying profiles that belong to the same real user across devices, sessions, and wallets.
+Trodo's internal system for unifying profiles that belong to the same real user across devices, sessions, and wallets.
 
 **Merge is triggered when:**
 - The same `identify()` ID is called across two different sessions or devices.
@@ -65,7 +65,7 @@ When a merge occurs, event history, profile properties, and wallet links from bo
 
 ## auto-events
 
-Behavioral events the SDK sends **without** `Cryptique.track()`, using the same pipeline as custom events. They are **off unless** you set `auto-events="true"` on the script tag or call `Cryptique.enableAutoEvents()`.
+Behavioral events the SDK sends **without** `Trodo.track()`, using the same pipeline as custom events. They are **off unless** you set `auto-events="true"` on the script tag or call `Trodo.enableAutoEvents()`.
 
 **Examples of event names** (not exhaustive):
 
@@ -83,7 +83,7 @@ Behavioral events the SDK sends **without** `Cryptique.track()`, using the same 
 | `page_performance` | Performance summary after load |
 | `exit_intent` / `page_summary` | Exit and page-level aggregates |
 
-Disable names or paths via script attributes or `Cryptique.disableAutoEvent()`. See [Auto-Events](/data-in/auto-events).
+Disable names or paths via script attributes or `Trodo.disableAutoEvent()`. See [Auto-Events](/data-in/auto-events).
 
 | Tool | Equivalent |
 |---|---|
@@ -98,10 +98,10 @@ Disable names or paths via script attributes or `Cryptique.disableAutoEvent()`. 
 
 | SDK | Role |
 |---|---|
-| `Cryptique.set_group(key, id)` / `add_group` / `remove_group` | Membership |
-| `Cryptique.get_group(key, id).set({...})` | Group profile (like `people.set` for the group) |
+| `Trodo.set_group(key, id)` / `add_group` / `remove_group` | Membership |
+| `Trodo.get_group(key, id).set({...})` | Group profile (like `people.set` for the group) |
 
-There is no `Cryptique.group` namespace — APIs are on the root object. See [Groups](/data-in/sdk-reference/groups).
+There is no `Trodo.group` namespace — APIs are on the root object. See [Groups](/data-in/sdk-reference/groups).
 
 | Tool | Equivalent |
 |---|---|
@@ -112,7 +112,7 @@ There is no `Cryptique.group` namespace — APIs are on the root object. See [Gr
 
 ## wallet enrichment
 
-The automatic process by which Cryptique adds on-chain properties to a user profile once a wallet address is linked. No extra SDK calls are needed.
+The automatic process by which Trodo adds on-chain properties to a user profile once a wallet address is linked. No extra SDK calls are needed.
 
 **Properties added automatically:**
 
@@ -125,13 +125,13 @@ The automatic process by which Cryptique adds on-chain properties to a user prof
 | `dapps_used` | dApps the wallet has interacted with |
 | `is_whale` | Derived boolean based on net worth |
 
-Enrichment covers all 35+ chains supported by Cryptique. There is no equivalent concept in Mixpanel or Amplitude (off-chain-only tools).
+Enrichment covers all 35+ chains supported by Trodo. There is no equivalent concept in Mixpanel or Amplitude (off-chain-only tools).
 
 ---
 
 ## people methods
 
-The `Cryptique.people.*` namespace contains methods for setting and managing persistent user profile properties. Unlike event properties (which are attached to a single event), people properties are stored on the profile and persist across sessions.
+The `Trodo.people.*` namespace contains methods for setting and managing persistent user profile properties. Unlike event properties (which are attached to a single event), people properties are stored on the profile and persist across sessions.
 
 | Method | What it does |
 |---|---|
@@ -159,7 +159,7 @@ See the [People SDK Reference](/data-in/sdk-reference/people) for full usage.
 Records a revenue or payment event against a user profile. Useful for tracking subscription payments, NFT purchases, or any monetization event.
 
 ```javascript
-Cryptique.people.trackCharge(49.99, {
+Trodo.people.trackCharge(49.99, {
   plan: 'pro',
   currency: 'USD'
 });
@@ -176,7 +176,7 @@ Cryptique.people.trackCharge(49.99, {
 
 On-chain events generated from your indexed smart contracts. Unlike behavioral events (which you track via the SDK), transactions are captured automatically once you add a contract in **Settings → Contracts**.
 
-Transactions are linked to user profiles via the wallet address — if the wallet that executed a transaction is connected to a Cryptique profile, the transaction appears in that profile's timeline.
+Transactions are linked to user profiles via the wallet address — if the wallet that executed a transaction is connected to a Trodo profile, the transaction appears in that profile's timeline.
 
 See [Transactions](/data-in/transactions) for details.
 

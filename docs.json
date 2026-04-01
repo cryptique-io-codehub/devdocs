@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Cryptique",
+  "name": "Trodo",
   "theme": "mint",
   "logo": {
     "dark": "/logo/dark.svg",
@@ -33,18 +33,18 @@
   ],
   "topbarCtaButton": {
     "name": "Dashboard",
-    "url": "https://app.cryptique.io"
+    "url": "https://app.trodo.ai"
   },
   "anchors": [
     {
       "name": "GitHub",
       "icon": "github",
-      "url": "https://github.com/aspect-dev/cryptique-sdk"
+      "url": "https://github.com/aspect-dev/trodo"
     },
     {
       "name": "Community",
       "icon": "discord",
-      "url": "https://discord.gg/cryptique"
+      "url": "https://discord.gg/trodo"
     }
   ],
   "navigation": {
@@ -55,7 +55,7 @@
           {
             "group": "INTRO",
             "pages": [
-              "intro/what-is-cryptique",
+              "intro/what-is-trodo",
               "intro/what-to-track",
               "intro/quickstart"
             ]
@@ -170,7 +170,7 @@
   },
   "footerSocials": {
     "twitter": "https://twitter.com/cryptaboratoire",
-    "linkedin": "https://linkedin.com/company/cryptique"
+    "linkedin": "https://linkedin.com/company/trodo"
   },
   "feedback": {
     "thumbsRating": true,

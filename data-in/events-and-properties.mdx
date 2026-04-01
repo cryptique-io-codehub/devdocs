@@ -1,11 +1,11 @@
 ---
 title: "Events & Properties"
-description: "Understanding events and their properties in Cryptique"
+description: "Understanding events and their properties in Trodo"
 ---
 
 ## Overview
 
-Events are the foundation of analytics in Cryptique. Every user action—from page views to transactions—is captured as an event with associated properties.
+Events are the foundation of analytics in Trodo. Every user action—from page views to transactions—is captured as an event with associated properties.
 
 ## Event Structure
 
@@ -39,7 +39,7 @@ Every event has this structure:
 
 ### Auto-Events
 
-Captured automatically **only when** `auto-events="true"` (or `Cryptique.enableAutoEvents()`). Examples of implemented names:
+Captured automatically **only when** `auto-events="true"` (or `Trodo.enableAutoEvents()`). Examples of implemented names:
 
 | Event | Trigger (summary) |
 |-------|-------------------|
@@ -67,7 +67,7 @@ Custom properties on each event may also include [group](/data-in/sdk-reference/
 Tracked via SDK:
 
 ```javascript
-Cryptique.track('swap_completed', {
+Trodo.track('swap_completed', {
   input_token: 'ETH',
   output_token: 'USDC',
   amount: 1.5
@@ -104,7 +104,7 @@ Auto-captured on every event:
   <Tab title="Identifiers">
     | Property | Description |
     |----------|-------------|
-    | `team_id` | Your Cryptique team |
+    | `team_id` | Your Trodo team |
     | `session_id` | Current session |
     | `distinct_id` | User identifier |
     | `website_id` | Site identifier |
@@ -170,7 +170,7 @@ Auto-captured on every event:
 Add your own properties to events:
 
 ```javascript
-Cryptique.track('purchase_completed', {
+Trodo.track('purchase_completed', {
   // Strings
   product_name: 'Premium NFT',
   category: 'art',
@@ -226,7 +226,7 @@ Auto event payloads vary by `event_name`. Examples:
 }
 ```
 
-Wallet lifecycle is not emitted as a built-in auto-event; track it explicitly with `Cryptique.walletAddress()` and `Cryptique.track('wallet_connected', { ... })` if needed.
+Wallet lifecycle is not emitted as a built-in auto-event; track it explicitly with `Trodo.walletAddress()` and `Trodo.track('wallet_connected', { ... })` if needed.
 
 ## Property Data Types
 

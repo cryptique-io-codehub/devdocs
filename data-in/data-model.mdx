@@ -1,11 +1,11 @@
 ---
 title: "Data Model"
-description: "Understanding Cryptique's unified data model for Web3 analytics"
+description: "Understanding Trodo's unified data model for Web3 analytics"
 ---
 
 ## Overview
 
-Cryptique's data model is designed to solve the unique challenges of Web3 analytics by unifying three types of data into cohesive user profiles:
+Trodo's data model is designed to solve the unique challenges of Web3 analytics by unifying three types of data into cohesive user profiles:
 
 ```mermaid
 flowchart LR
@@ -39,7 +39,7 @@ Events are discrete actions that users take. They form the foundation of behavio
 
 **Event Types**:
 - **Auto-events**: Captured when enabled (`page_view`, `element_click`, `page_scroll`, `page_summary`, etc.) — see [Auto-Events](/data-in/auto-events)
-- **Custom events**: Tracked via `Cryptique.track()`
+- **Custom events**: Tracked via `Trodo.track()`
 - **Transaction events**: Generated from indexed smart contracts
 
 See [Events & Properties](/data-in/events-and-properties) for details.
@@ -83,7 +83,7 @@ See [User Profiles](/data-in/user-profiles) for details.
 
 ### Groups
 
-Users can belong to **groups** (companies, workspaces, teams) under a string **group key** and one or more **group IDs**. Membership is updated with `Cryptique.set_group` / `add_group` / `remove_group`. Properties on the group itself (not the person) are updated via `Cryptique.get_group(key, id).set(...)`. Group fields are merged into event `custom_properties` when events are sent. See [Groups](/data-in/sdk-reference/groups).
+Users can belong to **groups** (companies, workspaces, teams) under a string **group key** and one or more **group IDs**. Membership is updated with `Trodo.set_group` / `add_group` / `remove_group`. Properties on the group itself (not the person) are updated via `Trodo.get_group(key, id).set(...)`. Group fields are merged into event `custom_properties` when events are sent. See [Groups](/data-in/sdk-reference/groups).
 
 ### Transactions
 
@@ -110,7 +110,7 @@ See [Transactions](/data-in/transactions) for details.
 
 ## Data Linking
 
-The power of Cryptique is in automatically linking these data types:
+The power of Trodo is in automatically linking these data types:
 
 ### distinct_id ↔ wallet_address
 
@@ -121,7 +121,7 @@ When a user connects their wallet:
 distinct_id: "anon_xyz789"
 
 // User connects wallet
-Cryptique.walletAddress("0x1234...");
+Trodo.walletAddress("0x1234...");
 
 // Profile now linked
 {
@@ -150,8 +150,8 @@ flowchart TB
 Users can connect multiple wallets:
 
 ```javascript
-Cryptique.walletAddress("0x1234..."); // First wallet
-Cryptique.walletAddress("0xabcd..."); // Second wallet
+Trodo.walletAddress("0x1234..."); // First wallet
+Trodo.walletAddress("0xabcd..."); // Second wallet
 
 // Profile now has both
 {
@@ -163,7 +163,7 @@ Cryptique.walletAddress("0xabcd..."); // Second wallet
 
 ## Property Types
 
-Cryptique supports these property data types:
+Trodo supports these property data types:
 
 | Type | Example | Operators |
 |------|---------|-----------|
@@ -212,7 +212,7 @@ flowchart LR
         B[Blockchain Indexer]
     end
     subgraph Processing["Processing"]
-        C[Cryptique API]
+        C[Trodo API]
         D[CQ Intel Merge Engine]
     end
     subgraph Output["Output"]

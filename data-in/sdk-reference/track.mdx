@@ -3,12 +3,12 @@ title: Track Events
 description: "Send custom events to capture specific user actions"
 ---
 
-## Cryptique.track()
+## Trodo.track()
 
 Track custom events to capture specific user actions in your dApp. This is how you instrument Web3-specific interactions like swaps, stakes, mints, and more.
 
 ```javascript
-Cryptique.track(eventName, properties?, options?)
+Trodo.track(eventName, properties?, options?)
 ```
 
 ### Parameters
@@ -42,13 +42,13 @@ Cryptique.track(eventName, properties?, options?)
 ### Simple Event
 
 ```javascript
-Cryptique.track('Button Clicked');
+Trodo.track('Button Clicked');
 ```
 
 ### Event with Properties
 
 ```javascript
-Cryptique.track('Swap Completed', {
+Trodo.track('Swap Completed', {
   fromToken: 'ETH',
   toToken: 'USDC',
   amount: 1.5,
@@ -65,7 +65,7 @@ Cryptique.track('Swap Completed', {
   <Tab title="DeFi">
     ```javascript
     // Swap
-    Cryptique.track('Swap Completed', {
+    Trodo.track('Swap Completed', {
       fromToken: 'ETH',
       toToken: 'USDC',
       fromAmount: 1.5,
@@ -76,7 +76,7 @@ Cryptique.track('Swap Completed', {
     });
 
     // Stake
-    Cryptique.track('Stake Initiated', {
+    Trodo.track('Stake Initiated', {
       token: 'ETH',
       amount: 32,
       protocol: 'Lido',
@@ -84,7 +84,7 @@ Cryptique.track('Swap Completed', {
     });
 
     // Liquidity
-    Cryptique.track('Liquidity Added', {
+    Trodo.track('Liquidity Added', {
       pool: 'ETH-USDC',
       token0Amount: 1,
       token1Amount: 1850,
@@ -93,7 +93,7 @@ Cryptique.track('Swap Completed', {
     });
 
     // Borrow
-    Cryptique.track('Borrow Completed', {
+    Trodo.track('Borrow Completed', {
       collateral: 'ETH',
       collateralAmount: 5,
       borrowed: 'USDC',
@@ -107,7 +107,7 @@ Cryptique.track('Swap Completed', {
   <Tab title="NFT">
     ```javascript
     // Mint
-    Cryptique.track('NFT Minted', {
+    Trodo.track('NFT Minted', {
       collection: 'CoolCats',
       tokenId: 1234,
       price: 0.05,
@@ -116,7 +116,7 @@ Cryptique.track('Swap Completed', {
     });
 
     // Purchase
-    Cryptique.track('NFT Purchased', {
+    Trodo.track('NFT Purchased', {
       collection: 'BoredApes',
       tokenId: 5678,
       price: 45.5,
@@ -126,7 +126,7 @@ Cryptique.track('Swap Completed', {
     });
 
     // List
-    Cryptique.track('NFT Listed', {
+    Trodo.track('NFT Listed', {
       collection: 'Azuki',
       tokenId: 9012,
       listPrice: 12.5,
@@ -140,7 +140,7 @@ Cryptique.track('Swap Completed', {
   <Tab title="Gaming">
     ```javascript
     // Game Start
-    Cryptique.track('Game Started', {
+    Trodo.track('Game Started', {
       gameMode: 'battle',
       characterId: 'warrior_001',
       level: 15,
@@ -149,7 +149,7 @@ Cryptique.track('Swap Completed', {
     });
 
     // Item Purchase
-    Cryptique.track('Item Purchased', {
+    Trodo.track('Item Purchased', {
       itemId: 'sword_legendary',
       itemType: 'weapon',
       price: 500,
@@ -158,7 +158,7 @@ Cryptique.track('Swap Completed', {
     });
 
     // Achievement
-    Cryptique.track('Achievement Unlocked', {
+    Trodo.track('Achievement Unlocked', {
       achievementId: 'first_win',
       achievementName: 'Victory Royale',
       rewardType: 'token',
@@ -170,20 +170,20 @@ Cryptique.track('Swap Completed', {
   <Tab title="General">
     ```javascript
     // Wallet Connect
-    Cryptique.track('Wallet Connect Clicked', {
+    Trodo.track('Wallet Connect Clicked', {
       walletType: 'MetaMask',
       page: '/swap'
     });
 
     // Feature Usage
-    Cryptique.track('Feature Used', {
+    Trodo.track('Feature Used', {
       featureName: 'Advanced Charts',
       featureCategory: 'trading',
       userTier: 'pro'
     });
 
     // Error
-    Cryptique.track('Transaction Error', {
+    Trodo.track('Transaction Error', {
       errorType: 'insufficient_gas',
       errorMessage: 'Not enough ETH for gas',
       attemptedAction: 'swap',
@@ -191,7 +191,7 @@ Cryptique.track('Swap Completed', {
     });
 
     // Conversion
-    Cryptique.track('Signup Completed', {
+    Trodo.track('Signup Completed', {
       source: 'twitter',
       campaign: 'launch_2025',
       referrer: '0xabc...def'
@@ -208,28 +208,28 @@ Cryptique.track('Swap Completed', {
 
 ```javascript
 // Action-oriented, descriptive names
-Cryptique.track('Swap Completed');
-Cryptique.track('NFT Minted');
-Cryptique.track('Stake Initiated');
-Cryptique.track('Wallet Connected');
+Trodo.track('Swap Completed');
+Trodo.track('NFT Minted');
+Trodo.track('Stake Initiated');
+Trodo.track('Wallet Connected');
 
 // Consistent casing
-Cryptique.track('Profile Updated');  // Title Case
-Cryptique.track('profile_updated');  // or snake_case
+Trodo.track('Profile Updated');  // Title Case
+Trodo.track('profile_updated');  // or snake_case
 ```
 
 ### Don't ❌
 
 ```javascript
 // Vague names
-Cryptique.track('click');
-Cryptique.track('event');
-Cryptique.track('action');
+Trodo.track('click');
+Trodo.track('event');
+Trodo.track('action');
 
 // Inconsistent casing
-Cryptique.track('swapCompleted');  // camelCase
-Cryptique.track('SWAP_COMPLETED'); // SCREAMING_CASE
-Cryptique.track('swap completed'); // lowercase with spaces
+Trodo.track('swapCompleted');  // camelCase
+Trodo.track('SWAP_COMPLETED'); // SCREAMING_CASE
+Trodo.track('swap completed'); // lowercase with spaces
 ```
 
 ---
@@ -240,7 +240,7 @@ Cryptique.track('swap completed'); // lowercase with spaces
 
 ```javascript
 // Good - provides actionable context
-Cryptique.track('Swap Completed', {
+Trodo.track('Swap Completed', {
   fromToken: 'ETH',
   toToken: 'USDC',
   amount: 1.5,
@@ -250,7 +250,7 @@ Cryptique.track('Swap Completed', {
 });
 
 // Bad - too vague
-Cryptique.track('Swap Completed', {
+Trodo.track('Swap Completed', {
   data: 'some swap',
   value: 1.5
 });
@@ -291,32 +291,32 @@ Track each step of your conversion funnel to identify drop-offs:
 
 ```javascript
 // Step 1: User views swap page
-Cryptique.track('Swap Page Viewed');
+Trodo.track('Swap Page Viewed');
 
 // Step 2: User selects tokens
-Cryptique.track('Tokens Selected', {
+Trodo.track('Tokens Selected', {
   fromToken: 'ETH',
   toToken: 'USDC'
 });
 
 // Step 3: User enters amount
-Cryptique.track('Amount Entered', {
+Trodo.track('Amount Entered', {
   fromToken: 'ETH',
   amount: 1.5
 });
 
 // Step 4: User clicks swap
-Cryptique.track('Swap Initiated', {
+Trodo.track('Swap Initiated', {
   fromToken: 'ETH',
   toToken: 'USDC',
   amount: 1.5
 });
 
 // Step 5: User confirms in wallet
-Cryptique.track('Wallet Confirmation Requested');
+Trodo.track('Wallet Confirmation Requested');
 
 // Step 6: Transaction succeeds
-Cryptique.track('Swap Completed', {
+Trodo.track('Swap Completed', {
   fromToken: 'ETH',
   toToken: 'USDC',
   amount: 1.5,
@@ -333,9 +333,9 @@ Track errors to identify friction points:
 ```javascript
 try {
   await executeSwap();
-  Cryptique.track('Swap Completed', { success: true });
+  Trodo.track('Swap Completed', { success: true });
 } catch (error) {
-  Cryptique.track('Swap Failed', {
+  Trodo.track('Swap Failed', {
     success: false,
     errorCode: error.code,
     errorMessage: error.message,
@@ -358,7 +358,7 @@ interface SwapEvent {
   txHash?: string;
 }
 
-Cryptique.track<SwapEvent>('Swap Completed', {
+Trodo.track<SwapEvent>('Swap Completed', {
   fromToken: 'ETH',
   toToken: 'USDC',
   amount: 1.5,

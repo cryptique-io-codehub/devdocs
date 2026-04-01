@@ -5,10 +5,10 @@ description: "Latest updates and releases"
 
 ## Overview
 
-Stay up to date with Cryptique releases, new features, and improvements.
+Stay up to date with Trodo releases, new features, and improvements.
 
 <Info>
-  Subscribe to our changelog to get notified of new releases. Email [hello@cryptique.io](mailto:hello@cryptique.io) to join the mailing list.
+  Subscribe to our changelog to get notified of new releases. Email [hello@trodo.ai](mailto:hello@trodo.ai) to join the mailing list.
 </Info>
 
 ---
@@ -39,7 +39,7 @@ Stay up to date with Cryptique releases, new features, and improvements.
 - **Removed events**: `input_change` and `copy` replaced by richer, lower-noise alternatives.
 - **Standard Element Data Object**: shared `element_data` sub-object across all interaction events with tag, id, class, type, text, category, and viewport position; extended with media/image fields for relevant click types.
 - **Per-event throttle/debounce**: `page_scroll` 250ms debounce, `text_selection` 300ms debounce + 1s cooldown, `media_play`/`media_pause` 2s per-element throttle, `element_view` fires once per element per load.
-- **JS Runtime API**: `Cryptique.disableAutoEvent()`, `Cryptique.enableAutoEvent()`, `Cryptique.setAutoEventsDisabledEvents()`, `Cryptique.getAutoEventsConfig()`.
+- **JS Runtime API**: `Trodo.disableAutoEvent()`, `Trodo.enableAutoEvent()`, `Trodo.setAutoEventsDisabledEvents()`, `Trodo.getAutoEventsConfig()`.
 - **Storage**: event payloads written to `auto_event_data` JSONB column; element fields extracted to dedicated indexed columns; `event_category` derived server-side.
 - **Transport**: normal events use `fetch` with `keepalive: true`; unload events use `navigator.sendBeacon`.
 
@@ -505,14 +505,14 @@ Stay up to date with Cryptique releases, new features, and improvements.
 
 Have feature requests or found a bug? Let us know:
 
-- **Email**: [hello@cryptique.io](mailto:hello@cryptique.io)
+- **Email**: [hello@trodo.ai](mailto:hello@trodo.ai)
 - **Support**: [Live Chat](https://tawk.to/chat/697c9c380c73c21c37c52292/1jg7c4fos)
 
 ---
 
 <CardGroup cols={2}>
   <Card title="Get Started" icon="rocket" href="/intro/quickstart">
-    Start using Cryptique
+    Start using Trodo
   </Card>
   <Card title="SDK Reference" icon="code" href="/data-in/sdk-reference/track">
     View all methods

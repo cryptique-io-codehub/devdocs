@@ -1,6 +1,6 @@
 ---
 title: "User Profile Data Model"
-description: "How Cryptique structures, builds, and enriches user profiles"
+description: "How Trodo structures, builds, and enriches user profiles"
 ---
 
 <Info>
@@ -9,7 +9,7 @@ description: "How Cryptique structures, builds, and enriches user profiles"
 
 ## Overview
 
-A user profile in Cryptique is the unified record for a single person. It aggregates three streams of data: off-chain behavioral events, connected wallet addresses, and on-chain transactions. Every profile is keyed on a `distinct_id`.
+A user profile in Trodo is the unified record for a single person. It aggregates three streams of data: off-chain behavioral events, connected wallet addresses, and on-chain transactions. Every profile is keyed on a `distinct_id`.
 
 ## Profile Structure
 
@@ -56,11 +56,11 @@ A user profile in Cryptique is the unified record for a single person. It aggreg
 
 ### Step 1 — Anonymous profile
 
-When a user first visits your site, Cryptique creates an anonymous profile with a generated `distinct_id` (e.g. `anon_abc123`). This profile immediately starts accumulating behavioral events.
+When a user first visits your site, Trodo creates an anonymous profile with a generated `distinct_id` (e.g. `anon_abc123`). This profile immediately starts accumulating behavioral events.
 
 ### Step 2 — Identity resolution
 
-When you call `Cryptique.identify('your_user_id')`, the anonymous profile is merged into (or converted to) an identified profile keyed on your ID. See the [Identify SDK Reference](/data-in/sdk-reference/identify) for full merge behavior.
+When you call `Trodo.identify('your_user_id')`, the anonymous profile is merged into (or converted to) an identified profile keyed on your ID. See the [Identify SDK Reference](/data-in/sdk-reference/identify) for full merge behavior.
 
 ### Step 3 — Property enrichment
 
@@ -70,7 +70,7 @@ Profile properties are added from these sources:
 |---|---|
 | `identify()` | Sets the `distinct_id` |
 | `people.set/increment/append` | Sets custom properties via SDK |
-| `Cryptique.walletAddress()` | Links a wallet address to the profile |
+| `Trodo.walletAddress()` | Links a wallet address to the profile |
 | Wallet enrichment (automatic) | Adds on-chain properties once a wallet is linked |
 | `identify()` response | Can restore **group memberships** server-side (see [Groups](/data-in/sdk-reference/groups)) |
 
@@ -78,7 +78,7 @@ Profile properties are added from these sources:
 
 ## Wallet Enrichment
 
-Once a wallet address is linked to a profile, Cryptique automatically queries the blockchain and adds the following properties:
+Once a wallet address is linked to a profile, Trodo automatically queries the blockchain and adds the following properties:
 
 | Property | Description |
 |---|---|
@@ -121,7 +121,7 @@ Find any profile by:
 |---|---|---|
 | Scope | User-level | Single event |
 | Persistence | Stored on profile, mutable | Immutable, stored with event |
-| How to set | `people.set()`, `people.increment()`, etc. | Second argument to `Cryptique.track()` |
+| How to set | `people.set()`, `people.increment()`, etc. | Second argument to `Trodo.track()` |
 | Use case | Who the user is | What happened in this event |
 
 ## Privacy

@@ -1,6 +1,6 @@
 ---
 title: "Quickstart"
-description: "Get Cryptique running on your site in 5 minutes"
+description: "Get Trodo running on your site in 5 minutes"
 ---
 
 ## Overview
@@ -9,18 +9,18 @@ This guide will get you tracking user behavior and wallet connections in about 5
 
 - ✅ Automatic page, click, scroll, and form signals (when `auto-events="true"`)
 - ✅ Session tracking via the SDK session model
-- ✅ Wallet linking with `Cryptique.walletAddress()` (and optional custom events)
+- ✅ Wallet linking with `Trodo.walletAddress()` (and optional custom events)
 - ✅ Data flowing to your dashboard
 
 ## Prerequisites
 
-- A Cryptique account ([sign up here](https://app.cryptique.io))
+- A Trodo account ([sign up here](https://app.trodo.ai))
 - Access to your website's HTML or build system
-- Your Site ID from the Cryptique dashboard
+- Your Site ID from the Trodo dashboard
 
 ## Step 1: Get Your Site ID
 
-1. Log in to [app.cryptique.io](https://app.cryptique.io)
+1. Log in to [app.trodo.ai](https://app.trodo.ai)
 2. Navigate to **Settings → Sites**
 3. Click **Add Site** or select an existing site
 4. Copy your **Site ID** (format: `your-domain-xx`)
@@ -36,7 +36,7 @@ Choose your installation method:
     ```html
     <script>
       var script = document.createElement('script');
-      script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+      script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
       script.setAttribute('site-id', 'YOUR_SITE_ID');
       script.setAttribute('auto-events', 'true');
       document.head.appendChild(script);
@@ -50,16 +50,16 @@ Choose your installation method:
     Install the package:
 
     ```bash
-    npm install cryptique-sdk
+    npm install trodo
     ```
 
     Initialize in your app:
 
     ```javascript
-    import Cryptique from 'cryptique-sdk';
+    import Trodo from 'trodo';
 
     // Initialize (async)
-    await Cryptique.init({
+    await Trodo.init({
       siteId: 'YOUR_SITE_ID',
       autoEvents: true
     });
@@ -80,8 +80,8 @@ Choose your installation method:
 
 1. Visit your website
 2. Open your browser's developer console (F12)
-3. Look for: `[Cryptique] Initialized successfully`
-4. Go to your Cryptique dashboard → **Live Events**
+3. Look for: `[Trodo] Initialized successfully`
+4. Go to your Trodo dashboard → **Live Events**
 5. You should see events appearing in real-time
 
 <Note>
@@ -94,7 +94,7 @@ Beyond auto-events, track specific actions that matter to your product:
 
 ```javascript
 // Track a custom event
-Cryptique.track('swap_initiated', {
+Trodo.track('swap_initiated', {
   input_token: 'ETH',
   output_token: 'USDC',
   amount: 1.5
@@ -107,15 +107,15 @@ When a user connects their wallet:
 
 ```javascript
 // After wallet connection (e.g., via wagmi, ethers, web3-react)
-Cryptique.walletAddress(walletAddress);
+Trodo.walletAddress(walletAddress);
 ```
 
-If you're using standard wallet libraries, Cryptique can auto-detect wallet connections. Enable with:
+If you're using standard wallet libraries, Trodo can auto-detect wallet connections. Enable with:
 
 ```html
 <script>
   var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
   script.setAttribute('site-id', 'YOUR_SITE_ID');
   script.setAttribute('auto-events', 'true');
   script.setAttribute('auto-wallet-detect', 'true');
@@ -128,10 +128,10 @@ If you're using standard wallet libraries, Cryptique can auto-detect wallet conn
 When a user logs in or you know their identity:
 
 ```javascript
-Cryptique.identify('user_12345');
+Trodo.identify('user_12345');
 
 // Set user properties
-Cryptique.people.set({
+Trodo.people.set({
   email: 'user@example.com',
   plan: 'pro',
   signup_date: '2024-01-15'
@@ -154,7 +154,7 @@ With `auto-events` enabled, the SDK sends many named auto events. Common ones:
 | `text_selection` / `copy_action` | Selection and copy signals |
 | `page_summary` | Aggregated engagement when the user leaves or hides the tab |
 
-See the full list in [Auto-Events](/data-in/auto-events). Wallet connect/disconnect are **not** built-in auto events — use `Cryptique.walletAddress()` and `Cryptique.track()` if you want them in the event stream.
+See the full list in [Auto-Events](/data-in/auto-events). Wallet connect/disconnect are **not** built-in auto events — use `Trodo.walletAddress()` and `Trodo.track()` if you want them in the event stream.
 
 ## Example: Complete Setup
 
@@ -166,10 +166,10 @@ Here's a complete example for a DeFi app:
 <head>
   <title>My DeFi App</title>
   
-  <!-- Cryptique Tracking -->
+  <!-- Trodo Tracking -->
   <script>
     var script = document.createElement('script');
-    script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+    script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
     script.setAttribute('site-id', 'mydefi-app-42');
     script.setAttribute('auto-events', 'true');
     document.head.appendChild(script);
@@ -181,7 +181,7 @@ Here's a complete example for a DeFi app:
   <script>
     // Track custom events when they happen
     function onSwapComplete(txHash, inputToken, outputToken, amount) {
-      Cryptique.track('swap_completed', {
+      Trodo.track('swap_completed', {
         transaction_hash: txHash,
         input_token: inputToken,
         output_token: outputToken,
@@ -195,8 +195,8 @@ Here's a complete example for a DeFi app:
         method: 'eth_requestAccounts' 
       });
       
-      Cryptique.walletAddress(accounts[0]);
-      Cryptique.track('wallet_connected', {
+      Trodo.walletAddress(accounts[0]);
+      Trodo.track('wallet_connected', {
         wallet_type: 'metamask',
         chain_id: await ethereum.request({ method: 'eth_chainId' })
       });
@@ -224,9 +224,9 @@ Here's a complete example for a DeFi app:
   </Accordion>
   
   <Accordion title="Wallet events not tracking">
-    1. Call `Cryptique.walletAddress(address)` after the wallet connects
+    1. Call `Trodo.walletAddress(address)` after the wallet connects
     2. Pass a valid address (0x…)
-    3. If you rely on a custom event (e.g. `wallet_connected`), call `Cryptique.track()` yourself — it is not emitted automatically
+    3. If you rely on a custom event (e.g. `wallet_connected`), call `Trodo.track()` yourself — it is not emitted automatically
   </Accordion>
 </AccordionGroup>
 

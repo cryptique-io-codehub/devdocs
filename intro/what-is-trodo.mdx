@@ -1,13 +1,13 @@
 ---
-title: "What is Cryptique?"
+title: "What is Trodo?"
 description: "Unified Web3 product analytics that bridges off-chain behavior with on-chain transactions"
 ---
 
 ## Overview
 
-Cryptique is a **unified analytics platform for Web3** that solves the fundamental attribution problem in blockchain applications: connecting anonymous wallet transactions with the user journeys that led to them.
+Trodo is a **unified analytics platform for Web3** that solves the fundamental attribution problem in blockchain applications: connecting anonymous wallet transactions with the user journeys that led to them.
 
-Traditional analytics tools track website behavior but stop at the wallet connection. Blockchain explorers show transaction data but have no context about user intent. Cryptique bridges this gap by creating **complete user profiles** that unify:
+Traditional analytics tools track website behavior but stop at the wallet connection. Blockchain explorers show transaction data but have no context about user intent. Trodo bridges this gap by creating **complete user profiles** that unify:
 
 - **Off-chain behavior**: Page views, clicks, form submissions, feature usage
 - **Wallet connections**: Which wallets users connect and when
@@ -15,7 +15,7 @@ Traditional analytics tools track website behavior but stop at the wallet connec
 
 <img
   src="/images/architecture.png"
-  alt="Cryptique Architecture"
+  alt="Trodo Architecture"
 />
 
 ## The Attribution Problem in Web3
@@ -26,7 +26,7 @@ In Web2, attribution is straightforward: you track a user from ad click to signu
 2. **Users have multiple wallets** — The same person might connect different wallets across sessions
 3. **On-chain and off-chain data live in silos** — Your web analytics and blockchain data never meet
 
-Cryptique solves this with a **CQ Intelligence** merge engine that automatically connects:
+Trodo solves this with a **CQ Intelligence** merge engine that automatically connects:
 
 ```
 Website Visit → Wallet Connection → On-chain Transaction
@@ -60,7 +60,7 @@ Add a single script to your website or dApp:
 ```html
 <script>
   var script = document.createElement('script');
-  script.src = 'https://cdn.cryptique.io/scripts/analytics/1.0.1/cryptique.script.min.js';  
+  script.src = 'https://cdn.trodo.ai/scripts/analytics/trodo.script.min.js';  
   script.setAttribute('site-id', 'your-site-id');
   document.head.appendChild(script);
 </script>
@@ -68,16 +68,16 @@ Add a single script to your website or dApp:
 
 ### 2. Automatic Event Capture
 
-Cryptique automatically tracks page views, sessions, clicks, scroll depth, and wallet connections—no additional code required.
+Trodo automatically tracks page views, sessions, clicks, scroll depth, and wallet connections—no additional code required.
 
 ### 3. Link Wallets to Users
 
-When a user connects their wallet, Cryptique automatically links that wallet address to their existing profile:
+When a user connects their wallet, Trodo automatically links that wallet address to their existing profile:
 
 ```javascript
 // Automatic wallet detection works out of the box
 // Or explicitly track wallet connections:
-Cryptique.walletAddress('0x1234...abcd');
+Trodo.walletAddress('0x1234...abcd');
 ```
 
 ### 4. Index Your Smart Contracts
@@ -118,7 +118,7 @@ Use Insights, Funnels, Retention, and Flows reports to understand the complete p
 
 ## Compared to Other Tools
 
-| Capability | Cryptique | Dune/Nansen | Mixpanel/Amplitude |
+| Capability | Trodo | Dune/Nansen | Mixpanel/Amplitude |
 |------------|-----------|-------------|-------------------|
 | Website analytics | ✅ | ❌ | ✅ |
 | Wallet connection tracking | ✅ | ❌ | ❌ |

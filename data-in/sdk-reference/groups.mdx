@@ -8,7 +8,7 @@ description: "Associate users with organizations, teams, or any entity — and t
 Groups let you model **B2B-style relationships**: companies, workspaces, teams, departments, or any entity your product has. You assign the **current user** to groups, track events in the context of a specific group, and optionally set **persistent properties on each group** (similar to [People](/data-in/sdk-reference/people), but scoped to that group entity).
 
 <Info>
-  Group APIs live on the root `Cryptique` object. Membership uses `set_group` / `add_group` / `remove_group`. Profile updates use `get_group(groupKey, groupId)` and call methods on the returned object.
+  Group APIs live on the root `Trodo` object. Membership uses `set_group` / `add_group` / `remove_group`. Profile updates use `get_group(groupKey, groupId)` and call methods on the returned object.
 </Info>
 
 ---
@@ -27,19 +27,19 @@ Groups let you model **B2B-style relationships**: companies, workspaces, teams, 
 
 ## How event attribution works
 
-Every event fired after group membership is set gets **stamped with the user's current group context**. This is how Cryptique knows which group's timeline an event belongs to.
+Every event fired after group membership is set gets **stamped with the user's current group context**. This is how Trodo knows which group's timeline an event belongs to.
 
 - `add_group` → adds a group to the user's membership list. All subsequent events are attributed to **all current memberships** for that key.
 - `set_group` → updates active context for that key in the SDK and ensures the provided group(s) are attached on the server. Events fired after the switch use the new context.
 - Only events fired **after** a group call are attributed to the updated context. No historical backfill is performed.
 
-This means the **group timeline** in Cryptique shows exactly the events that happened while a user was in that group — not all events by all current members.
+This means the **group timeline** in Trodo shows exactly the events that happened while a user was in that group — not all events by all current members.
 
 ---
 
 ## Group membership
 
-### `Cryptique.set_group(groupKey, groupId)`
+### `Trodo.set_group(groupKey, groupId)`
 
 Sets the active context for `groupKey` to one ID (or an array of IDs) in the SDK and ensures those groups are attached for the user on the server.
 
@@ -47,12 +47,12 @@ Use this when the user **switches** their active context (e.g. switching from on
 
 ```javascript
 // User switches to a different team — active context changes
-await Cryptique.set_group('active_team', 'team-b-id');
+await Trodo.set_group('active_team', 'team-b-id');
 ```
 
 ```javascript
 // Also accepts an array to set multiple IDs at once
-await Cryptique.set_group('team', ['engineering', 'design']);
+await Trodo.set_group('team', ['engineering', 'design']);
 ```
 
 <ParamField path="groupKey" type="string" required>
@@ -70,7 +70,7 @@ await Cryptique.set_group('team', ['engineering', 'design']);
 
 ---
 
-### `Cryptique.add_group(groupKey, groupId)`
+### `Trodo.add_group(groupKey, groupId)`
 
 **Adds** one group ID to the user's existing list for `groupKey` without removing others. Safe to call multiple times — calling with the same ID twice has no effect.
 
@@ -78,11 +78,11 @@ Use this when a user **joins** a group permanently (e.g. joining a team or organ
 
 ```javascript
 // User is a permanent member of this company
-await Cryptique.add_group('company', 'acme-inc');
+await Trodo.add_group('company', 'acme-inc');
 
 // User is also a member of this team — both are kept
-await Cryptique.add_group('team', 'engineering');
-await Cryptique.add_group('team', 'design');
+await Trodo.add_group('team', 'engineering');
+await Trodo.add_group('team', 'design');
 ```
 
 <ParamField path="groupKey" type="string" required>
@@ -100,12 +100,12 @@ await Cryptique.add_group('team', 'design');
 
 ---
 
-### `Cryptique.remove_group(groupKey, groupId)`
+### `Trodo.remove_group(groupKey, groupId)`
 
 Removes one specific group ID from the user's list for `groupKey`.
 
 ```javascript
-await Cryptique.remove_group('team', 'design');
+await Trodo.remove_group('team', 'design');
 ```
 
 If no IDs remain for that key after removal, the key is deleted from `localStorage`.
@@ -127,19 +127,19 @@ Most B2B apps have users who belong to multiple teams permanently but only work 
 
 ```javascript
 // On login — user joins their teams permanently
-await Cryptique.add_group('team', 'team-a-id');
-await Cryptique.add_group('team', 'team-b-id');
+await Trodo.add_group('team', 'team-a-id');
+await Trodo.add_group('team', 'team-b-id');
 
 // Set the currently active team (for event attribution)
-await Cryptique.set_group('active_team', 'team-a-id');
+await Trodo.set_group('active_team', 'team-a-id');
 
 // User switches to Team B
-await Cryptique.set_group('active_team', 'team-b-id');
+await Trodo.set_group('active_team', 'team-b-id');
 // → events fired from here are attributed to team-b only
 // → events fired earlier stay attributed to team-a
 ```
 
-**Result in Cryptique:**
+**Result in Trodo:**
 - The `team` group page for `team-a` shows the user as a **member** (permanent).
 - The `active_team` group page for `team-a` shows only **events fired while team-a was active**.
 - The `active_team` group page for `team-b` shows only **events fired while team-b was active**.
@@ -148,12 +148,12 @@ await Cryptique.set_group('active_team', 'team-b-id');
 
 ## Group profile (properties per group)
 
-### `Cryptique.get_group(groupKey, groupId)`
+### `Trodo.get_group(groupKey, groupId)`
 
 Returns a **synchronous** handle with profile methods. Each method sends a network request when called. This is for setting **properties on the group entity itself** — not for event attribution.
 
 ```javascript
-const team = Cryptique.get_group('team', 'team-a-id');
+const team = Trodo.get_group('team', 'team-a-id');
 
 await team.set({ name: 'Engineering', plan: 'enterprise', seat_count: 50 });
 await team.set_once({ created_at: '2024-01-01' });
@@ -195,10 +195,10 @@ See [Identify](/data-in/sdk-reference/identify) for when to call `identify()`.
 
 ```javascript
 // 1. Identify the user
-await Cryptique.identify(user.id);
+await Trodo.identify(user.id);
 
 // 2. Set user profile properties
-Cryptique.people.set({
+Trodo.people.set({
   email: user.email,
   name: user.name,
   plan: user.plan
@@ -206,14 +206,14 @@ Cryptique.people.set({
 
 // 3. Add permanent team memberships (all teams this user belongs to)
 for (const team of user.teams) {
-  await Cryptique.add_group('team', team.id);
+  await Trodo.add_group('team', team.id);
 }
 
 // 4. Set the active team context (drives event attribution)
-await Cryptique.set_group('active_team', user.currentTeamId);
+await Trodo.set_group('active_team', user.currentTeamId);
 
 // 5. Set properties on the active team's profile
-const activeTeam = Cryptique.get_group('active_team', user.currentTeamId);
+const activeTeam = Trodo.get_group('active_team', user.currentTeamId);
 await activeTeam.set({
   name: user.currentTeam.name,
   plan: user.currentTeam.plan,
@@ -221,10 +221,10 @@ await activeTeam.set({
 });
 
 // 6. Track events — these are attributed to the active team
-Cryptique.track('dashboard_opened', { section: 'overview' });
+Trodo.track('dashboard_opened', { section: 'overview' });
 
 // 7. When user switches team
-await Cryptique.set_group('active_team', newTeamId);
+await Trodo.set_group('active_team', newTeamId);
 // → all subsequent events attributed to newTeamId
 ```
 
@@ -235,9 +235,9 @@ await Cryptique.set_group('active_team', newTeamId);
 | | People | Groups |
 |---|--------|--------|
 | **What it describes** | The end user | An organization, team, or entity the user belongs to |
-| **Namespace** | `Cryptique.people.*` | `Cryptique.set_group` / `add_group` / `get_group` on root |
-| **Typical first step** | `Cryptique.identify(id)` | `Cryptique.add_group('team', id)` or `Cryptique.set_group(...)` |
-| **Profile updates** | `Cryptique.people.set({...})` | `Cryptique.get_group(key, id).set({...})` |
+| **Namespace** | `Trodo.people.*` | `Trodo.set_group` / `add_group` / `get_group` on root |
+| **Typical first step** | `Trodo.identify(id)` | `Trodo.add_group('team', id)` or `Trodo.set_group(...)` |
+| **Profile updates** | `Trodo.people.set({...})` | `Trodo.get_group(key, id).set({...})` |
 | **Membership** | Single user, always tied to `identify()` | One user can belong to many groups across many keys |
 
 ---

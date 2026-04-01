@@ -5,17 +5,17 @@ description: "Track wallet connections and addresses"
 
 ## Overview
 
-Cryptique provides specialized methods for tracking wallet connections in Web3 applications. The SDK automatically detects wallet connections via EIP-6963 and `window.ethereum`, but you can also manually trigger wallet tracking.
+Trodo provides specialized methods for tracking wallet connections in Web3 applications. The SDK automatically detects wallet connections via EIP-6963 and `window.ethereum`, but you can also manually trigger wallet tracking.
 
 <Info>
-  When a wallet connects, Cryptique automatically links the wallet address to the current session and user profile. This enables unified analytics across off-chain behavior and on-chain transactions.
+  When a wallet connects, Trodo automatically links the wallet address to the current session and user profile. This enables unified analytics across off-chain behavior and on-chain transactions.
 </Info>
 
 ---
 
 ## Automatic Wallet Detection
 
-Cryptique automatically detects:
+Trodo automatically detects:
 
 - **Wallet Connection**: When `window.ethereum` or EIP-6963 providers connect
 - **Account Changes**: When user switches accounts (`accountsChanged` event)
@@ -26,12 +26,12 @@ This data is captured in session data without any code required.
 
 ---
 
-## Cryptique.walletAddress()
+## Trodo.walletAddress()
 
 Associate a wallet address with the current user. Use this when you have the wallet address from your connection flow.
 
 ```javascript
-Cryptique.walletAddress(address)
+Trodo.walletAddress(address)
 ```
 
 <ParamField path="address" type="string" required>
@@ -55,19 +55,19 @@ When you call `walletAddress()`:
 ```javascript
 // After your own wallet connection logic
 const address = await connectWallet();
-Cryptique.walletAddress(address);
+Trodo.walletAddress(address);
 
 // With ethers.js
 const provider = new ethers.BrowserProvider(window.ethereum);
 const signer = await provider.getSigner();
 const address = await signer.getAddress();
-Cryptique.walletAddress(address);
+Trodo.walletAddress(address);
 
 // With wagmi
 const { address } = useAccount();
 useEffect(() => {
   if (address) {
-    Cryptique.walletAddress(address);
+    Trodo.walletAddress(address);
   }
 }, [address]);
 
@@ -75,7 +75,7 @@ useEffect(() => {
 const { address, isConnected } = useAccount();
 useEffect(() => {
   if (isConnected && address) {
-    Cryptique.walletAddress(address);
+    Trodo.walletAddress(address);
   }
 }, [isConnected, address]);
 ```
@@ -88,16 +88,16 @@ Users can connect multiple wallets. Each call to `walletAddress()` adds to the u
 
 ```javascript
 // User connects first wallet
-Cryptique.walletAddress('0x111...');
+Trodo.walletAddress('0x111...');
 
 // User connects second wallet  
-Cryptique.walletAddress('0x222...');
+Trodo.walletAddress('0x222...');
 
 // Both wallets are now linked to this user profile
 ```
 
 <Tip>
-  The user profile accumulates all connected wallets. You can see all associated wallets in the Cryptique dashboard under the user's profile.
+  The user profile accumulates all connected wallets. You can see all associated wallets in the Trodo dashboard under the user's profile.
 </Tip>
 
 ---
@@ -120,14 +120,14 @@ You can use wallet address as the user's identity:
 ```javascript
 // Option 1: Wallet as primary identity
 function handleWalletConnect(address) {
-  Cryptique.identify(address);
-  Cryptique.walletAddress(address);
+  Trodo.identify(address);
+  Trodo.walletAddress(address);
 }
 
 // Option 2: Separate user ID + wallet
 function handleWalletConnect(userId, walletAddress) {
-  Cryptique.identify(userId);
-  Cryptique.walletAddress(walletAddress);
+  Trodo.identify(userId);
+  Trodo.walletAddress(walletAddress);
 }
 ```
 
@@ -153,15 +153,15 @@ When a wallet is connected, these fields are captured in session data:
     ```jsx
     import { useAccount } from 'wagmi';
     import { useEffect } from 'react';
-    import Cryptique from 'cryptique-sdk';
+    import Trodo from 'trodo';
 
     function WalletTracker() {
       const { address, isConnected, connector } = useAccount();
       
       useEffect(() => {
         if (isConnected && address) {
-          Cryptique.walletAddress(address);
-          Cryptique.track('wallet_connected', {
+          Trodo.walletAddress(address);
+          Trodo.track('wallet_connected', {
             address: address,
             wallet_type: connector?.name
           });
@@ -186,7 +186,7 @@ When a wallet is connected, these fields are captured in session data:
   <Tab title="ethers.js">
     ```javascript
     import { ethers } from 'ethers';
-    import Cryptique from 'cryptique-sdk';
+    import Trodo from 'trodo';
 
     async function connectWallet() {
       if (!window.ethereum) {
@@ -201,9 +201,9 @@ When a wallet is connected, these fields are captured in session data:
       const address = await signer.getAddress();
       const network = await provider.getNetwork();
       
-      // Track with Cryptique
-      Cryptique.walletAddress(address);
-      Cryptique.track('wallet_connected', {
+      // Track with Trodo
+      Trodo.walletAddress(address);
+      Trodo.track('wallet_connected', {
         address: address,
         chain_id: Number(network.chainId)
       });
@@ -214,7 +214,7 @@ When a wallet is connected, these fields are captured in session data:
     // Listen for account changes
     window.ethereum?.on('accountsChanged', (accounts) => {
       if (accounts.length > 0) {
-        Cryptique.walletAddress(accounts[0]);
+        Trodo.walletAddress(accounts[0]);
       }
     });
     ```
@@ -223,7 +223,7 @@ When a wallet is connected, these fields are captured in session data:
   <Tab title="Web3Modal">
     ```javascript
     import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5';
-    import Cryptique from 'cryptique-sdk';
+    import Trodo from 'trodo';
 
     const modal = createWeb3Modal({
       ethersConfig: defaultConfig({ metadata }),
@@ -234,8 +234,8 @@ When a wallet is connected, these fields are captured in session data:
     // Subscribe to connection events
     modal.subscribeProvider(({ address, isConnected }) => {
       if (isConnected && address) {
-        Cryptique.walletAddress(address);
-        Cryptique.track('wallet_connected', { address });
+        Trodo.walletAddress(address);
+        Trodo.track('wallet_connected', { address });
       }
     });
     ```
@@ -251,9 +251,9 @@ When a wallet is connected, these fields are captured in session data:
 ```javascript
 // Track the connection as an event too
 function handleWalletConnect(address, chainId) {
-  Cryptique.walletAddress(address);
+  Trodo.walletAddress(address);
   
-  Cryptique.track('wallet_connected', {
+  Trodo.track('wallet_connected', {
     address: address,
     chain_id: chainId,
     connection_method: 'metamask'
@@ -266,7 +266,7 @@ function handleWalletConnect(address, chainId) {
 ```javascript
 // Track chain switches
 window.ethereum?.on('chainChanged', (chainId) => {
-  Cryptique.track('chain_switched', {
+  Trodo.track('chain_switched', {
     new_chain_id: parseInt(chainId, 16),
     chain_name: getChainName(chainId)
   });
@@ -278,7 +278,7 @@ window.ethereum?.on('chainChanged', (chainId) => {
 ```javascript
 // If user has multiple wallets, track the primary one
 function setPrimaryWallet(address) {
-  Cryptique.people.set({
+  Trodo.people.set({
     primary_wallet: address
   });
 }

@@ -5,7 +5,7 @@ description: "On-chain transaction data from your smart contracts"
 
 ## Overview
 
-Cryptique indexes transactions from your smart contracts and automatically links them to user profiles via wallet addresses. This creates complete attribution from first website visit to on-chain conversion.
+Trodo indexes transactions from your smart contracts and automatically links them to user profiles via wallet addresses. This creates complete attribution from first website visit to on-chain conversion.
 
 ## How It Works
 
@@ -15,7 +15,7 @@ flowchart LR
     B -->|Link via wallet_address| C[User Profile]
 ```
 
-1. **Index**: Cryptique monitors your contracts for new transactions
+1. **Index**: Trodo monitors your contracts for new transactions
 2. **Decode**: Transaction data is decoded into readable properties
 3. **Link**: Transactions are attributed to users via wallet_address
 
@@ -99,7 +99,7 @@ When a user connects their wallet, all transactions from that wallet are attribu
 
 ```
 User connects wallet:
-Cryptique.walletAddress('0x1234...');
+Trodo.walletAddress('0x1234...');
 
 Profile created:
 ├── distinct_id: "user_12345"
